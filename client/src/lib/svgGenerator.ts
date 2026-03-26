@@ -36,6 +36,12 @@ function escapeXml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+// Estima a largura do texto em SVG units baseado no número de caracteres e tamanho da fonte
+function estimateTextWidth(text: string, fontSize: number): number {
+  // Fator médio: cada caractere ocupa ~0.55 da altura da fonte
+  return Math.round(text.length * fontSize * 0.55);
+}
+
 export function generateBraceletSVG(order: BraceletOrder): string {
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
@@ -49,7 +55,6 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const H = 11300;
 
   // Escala exata: 100 SVG units = 1mm
-  // halfCm * 10 * 100 = largura exata em SVG units
   const sizeName = order.tamanhoLabel || order.tamanho;
   const halfCm = getHalfCmFromSize(sizeName);
   const rectW = getHalfWidthSvg(halfCm);
@@ -64,13 +69,26 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const frenteX = startX;
   const versoX = startX + rectW;
 
-  // Posições de texto centralizadas em cada retângulo
-  const frenteCenterX = frenteX + Math.round(rectW / 2);
-  const versoCenterX = versoX + Math.round(rectW / 2);
+  // Área útil: 15mm = 1500 SVG units menor de cada lado
+  const padding = 750; // 7.5mm de cada lado = 15mm total
+  const frenteUsableStart = frenteX + padding;
+  const frenteUsableEnd = frenteX + rectW - padding;
+  const versoUsableStart = versoX + padding;
+  const versoUsableEnd = versoX + rectW - padding;
+
+  // Texto centralizado na área útil
+  const frenteCenterX = Math.round((frenteUsableStart + frenteUsableEnd) / 2);
+  const versoCenterX = Math.round((versoUsableStart + versoUsableEnd) / 2);
 
   // Tamanho do símbolo proporcional à altura do retângulo
   const symbolSize = rectH - 100;
   const symbolY = 5267 + 50;
+  const fontSize = 423;
+
+  // Calcular posição do símbolo próximo ao texto
+  const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
+  const versoTextW = estimateTextWidth(order.textoVerso, fontSize);
+  const symbolGap = 100; // 1mm de gap entre símbolo e texto
 
   const parts: string[] = [];
 
@@ -101,45 +119,54 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "frente" label
   parts.push('<text x="10500" y="4900" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">frente</text>');
 
-  // Frente rectangle - com ID e sem lock
-  parts.push('<rect id="' + prefix + 'frente" x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Frente rectangle - sem stroke, sem lock
+  parts.push('<rect id="' + prefix + 'frente" x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Verso rectangle - com ID e sem lock
-  parts.push('<rect id="' + prefix + 'verso" x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Verso rectangle - sem stroke, sem lock
+  parts.push('<rect id="' + prefix + 'verso" x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Symbol on frente
+  // Symbol + text na frente: símbolo à esquerda do texto, ambos centralizados na área útil
   var hasSymbolFrente = !!order.simboloFrente;
-  if (order.simboloFrente) {
-    parts.push(getSymbolSvgTag(order.simboloFrente, frenteX + 50, symbolY, symbolSize));
+  if (hasSymbolFrente) {
+    // Conjunto símbolo+texto centralizado na área útil
+    var totalFrenteW = symbolSize + symbolGap + frenteTextW;
+    var frenteGroupStart = frenteCenterX - Math.round(totalFrenteW / 2);
+    var symbolFrenteX = frenteGroupStart;
+    var textFrenteX = frenteGroupStart + symbolSize + symbolGap + Math.round(frenteTextW / 2);
+    parts.push(getSymbolSvgTag(order.simboloFrente, symbolFrenteX, symbolY, symbolSize));
+    parts.push('<text x="' + textFrenteX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoFrente) + '</text>');
+  } else {
+    parts.push('<text x="' + frenteCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoFrente) + '</text>');
   }
 
-  // Frente text
-  var frenteTextX = hasSymbolFrente ? frenteCenterX + Math.round(symbolSize / 2) : frenteCenterX;
-  parts.push('<text x="' + frenteTextX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="423">' + escapeXml(order.textoFrente) + '</text>');
-
-  // Symbol on verso
+  // Symbol + text no verso: símbolo à esquerda do texto, ambos centralizados na área útil
   var hasSymbolVerso = !!order.simboloVerso;
-  if (order.simboloVerso) {
-    parts.push(getSymbolSvgTag(order.simboloVerso, versoX + 50, symbolY, symbolSize));
+  if (hasSymbolVerso) {
+    var totalVersoW = symbolSize + symbolGap + versoTextW;
+    var versoGroupStart = versoCenterX - Math.round(totalVersoW / 2);
+    var symbolVersoX = versoGroupStart;
+    var textVersoX = versoGroupStart + symbolSize + symbolGap + Math.round(versoTextW / 2);
+    parts.push(getSymbolSvgTag(order.simboloVerso, symbolVersoX, symbolY, symbolSize));
+    parts.push('<text x="' + textVersoX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoVerso) + '</text>');
+  } else {
+    parts.push('<text x="' + versoCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoVerso) + '</text>');
   }
-
-  // Verso text
-  var versoTextX = hasSymbolVerso ? versoCenterX + Math.round(symbolSize / 2) : versoCenterX;
-  parts.push('<text x="' + versoTextX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="423">' + escapeXml(order.textoVerso) + '</text>');
 
   // "dentro" label
   parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
 
-  // Inside rectangles - com IDs e sem lock
-  parts.push('<rect id="' + prefix + 'dentro1" x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
-  parts.push('<rect id="' + prefix + 'dentro2" x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Inside rectangles - sem stroke, sem lock
+  parts.push('<rect id="' + prefix + 'dentro1" x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
+  parts.push('<rect id="' + prefix + 'dentro2" x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Inside texts (Calibri)
+  // Inside texts (Calibri) - centralizados na área útil
+  var dentro1CenterX = Math.round((frenteX + padding + frenteX + rectW - padding) / 2);
+  var dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
   var insideFont = "Calibri, 'Segoe UI', sans-serif";
-  parts.push('<text x="' + frenteCenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro1) + '</text>');
-  parts.push('<text x="' + frenteCenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro1) + '</text>');
-  parts.push('<text x="' + versoCenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro2) + '</text>');
-  parts.push('<text x="' + versoCenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro2) + '</text>');
+  parts.push('<text x="' + dentro1CenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro1) + '</text>');
+  parts.push('<text x="' + dentro1CenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro1) + '</text>');
+  parts.push('<text x="' + dentro2CenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro2) + '</text>');
+  parts.push('<text x="' + dentro2CenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro2) + '</text>');
 
   // Footer bar
   parts.push('<rect x="0" y="10790" width="' + W + '" height="500" fill="#A9ABAE"/>');

@@ -20,7 +20,6 @@ function isBoldFont(fontName: string): boolean {
   return fontName === "Calibri Negrito";
 }
 
-// Renders a symbol inline as a nested <svg> with the correct viewBox and paths
 function SymbolInline({ symbol, x, y, size }: { symbol: BraceletSymbol; x: number; y: number; size: number }) {
   return (
     <svg x={x} y={y} width={size} height={size} viewBox={symbol.viewBox} preserveAspectRatio="xMidYMid meet">
@@ -29,6 +28,11 @@ function SymbolInline({ symbol, x, y, size }: { symbol: BraceletSymbol; x: numbe
       ))}
     </svg>
   );
+}
+
+// Estima a largura do texto em SVG units
+function estimateTextWidth(text: string, fontSize: number): number {
+  return Math.round(text.length * fontSize * 0.55);
 }
 
 export default function BraceletPreview({ order, compact = false }: BraceletPreviewProps) {
@@ -50,25 +54,55 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
   const rectW = getHalfWidthSvg(halfCm);
   const rectH = 1200;
 
-  // Prefixo para IDs dos objetos
   const prefix = getSizePrefixFromSize(sizeName);
 
-  // Centralizar os dois retângulos lado a lado no SVG
   const totalW = rectW * 2;
   const startX = Math.round((W - totalW) / 2);
   const frenteX = startX;
   const versoX = startX + rectW;
 
+  // Área útil: 15mm = 1500 SVG units total (750 de cada lado)
+  const padding = 750;
+  const frenteUsableStart = frenteX + padding;
+  const frenteUsableEnd = frenteX + rectW - padding;
+  const versoUsableStart = versoX + padding;
+  const versoUsableEnd = versoX + rectW - padding;
+
+  // Texto centralizado na área útil
+  const frenteCenterX = Math.round((frenteUsableStart + frenteUsableEnd) / 2);
+  const versoCenterX = Math.round((versoUsableStart + versoUsableEnd) / 2);
+
   const symbolFrente = BRACELET_SYMBOLS.find((s) => s.id === order.simboloFrente);
   const symbolVerso = BRACELET_SYMBOLS.find((s) => s.id === order.simboloVerso);
 
-  // Posições de texto centralizadas em cada retângulo
-  const frenteCenterX = frenteX + Math.round(rectW / 2);
-  const versoCenterX = versoX + Math.round(rectW / 2);
-
-  // Tamanho do símbolo proporcional à altura do retângulo
   const symbolSize = rectH - 100;
   const symbolY = 5267 + 50;
+  const fontSize = 423;
+  const symbolGap = 100;
+
+  // Calcular posições de símbolo+texto para frente
+  const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
+  const versoTextW = estimateTextWidth(order.textoVerso, fontSize);
+
+  let symbolFrenteX = 0, textFrenteX = frenteCenterX;
+  if (symbolFrente) {
+    const totalFrenteW = symbolSize + symbolGap + frenteTextW;
+    const frenteGroupStart = frenteCenterX - Math.round(totalFrenteW / 2);
+    symbolFrenteX = frenteGroupStart;
+    textFrenteX = frenteGroupStart + symbolSize + symbolGap + Math.round(frenteTextW / 2);
+  }
+
+  let symbolVersoX = 0, textVersoX = versoCenterX;
+  if (symbolVerso) {
+    const totalVersoW = symbolSize + symbolGap + versoTextW;
+    const versoGroupStart = versoCenterX - Math.round(totalVersoW / 2);
+    symbolVersoX = versoGroupStart;
+    textVersoX = versoGroupStart + symbolSize + symbolGap + Math.round(versoTextW / 2);
+  }
+
+  // Dentro: centralizado na área útil
+  const dentro1CenterX = Math.round((frenteX + padding + frenteX + rectW - padding) / 2);
+  const dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: compact ? "200px" : "400px" }}>
@@ -111,44 +145,40 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
         frente
       </text>
 
-      {/* Frente rectangle - com ID */}
-      <rect id={`${prefix}frente`} x={frenteX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Frente rectangle - sem stroke */}
+      <rect id={`${prefix}frente`} x={frenteX} y="5267" width={rectW} height={rectH} fill={braceletHex} />
 
-      {/* Verso rectangle - com ID */}
-      <rect id={`${prefix}verso`} x={versoX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Verso rectangle - sem stroke */}
+      <rect id={`${prefix}verso`} x={versoX} y="5267" width={rectW} height={rectH} fill={braceletHex} />
 
-      {/* Symbol on frente */}
+      {/* Symbol + text na frente */}
       {symbolFrente && (
-        <SymbolInline symbol={symbolFrente} x={frenteX + 50} y={symbolY} size={symbolSize} />
+        <SymbolInline symbol={symbolFrente} x={symbolFrenteX} y={symbolY} size={symbolSize} />
       )}
-
-      {/* Frente text */}
       <text
-        x={symbolFrente ? frenteCenterX + Math.round(symbolSize / 2) : frenteCenterX}
+        x={textFrenteX}
         y="5977"
         textAnchor="middle"
         fill={textColor}
         fontFamily={fontFrente}
         fontWeight={boldFrente ? "bold" : "normal"}
-        fontSize="423"
+        fontSize={fontSize}
       >
         {order.textoFrente}
       </text>
 
-      {/* Symbol on verso */}
+      {/* Symbol + text no verso */}
       {symbolVerso && (
-        <SymbolInline symbol={symbolVerso} x={versoX + 50} y={symbolY} size={symbolSize} />
+        <SymbolInline symbol={symbolVerso} x={symbolVersoX} y={symbolY} size={symbolSize} />
       )}
-
-      {/* Verso text */}
       <text
-        x={symbolVerso ? versoCenterX + Math.round(symbolSize / 2) : versoCenterX}
+        x={textVersoX}
         y="5977"
         textAnchor="middle"
         fill={textColor}
         fontFamily={fontVerso}
         fontWeight={boldVerso ? "bold" : "normal"}
-        fontSize="423"
+        fontSize={fontSize}
       >
         {order.textoVerso}
       </text>
@@ -158,23 +188,23 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
         dentro
       </text>
 
-      {/* Inside rectangle 1 - com ID */}
-      <rect id={`${prefix}dentro1`} x={frenteX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Inside rectangle 1 - sem stroke */}
+      <rect id={`${prefix}dentro1`} x={frenteX} y="7606" width={rectW} height={rectH} fill={braceletHex} />
 
-      {/* Inside rectangle 2 - com ID */}
-      <rect id={`${prefix}dentro2`} x={versoX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Inside rectangle 2 - sem stroke */}
+      <rect id={`${prefix}dentro2`} x={versoX} y="7606" width={rectW} height={rectH} fill={braceletHex} />
 
-      {/* Inside texts - always Calibri */}
-      <text x={frenteCenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      {/* Inside texts - centralizados na área útil */}
+      <text x={dentro1CenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
         {order.l1Dentro1}
       </text>
-      <text x={frenteCenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      <text x={dentro1CenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
         {order.l2Dentro1}
       </text>
-      <text x={versoCenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      <text x={dentro2CenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
         {order.l1Dentro2}
       </text>
-      <text x={versoCenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      <text x={dentro2CenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
         {order.l2Dentro2}
       </text>
 
