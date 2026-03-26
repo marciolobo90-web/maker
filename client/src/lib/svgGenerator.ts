@@ -8,14 +8,38 @@ import {
   getSizePrefixFromSize,
 } from "./constants";
 
-function getSymbolSvgTag(symbolId: string | undefined, x: number, y: number, size: number): string {
+// Renderiza símbolo usando <g transform> ao invés de <svg> aninhado
+// Isso evita que o CorelDRAW bloqueie os elementos
+function getSymbolGroupTag(symbolId: string | undefined, x: number, y: number, size: number): string {
   if (!symbolId) return "";
   const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
   if (!symbol) return "";
+
+  // Parsear viewBox: "minX minY width height"
+  const vb = symbol.viewBox.split(" ").map(Number);
+  const vbMinX = vb[0];
+  const vbMinY = vb[1];
+  const vbW = vb[2];
+  const vbH = vb[3];
+
+  // Calcular escala para caber no tamanho desejado
+  const scale = Math.min(size / vbW, size / vbH);
+
+  // Calcular offset para centralizar
+  const scaledW = vbW * scale;
+  const scaledH = vbH * scale;
+  const offsetX = x + (size - scaledW) / 2;
+  const offsetY = y + (size - scaledH) / 2;
+
+  // translate para posição final, compensando o viewBox original
+  const tx = offsetX - vbMinX * scale;
+  const ty = offsetY - vbMinY * scale;
+
   const pathTags = symbol.paths.map((p) =>
     '<path d="' + p.d + '" fill="' + p.fill + '" fill-rule="evenodd" clip-rule="evenodd"/>'
   ).join("\n");
-  return '<svg x="' + x + '" y="' + y + '" width="' + size + '" height="' + size + '" viewBox="' + symbol.viewBox + '" preserveAspectRatio="xMidYMid meet">\n' + pathTags + '\n</svg>';
+
+  return '<g transform="translate(' + tx.toFixed(2) + ',' + ty.toFixed(2) + ') scale(' + scale.toFixed(6) + ')">\n' + pathTags + '\n</g>';
 }
 
 function getFontFamily(fontName: string): string {
@@ -38,7 +62,6 @@ function escapeXml(str: string): string {
 
 // Estima a largura do texto em SVG units baseado no número de caracteres e tamanho da fonte
 function estimateTextWidth(text: string, fontSize: number): number {
-  // Fator médio: cada caractere ocupa ~0.55 da altura da fonte
   return Math.round(text.length * fontSize * 0.55);
 }
 
@@ -60,7 +83,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const rectW = getHalfWidthSvg(halfCm);
   const rectH = 1200;
 
-  // Prefixo para IDs dos objetos (ex: "12" para Bebê, "21" para GG adulto)
+  // Prefixo para IDs dos objetos
   const prefix = getSizePrefixFromSize(sizeName);
 
   // Centralizar os dois retângulos lado a lado no SVG
@@ -69,8 +92,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const frenteX = startX;
   const versoX = startX + rectW;
 
-  // Área útil: 15mm = 1500 SVG units menor de cada lado
-  const padding = 750; // 7.5mm de cada lado = 15mm total
+  // Área útil: 15mm = 1500 SVG units total (750 de cada lado)
+  const padding = 750;
   const frenteUsableStart = frenteX + padding;
   const frenteUsableEnd = frenteX + rectW - padding;
   const versoUsableStart = versoX + padding;
@@ -88,7 +111,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // Calcular posição do símbolo próximo ao texto
   const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
   const versoTextW = estimateTextWidth(order.textoVerso, fontSize);
-  const symbolGap = 100; // 1mm de gap entre símbolo e texto
+  const symbolGap = 100;
 
   const parts: string[] = [];
 
@@ -119,34 +142,33 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "frente" label
   parts.push('<text x="10500" y="4900" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">frente</text>');
 
-  // Frente rectangle - sem stroke, sem lock
+  // Frente rectangle
   parts.push('<rect id="' + prefix + 'frente" x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Verso rectangle - sem stroke, sem lock
+  // Verso rectangle
   parts.push('<rect id="' + prefix + 'verso" x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Symbol + text na frente: símbolo à esquerda do texto, ambos centralizados na área útil
+  // Symbol + text na frente
   var hasSymbolFrente = !!order.simboloFrente;
   if (hasSymbolFrente) {
-    // Conjunto símbolo+texto centralizado na área útil
     var totalFrenteW = symbolSize + symbolGap + frenteTextW;
     var frenteGroupStart = frenteCenterX - Math.round(totalFrenteW / 2);
     var symbolFrenteX = frenteGroupStart;
     var textFrenteX = frenteGroupStart + symbolSize + symbolGap + Math.round(frenteTextW / 2);
-    parts.push(getSymbolSvgTag(order.simboloFrente, symbolFrenteX, symbolY, symbolSize));
+    parts.push(getSymbolGroupTag(order.simboloFrente, symbolFrenteX, symbolY, symbolSize));
     parts.push('<text x="' + textFrenteX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoFrente) + '</text>');
   } else {
     parts.push('<text x="' + frenteCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoFrente) + '</text>');
   }
 
-  // Symbol + text no verso: símbolo à esquerda do texto, ambos centralizados na área útil
+  // Symbol + text no verso
   var hasSymbolVerso = !!order.simboloVerso;
   if (hasSymbolVerso) {
     var totalVersoW = symbolSize + symbolGap + versoTextW;
     var versoGroupStart = versoCenterX - Math.round(totalVersoW / 2);
     var symbolVersoX = versoGroupStart;
     var textVersoX = versoGroupStart + symbolSize + symbolGap + Math.round(versoTextW / 2);
-    parts.push(getSymbolSvgTag(order.simboloVerso, symbolVersoX, symbolY, symbolSize));
+    parts.push(getSymbolGroupTag(order.simboloVerso, symbolVersoX, symbolY, symbolSize));
     parts.push('<text x="' + textVersoX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoVerso) + '</text>');
   } else {
     parts.push('<text x="' + versoCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoVerso) + '</text>');
@@ -155,11 +177,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "dentro" label
   parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
 
-  // Inside rectangles - sem stroke, sem lock
+  // Inside rectangles
   parts.push('<rect id="' + prefix + 'dentro1" x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
   parts.push('<rect id="' + prefix + 'dentro2" x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
 
-  // Inside texts (Calibri) - centralizados na área útil
+  // Inside texts (Calibri)
   var dentro1CenterX = Math.round((frenteX + padding + frenteX + rectW - padding) / 2);
   var dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
   var insideFont = "Calibri, 'Segoe UI', sans-serif";
