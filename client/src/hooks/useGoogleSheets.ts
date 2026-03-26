@@ -72,7 +72,7 @@ function findSize(name: string): { tamanho: string; tamanhoLabel: string; tamanh
   const normalized = name.toUpperCase().trim();
   const found = BRACELET_SIZES.find((s) => s.name === normalized || s.label.toUpperCase().includes(normalized) || normalized.includes(s.cm));
   if (found) return { tamanho: found.name, tamanhoLabel: found.label, tamanhoCm: found.cm };
-  return { tamanho: "M", tamanhoLabel: "M adulto", tamanhoCm: "18" };
+  return { tamanho: "M adulto", tamanhoLabel: "M adulto", tamanhoCm: "18,5" };
 }
 
 export function useGoogleSheets() {
@@ -133,8 +133,8 @@ export function useGoogleSheets() {
           l2Dentro2: getCol(row, "L2_DENTRO2") || "",
           cor: colorInfo.cor,
           corTexto: getCol(row, "COR_TEXTO") || colorInfo.corTexto,
-          fonteFrente: getCol(row, "FONTE_FRENTE") || "Arial",
-          fonteVerso: getCol(row, "FONTE_VERSO") || "Arial",
+          fonteFrente: getCol(row, "FONTE_FRENTE") || "Bahnschrift",
+          fonteVerso: getCol(row, "FONTE_VERSO") || "Bahnschrift",
           tamanho: sizeInfo.tamanho,
           tamanhoLabel: sizeInfo.tamanhoLabel,
           tamanhoCm: sizeInfo.tamanhoCm,
@@ -190,8 +190,8 @@ export function useGoogleSheets() {
           l2Dentro2: getCol(row, "L2_DENTRO2") || "",
           cor: colorInfo.cor,
           corTexto: getCol(row, "COR_TEXTO") || colorInfo.corTexto,
-          fonteFrente: getCol(row, "FONTE_FRENTE") || "Arial",
-          fonteVerso: getCol(row, "FONTE_VERSO") || "Arial",
+          fonteFrente: getCol(row, "FONTE_FRENTE") || "Bahnschrift",
+          fonteVerso: getCol(row, "FONTE_VERSO") || "Bahnschrift",
           tamanho: sizeInfo.tamanho,
           tamanhoLabel: sizeInfo.tamanhoLabel,
           tamanhoCm: sizeInfo.tamanhoCm,

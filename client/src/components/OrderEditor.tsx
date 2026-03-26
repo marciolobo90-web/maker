@@ -165,9 +165,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               {BRACELET_SYMBOLS.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   <div className="flex items-center gap-2">
-                    <svg width="16" height="16" viewBox={s.viewBox} className="fill-current">
-                      <path d={s.svgPath} />
-                    </svg>
+                    <img src={s.svgUrl} alt={s.name} width="16" height="16" className="object-contain" />
                     {s.name}
                   </div>
                 </SelectItem>
@@ -188,9 +186,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               {BRACELET_SYMBOLS.map((s) => (
                 <SelectItem key={s.id} value={s.id}>
                   <div className="flex items-center gap-2">
-                    <svg width="16" height="16" viewBox={s.viewBox} className="fill-current">
-                      <path d={s.svgPath} />
-                    </svg>
+                    <img src={s.svgUrl} alt={s.name} width="16" height="16" className="object-contain" />
                     {s.name}
                   </div>
                 </SelectItem>

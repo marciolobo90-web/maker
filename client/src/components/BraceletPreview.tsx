@@ -13,30 +13,28 @@ function getBraceletColor(colorName: string) {
 
 function getFontFamily(fontName: string): string {
   const font = FRONT_BACK_FONTS.find((f) => f.name === fontName);
-  return font ? font.family : "Arial, Helvetica, sans-serif";
+  return font ? font.family : "Calibri, 'Segoe UI', sans-serif";
 }
 
-function SymbolIcon({ symbolId, x, y, size, color }: { symbolId?: string; x: number; y: number; size: number; color: string }) {
-  if (!symbolId) return null;
-  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
-  if (!symbol) return null;
-  return (
-    <g transform={`translate(${x}, ${y})`}>
-      <path d={symbol.svgPath} fill={color} transform={`scale(${size / 24})`} />
-    </g>
-  );
+function isBoldFont(fontName: string): boolean {
+  return fontName === "Calibri Negrito";
 }
 
 export default function BraceletPreview({ order, compact = false }: BraceletPreviewProps) {
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
   const textColor = order.corTexto || colorInfo.textColor;
-  const fontFrente = getFontFamily(order.fonteFrente || "Arial");
-  const fontVerso = getFontFamily(order.fonteVerso || "Arial");
+  const fontFrente = getFontFamily(order.fonteFrente || "Bahnschrift");
+  const fontVerso = getFontFamily(order.fonteVerso || "Bahnschrift");
+  const boldFrente = isBoldFont(order.fonteFrente);
+  const boldVerso = isBoldFont(order.fonteVerso);
   const insideFont = "Calibri, 'Segoe UI', sans-serif";
 
   const W = 21000;
   const H = compact ? 9200 : 11300;
+
+  const symbolFrente = BRACELET_SYMBOLS.find((s) => s.id === order.simboloFrente);
+  const symbolVerso = BRACELET_SYMBOLS.find((s) => s.id === order.simboloVerso);
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: compact ? "200px" : "400px" }}>
@@ -85,19 +83,53 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
       {/* Verso rectangle */}
       <rect x="10500" y="5267" width="8500" height="1200" fill={braceletHex} stroke="#999" strokeWidth="4" />
 
-      {/* Symbol on frente */}
-      <SymbolIcon symbolId={order.simboloFrente} x={2250} y={5517} size={20} color={textColor} />
+      {/* Symbol on frente - using <image> for complex SVGs */}
+      {symbolFrente && (
+        <image
+          href={symbolFrente.svgUrl}
+          x="2150"
+          y="5367"
+          width="1000"
+          height="1000"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      )}
 
       {/* Frente text */}
-      <text x="6250" y="5977" textAnchor="middle" fill={textColor} fontFamily={fontFrente} fontSize="423">
+      <text
+        x={symbolFrente ? "6750" : "6250"}
+        y="5977"
+        textAnchor="middle"
+        fill={textColor}
+        fontFamily={fontFrente}
+        fontWeight={boldFrente ? "bold" : "normal"}
+        fontSize="423"
+      >
         {order.textoFrente}
       </text>
 
       {/* Symbol on verso */}
-      <SymbolIcon symbolId={order.simboloVerso} x={10750} y={5517} size={20} color={textColor} />
+      {symbolVerso && (
+        <image
+          href={symbolVerso.svgUrl}
+          x="10650"
+          y="5367"
+          width="1000"
+          height="1000"
+          preserveAspectRatio="xMidYMid meet"
+        />
+      )}
 
       {/* Verso text */}
-      <text x="14750" y="5977" textAnchor="middle" fill={textColor} fontFamily={fontVerso} fontSize="423">
+      <text
+        x={symbolVerso ? "15250" : "14750"}
+        y="5977"
+        textAnchor="middle"
+        fill={textColor}
+        fontFamily={fontVerso}
+        fontWeight={boldVerso ? "bold" : "normal"}
+        fontSize="423"
+      >
         {order.textoVerso}
       </text>
 
@@ -112,7 +144,7 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
       {/* Inside rectangle 2 */}
       <rect x="10500" y="7606" width="8500" height="1200" fill={braceletHex} stroke="#999" strokeWidth="4" />
 
-      {/* Inside texts */}
+      {/* Inside texts - always Calibri */}
       <text x="6250" y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
         {order.l1Dentro1}
       </text>

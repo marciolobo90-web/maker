@@ -45,11 +45,11 @@ function createEmptyOrder(index: number): BraceletOrder {
     l2Dentro2: "",
     cor: "Preto",
     corTexto: "#FFFFFF",
-    fonteFrente: "Arial",
-    fonteVerso: "Arial",
-    tamanho: "M",
+    fonteFrente: "Bahnschrift",
+    fonteVerso: "Bahnschrift",
+    tamanho: "M adulto",
     tamanhoLabel: "M adulto",
-    tamanhoCm: "18",
+    tamanhoCm: "18,5",
     quantidade: 1,
   };
 }
@@ -304,10 +304,12 @@ export default function Home() {
                 {orders.map((order, i) => {
                   const colorInfo = BRACELET_COLORS.find((c) => c.name === order.cor);
                   return (
-                    <button
+                    <div
                       key={order.id}
+                      role="button"
+                      tabIndex={0}
                       onClick={() => { setSelectedIndex(i); setEditingIndex(null); }}
-                      className={`w-full text-left p-3 rounded-lg border transition-all duration-150 ${
+                      className={`w-full text-left p-3 rounded-lg border transition-all duration-150 cursor-pointer ${
                         i === selectedIndex
                           ? "border-primary bg-primary/10"
                           : "border-border bg-card hover:border-primary/30"
@@ -339,7 +341,7 @@ export default function Home() {
                           </button>
                         </div>
                       </div>
-                    </button>
+                    </div>
                   );
                 })}
               </div>
