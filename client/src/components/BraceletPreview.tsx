@@ -1,4 +1,4 @@
-import type { BraceletOrder } from "@/lib/constants";
+import type { BraceletOrder, BraceletSymbol } from "@/lib/constants";
 import { BRACELET_COLORS, BRACELET_SYMBOLS, FRONT_BACK_FONTS } from "@/lib/constants";
 
 interface BraceletPreviewProps {
@@ -18,6 +18,17 @@ function getFontFamily(fontName: string): string {
 
 function isBoldFont(fontName: string): boolean {
   return fontName === "Calibri Negrito";
+}
+
+// Renders a symbol inline as a nested <svg> with the correct viewBox and paths
+function SymbolInline({ symbol, x, y, size }: { symbol: BraceletSymbol; x: number; y: number; size: number }) {
+  return (
+    <svg x={x} y={y} width={size} height={size} viewBox={symbol.viewBox} preserveAspectRatio="xMidYMid meet">
+      {symbol.paths.map((p, i) => (
+        <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+      ))}
+    </svg>
+  );
 }
 
 export default function BraceletPreview({ order, compact = false }: BraceletPreviewProps) {
@@ -83,16 +94,9 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
       {/* Verso rectangle */}
       <rect x="10500" y="5267" width="8500" height="1200" fill={braceletHex} stroke="#999" strokeWidth="4" />
 
-      {/* Symbol on frente - using <image> for complex SVGs */}
+      {/* Symbol on frente */}
       {symbolFrente && (
-        <image
-          href={symbolFrente.svgUrl}
-          x="2150"
-          y="5367"
-          width="1000"
-          height="1000"
-          preserveAspectRatio="xMidYMid meet"
-        />
+        <SymbolInline symbol={symbolFrente} x={2150} y={5317} size={1100} />
       )}
 
       {/* Frente text */}
@@ -110,14 +114,7 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
 
       {/* Symbol on verso */}
       {symbolVerso && (
-        <image
-          href={symbolVerso.svgUrl}
-          x="10650"
-          y="5367"
-          width="1000"
-          height="1000"
-          preserveAspectRatio="xMidYMid meet"
-        />
+        <SymbolInline symbol={symbolVerso} x={10650} y={5317} size={1100} />
       )}
 
       {/* Verso text */}

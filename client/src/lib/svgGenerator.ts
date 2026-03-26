@@ -5,11 +5,14 @@ import {
   FRONT_BACK_FONTS,
 } from "./constants";
 
-function getSymbolImageTag(symbolId: string | undefined, x: number, y: number, size: number): string {
+function getSymbolSvgTag(symbolId: string | undefined, x: number, y: number, size: number): string {
   if (!symbolId) return "";
   const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
   if (!symbol) return "";
-  return '<image href="' + symbol.svgUrl + '" x="' + x + '" y="' + y + '" width="' + size + '" height="' + size + '" preserveAspectRatio="xMidYMid meet"/>';
+  const pathTags = symbol.paths.map((p) =>
+    '<path d="' + p.d + '" fill="' + p.fill + '" fill-rule="evenodd" clip-rule="evenodd"/>'
+  ).join("\n");
+  return '<svg x="' + x + '" y="' + y + '" width="' + size + '" height="' + size + '" viewBox="' + symbol.viewBox + '" preserveAspectRatio="xMidYMid meet">\n' + pathTags + '\n</svg>';
 }
 
 function getFontFamily(fontName: string): string {
@@ -80,7 +83,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // Symbol on frente
   var hasSymbolFrente = !!order.simboloFrente;
   if (order.simboloFrente) {
-    parts.push(getSymbolImageTag(order.simboloFrente, 2150, 5367, 1000));
+    parts.push(getSymbolSvgTag(order.simboloFrente, 2150, 5317, 1100));
   }
 
   // Frente text
@@ -90,7 +93,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // Symbol on verso
   var hasSymbolVerso = !!order.simboloVerso;
   if (order.simboloVerso) {
-    parts.push(getSymbolImageTag(order.simboloVerso, 10650, 5367, 1000));
+    parts.push(getSymbolSvgTag(order.simboloVerso, 10650, 5317, 1100));
   }
 
   // Verso text
