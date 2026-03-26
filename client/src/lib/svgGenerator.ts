@@ -3,6 +3,8 @@ import {
   BRACELET_SYMBOLS,
   BRACELET_COLORS,
   FRONT_BACK_FONTS,
+  getHalfCmFromSize,
+  getHalfWidthSvg,
 } from "./constants";
 
 function getSymbolSvgTag(symbolId: string | undefined, x: number, y: number, size: number): string {
@@ -45,6 +47,25 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const W = 21000;
   const H = 11300;
 
+  // Calcular larguras proporcionais baseadas no tamanho real da pulseira
+  const halfCm = getHalfCmFromSize(order.tamanhoLabel || order.tamanho);
+  const rectW = getHalfWidthSvg(halfCm);
+  const rectH = 1200;
+
+  // Centralizar os dois retângulos lado a lado no SVG
+  const totalW = rectW * 2;
+  const startX = Math.round((W - totalW) / 2);
+  const frenteX = startX;
+  const versoX = startX + rectW;
+
+  // Posições de texto centralizadas em cada retângulo
+  const frenteCenterX = frenteX + Math.round(rectW / 2);
+  const versoCenterX = versoX + Math.round(rectW / 2);
+
+  // Tamanho do símbolo proporcional à altura do retângulo
+  const symbolSize = rectH - 100;
+  const symbolY = 5267 + 50;
+
   const parts: string[] = [];
 
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
@@ -74,45 +95,45 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "frente" label
   parts.push('<text x="10500" y="4900" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">frente</text>');
 
-  // Frente rectangle
-  parts.push('<rect x="2000" y="5267" width="8500" height="1200" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Frente rectangle (proporcional)
+  parts.push('<rect x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
-  // Verso rectangle
-  parts.push('<rect x="10500" y="5267" width="8500" height="1200" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Verso rectangle (proporcional)
+  parts.push('<rect x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
   // Symbol on frente
   var hasSymbolFrente = !!order.simboloFrente;
   if (order.simboloFrente) {
-    parts.push(getSymbolSvgTag(order.simboloFrente, 2150, 5317, 1100));
+    parts.push(getSymbolSvgTag(order.simboloFrente, frenteX + 50, symbolY, symbolSize));
   }
 
   // Frente text
-  var frenteTextX = hasSymbolFrente ? "6750" : "6250";
+  var frenteTextX = hasSymbolFrente ? frenteCenterX + Math.round(symbolSize / 2) : frenteCenterX;
   parts.push('<text x="' + frenteTextX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="423">' + escapeXml(order.textoFrente) + '</text>');
 
   // Symbol on verso
   var hasSymbolVerso = !!order.simboloVerso;
   if (order.simboloVerso) {
-    parts.push(getSymbolSvgTag(order.simboloVerso, 10650, 5317, 1100));
+    parts.push(getSymbolSvgTag(order.simboloVerso, versoX + 50, symbolY, symbolSize));
   }
 
   // Verso text
-  var versoTextX = hasSymbolVerso ? "15250" : "14750";
+  var versoTextX = hasSymbolVerso ? versoCenterX + Math.round(symbolSize / 2) : versoCenterX;
   parts.push('<text x="' + versoTextX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="423">' + escapeXml(order.textoVerso) + '</text>');
 
   // "dentro" label
   parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
 
-  // Inside rectangles
-  parts.push('<rect x="2000" y="7606" width="8500" height="1200" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
-  parts.push('<rect x="10500" y="7606" width="8500" height="1200" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Inside rectangles (proporcionais)
+  parts.push('<rect x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  parts.push('<rect x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
   // Inside texts (Calibri)
   var insideFont = "Calibri, 'Segoe UI', sans-serif";
-  parts.push('<text x="6250" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro1) + '</text>');
-  parts.push('<text x="6250" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro1) + '</text>');
-  parts.push('<text x="14750" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro2) + '</text>');
-  parts.push('<text x="14750" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro2) + '</text>');
+  parts.push('<text x="' + frenteCenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro1) + '</text>');
+  parts.push('<text x="' + frenteCenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro1) + '</text>');
+  parts.push('<text x="' + versoCenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro2) + '</text>');
+  parts.push('<text x="' + versoCenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro2) + '</text>');
 
   // Footer bar
   parts.push('<rect x="0" y="10790" width="' + W + '" height="500" fill="#A9ABAE"/>');

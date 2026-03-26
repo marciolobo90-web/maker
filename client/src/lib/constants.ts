@@ -55,20 +55,37 @@ export interface BraceletSize {
   name: string;
   cm: string;
   label: string;
+  halfCm: number; // largura de cada metade (frente/verso) em cm
 }
 
+// Medidas reais: cada pulseira tem frente+verso e dentro1+dentro2
+// A largura de cada metade (halfCm) é usada para dimensionar os retângulos proporcionalmente
 export const BRACELET_SIZES: BraceletSize[] = [
-  { name: "Bebê", cm: "11,5", label: "Bebê" },
-  { name: "PP infantil", cm: "12,5", label: "PP infantil" },
-  { name: "P infantil", cm: "13,5", label: "P infantil" },
-  { name: "M infantil", cm: "14,5", label: "M infantil" },
-  { name: "G infantil", cm: "15,5", label: "G infantil" },
-  { name: "PP adulto", cm: "16,5", label: "PP adulto" },
-  { name: "P adulto", cm: "17,5", label: "P adulto" },
-  { name: "M adulto", cm: "18,5", label: "M adulto" },
-  { name: "G adulto", cm: "19,5", label: "G adulto" },
-  { name: "GG adulto", cm: "20,5", label: "GG adulto" },
+  { name: "Bebê", cm: "11,5", label: "Bebê", halfCm: 6 },
+  { name: "PP infantil", cm: "12,5", label: "PP infantil", halfCm: 6.5 },
+  { name: "P infantil", cm: "13,5", label: "P infantil", halfCm: 7 },
+  { name: "M infantil", cm: "14,5", label: "M infantil", halfCm: 7.5 },
+  { name: "G infantil", cm: "15,5", label: "G infantil", halfCm: 8 },
+  { name: "PP adulto", cm: "16,5", label: "PP adulto", halfCm: 8.5 },
+  { name: "P adulto", cm: "17,5", label: "P adulto", halfCm: 9 },
+  { name: "M adulto", cm: "18,5", label: "M adulto", halfCm: 9.5 },
+  { name: "G adulto", cm: "19,5", label: "G adulto", halfCm: 10 },
+  { name: "GG adulto", cm: "20,5", label: "GG adulto", halfCm: 10.5 },
 ];
+
+// Converte o tamanho da pulseira em largura SVG proporcional para cada metade
+// O maior tamanho (GG adulto = 10,5cm por metade) ocupa a largura máxima disponível
+// Os outros são proporcionais
+export const MAX_HALF_CM = 10.5;
+export const MAX_RECT_WIDTH = 8500; // largura SVG máxima de cada retângulo
+export function getHalfWidthSvg(halfCm: number): number {
+  return Math.round((halfCm / MAX_HALF_CM) * MAX_RECT_WIDTH);
+}
+
+export function getHalfCmFromSize(sizeName: string): number {
+  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
+  return size ? size.halfCm : 9.5; // default M adulto
+}
 
 export interface BraceletOrder {
   id: string;
