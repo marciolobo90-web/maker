@@ -5,6 +5,7 @@ import {
   FRONT_BACK_FONTS,
   getHalfCmFromSize,
   getHalfWidthSvg,
+  getSizePrefixFromSize,
 } from "./constants";
 
 function getSymbolSvgTag(symbolId: string | undefined, x: number, y: number, size: number): string {
@@ -47,10 +48,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const W = 21000;
   const H = 11300;
 
-  // Calcular larguras proporcionais baseadas no tamanho real da pulseira
-  const halfCm = getHalfCmFromSize(order.tamanhoLabel || order.tamanho);
+  // Escala exata: 100 SVG units = 1mm
+  // halfCm * 10 * 100 = largura exata em SVG units
+  const sizeName = order.tamanhoLabel || order.tamanho;
+  const halfCm = getHalfCmFromSize(sizeName);
   const rectW = getHalfWidthSvg(halfCm);
   const rectH = 1200;
+
+  // Prefixo para IDs dos objetos (ex: "12" para Bebê, "21" para GG adulto)
+  const prefix = getSizePrefixFromSize(sizeName);
 
   // Centralizar os dois retângulos lado a lado no SVG
   const totalW = rectW * 2;
@@ -70,7 +76,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   parts.push('<?xml version="1.0" encoding="UTF-8"?>');
   parts.push('<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" width="210mm" height="113mm" version="1.1"');
-  parts.push('  viewBox="0 0 ' + W + ' ' + H + '" text-anchor="middle"');
+  parts.push('  viewBox="0 0 ' + W + ' ' + H + '"');
   parts.push('  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision">');
 
   // Background
@@ -95,11 +101,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "frente" label
   parts.push('<text x="10500" y="4900" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">frente</text>');
 
-  // Frente rectangle (proporcional)
-  parts.push('<rect x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Frente rectangle - com ID e sem lock
+  parts.push('<rect id="' + prefix + 'frente" x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
-  // Verso rectangle (proporcional)
-  parts.push('<rect x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Verso rectangle - com ID e sem lock
+  parts.push('<rect id="' + prefix + 'verso" x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
   // Symbol on frente
   var hasSymbolFrente = !!order.simboloFrente;
@@ -124,9 +130,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // "dentro" label
   parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
 
-  // Inside rectangles (proporcionais)
-  parts.push('<rect x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
-  parts.push('<rect x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  // Inside rectangles - com IDs e sem lock
+  parts.push('<rect id="' + prefix + 'dentro1" x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
+  parts.push('<rect id="' + prefix + 'dentro2" x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '" stroke="#333" stroke-width="2"/>');
 
   // Inside texts (Calibri)
   var insideFont = "Calibri, 'Segoe UI', sans-serif";

@@ -1,5 +1,5 @@
 import type { BraceletOrder, BraceletSymbol } from "@/lib/constants";
-import { BRACELET_COLORS, BRACELET_SYMBOLS, FRONT_BACK_FONTS, getHalfCmFromSize, getHalfWidthSvg } from "@/lib/constants";
+import { BRACELET_COLORS, BRACELET_SYMBOLS, FRONT_BACK_FONTS, getHalfCmFromSize, getHalfWidthSvg, getSizePrefixFromSize } from "@/lib/constants";
 
 interface BraceletPreviewProps {
   order: BraceletOrder;
@@ -44,17 +44,20 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
   const W = 21000;
   const H = compact ? 9200 : 11300;
 
-  // Calcular larguras proporcionais baseadas no tamanho real da pulseira
-  const halfCm = getHalfCmFromSize(order.tamanhoLabel || order.tamanho);
+  // Escala exata: 100 SVG units = 1mm
+  const sizeName = order.tamanhoLabel || order.tamanho;
+  const halfCm = getHalfCmFromSize(sizeName);
   const rectW = getHalfWidthSvg(halfCm);
   const rectH = 1200;
 
+  // Prefixo para IDs dos objetos
+  const prefix = getSizePrefixFromSize(sizeName);
+
   // Centralizar os dois retângulos lado a lado no SVG
   const totalW = rectW * 2;
-  const gap = 0; // sem gap entre frente e verso (é uma pulseira contínua)
-  const startX = Math.round((W - totalW - gap) / 2);
+  const startX = Math.round((W - totalW) / 2);
   const frenteX = startX;
-  const versoX = startX + rectW + gap;
+  const versoX = startX + rectW;
 
   const symbolFrente = BRACELET_SYMBOLS.find((s) => s.id === order.simboloFrente);
   const symbolVerso = BRACELET_SYMBOLS.find((s) => s.id === order.simboloVerso);
@@ -108,11 +111,11 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
         frente
       </text>
 
-      {/* Frente rectangle */}
-      <rect x={frenteX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Frente rectangle - com ID */}
+      <rect id={`${prefix}frente`} x={frenteX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
 
-      {/* Verso rectangle */}
-      <rect x={versoX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Verso rectangle - com ID */}
+      <rect id={`${prefix}verso`} x={versoX} y="5267" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
 
       {/* Symbol on frente */}
       {symbolFrente && (
@@ -155,11 +158,11 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
         dentro
       </text>
 
-      {/* Inside rectangle 1 */}
-      <rect x={frenteX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Inside rectangle 1 - com ID */}
+      <rect id={`${prefix}dentro1`} x={frenteX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
 
-      {/* Inside rectangle 2 */}
-      <rect x={versoX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
+      {/* Inside rectangle 2 - com ID */}
+      <rect id={`${prefix}dentro2`} x={versoX} y="7606" width={rectW} height={rectH} fill={braceletHex} stroke="#999" strokeWidth="4" />
 
       {/* Inside texts - always Calibri */}
       <text x={frenteCenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">

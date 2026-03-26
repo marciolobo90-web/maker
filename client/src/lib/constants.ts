@@ -56,35 +56,43 @@ export interface BraceletSize {
   cm: string;
   label: string;
   halfCm: number; // largura de cada metade (frente/verso) em cm
+  sizePrefix: string; // prefixo para IDs dos objetos no SVG (ex: "12" para Bebê)
 }
 
 // Medidas reais: cada pulseira tem frente+verso e dentro1+dentro2
-// A largura de cada metade (halfCm) é usada para dimensionar os retângulos proporcionalmente
+// A largura de cada metade (halfCm) é usada para dimensionar os retângulos
+// Escala SVG: viewBox 21000 = 210mm, portanto 100 SVG units = 1mm
 export const BRACELET_SIZES: BraceletSize[] = [
-  { name: "Bebê", cm: "11,5", label: "Bebê", halfCm: 6 },
-  { name: "PP infantil", cm: "12,5", label: "PP infantil", halfCm: 6.5 },
-  { name: "P infantil", cm: "13,5", label: "P infantil", halfCm: 7 },
-  { name: "M infantil", cm: "14,5", label: "M infantil", halfCm: 7.5 },
-  { name: "G infantil", cm: "15,5", label: "G infantil", halfCm: 8 },
-  { name: "PP adulto", cm: "16,5", label: "PP adulto", halfCm: 8.5 },
-  { name: "P adulto", cm: "17,5", label: "P adulto", halfCm: 9 },
-  { name: "M adulto", cm: "18,5", label: "M adulto", halfCm: 9.5 },
-  { name: "G adulto", cm: "19,5", label: "G adulto", halfCm: 10 },
-  { name: "GG adulto", cm: "20,5", label: "GG adulto", halfCm: 10.5 },
+  { name: "Bebê", cm: "11,5", label: "Bebê", halfCm: 6, sizePrefix: "12" },
+  { name: "PP infantil", cm: "12,5", label: "PP infantil", halfCm: 6.5, sizePrefix: "13" },
+  { name: "P infantil", cm: "13,5", label: "P infantil", halfCm: 7, sizePrefix: "14" },
+  { name: "M infantil", cm: "14,5", label: "M infantil", halfCm: 7.5, sizePrefix: "15" },
+  { name: "G infantil", cm: "15,5", label: "G infantil", halfCm: 8, sizePrefix: "16" },
+  { name: "PP adulto", cm: "16,5", label: "PP adulto", halfCm: 8.5, sizePrefix: "17" },
+  { name: "P adulto", cm: "17,5", label: "P adulto", halfCm: 9, sizePrefix: "18" },
+  { name: "M adulto", cm: "18,5", label: "M adulto", halfCm: 9.5, sizePrefix: "19" },
+  { name: "G adulto", cm: "19,5", label: "G adulto", halfCm: 10, sizePrefix: "20" },
+  { name: "GG adulto", cm: "20,5", label: "GG adulto", halfCm: 10.5, sizePrefix: "21" },
 ];
 
-// Converte o tamanho da pulseira em largura SVG proporcional para cada metade
-// O maior tamanho (GG adulto = 10,5cm por metade) ocupa a largura máxima disponível
-// Os outros são proporcionais
-export const MAX_HALF_CM = 10.5;
-export const MAX_RECT_WIDTH = 8500; // largura SVG máxima de cada retângulo
+// Escala: 100 SVG units = 1mm (viewBox 21000 = 210mm)
+// Converte halfCm em largura SVG exata em mm
 export function getHalfWidthSvg(halfCm: number): number {
-  return Math.round((halfCm / MAX_HALF_CM) * MAX_RECT_WIDTH);
+  // halfCm * 10 = mm, * 100 = SVG units
+  return Math.round(halfCm * 10 * 100);
+}
+
+export function getSizeInfo(sizeName: string): BraceletSize {
+  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
+  return size || BRACELET_SIZES[7]; // default M adulto
 }
 
 export function getHalfCmFromSize(sizeName: string): number {
-  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
-  return size ? size.halfCm : 9.5; // default M adulto
+  return getSizeInfo(sizeName).halfCm;
+}
+
+export function getSizePrefixFromSize(sizeName: string): string {
+  return getSizeInfo(sizeName).sizePrefix;
 }
 
 export interface BraceletOrder {
