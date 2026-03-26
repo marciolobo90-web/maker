@@ -9,29 +9,22 @@ import {
 } from "./constants";
 
 // Renderiza símbolo usando <g transform> ao invés de <svg> aninhado
-// Isso evita que o CorelDRAW bloqueie os elementos
 function getSymbolGroupTag(symbolId: string | undefined, x: number, y: number, size: number): string {
   if (!symbolId) return "";
   const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
   if (!symbol) return "";
 
-  // Parsear viewBox: "minX minY width height"
   const vb = symbol.viewBox.split(" ").map(Number);
   const vbMinX = vb[0];
   const vbMinY = vb[1];
   const vbW = vb[2];
   const vbH = vb[3];
 
-  // Calcular escala para caber no tamanho desejado
   const scale = Math.min(size / vbW, size / vbH);
-
-  // Calcular offset para centralizar
   const scaledW = vbW * scale;
   const scaledH = vbH * scale;
   const offsetX = x + (size - scaledW) / 2;
   const offsetY = y + (size - scaledH) / 2;
-
-  // translate para posição final, compensando o viewBox original
   const tx = offsetX - vbMinX * scale;
   const ty = offsetY - vbMinY * scale;
 
@@ -60,7 +53,6 @@ function escapeXml(str: string): string {
   return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
-// Estima a largura do texto em SVG units baseado no número de caracteres e tamanho da fonte
 function estimateTextWidth(text: string, fontSize: number): number {
   return Math.round(text.length * fontSize * 0.55);
 }
@@ -77,38 +69,31 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   const W = 21000;
   const H = 11300;
 
-  // Escala exata: 100 SVG units = 1mm
   const sizeName = order.tamanhoLabel || order.tamanho;
   const halfCm = getHalfCmFromSize(sizeName);
   const rectW = getHalfWidthSvg(halfCm);
   const rectH = 1200;
 
-  // Prefixo para IDs dos objetos
   const prefix = getSizePrefixFromSize(sizeName);
 
-  // Centralizar os dois retângulos lado a lado no SVG
   const totalW = rectW * 2;
   const startX = Math.round((W - totalW) / 2);
   const frenteX = startX;
   const versoX = startX + rectW;
 
-  // Área útil: 15mm = 1500 SVG units total (750 de cada lado)
   const padding = 750;
   const frenteUsableStart = frenteX + padding;
   const frenteUsableEnd = frenteX + rectW - padding;
   const versoUsableStart = versoX + padding;
   const versoUsableEnd = versoX + rectW - padding;
 
-  // Texto centralizado na área útil
   const frenteCenterX = Math.round((frenteUsableStart + frenteUsableEnd) / 2);
   const versoCenterX = Math.round((versoUsableStart + versoUsableEnd) / 2);
 
-  // Tamanho do símbolo proporcional à altura do retângulo
   const symbolSize = rectH - 100;
   const symbolY = 5267 + 50;
   const fontSize = 423;
 
-  // Calcular posição do símbolo próximo ao texto
   const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
   const versoTextW = estimateTextWidth(order.textoVerso, fontSize);
   const symbolGap = 100;
@@ -120,35 +105,36 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   parts.push('  viewBox="0 0 ' + W + ' ' + H + '"');
   parts.push('  style="shape-rendering:geometricPrecision;text-rendering:geometricPrecision">');
 
-  // Background
+  // ===== CAMADA 1: Background e estrutura do gabarito =====
   parts.push('<rect x="0" y="0" width="' + W + '" height="' + H + '" fill="#FFFFFF"/>');
-
-  // Header bar
   parts.push('<rect x="0" y="0" width="' + W + '" height="1200" fill="#606062"/>');
-
-  // Sub-header bar
   parts.push('<rect x="0" y="1200" width="' + W + '" height="1500" fill="#D2D3D5"/>');
+  parts.push('<rect x="0" y="10790" width="' + W + '" height="500" fill="#A9ABAE"/>');
 
-  // Client name
+  // ===== CAMADA 2: Textos do cabeçalho =====
   parts.push('<text x="800" y="850" text-anchor="start" fill="#FEFEFE" font-family="Calibri, sans-serif" font-weight="bold" font-size="768">Cliente: ' + escapeXml(order.nomeCliente) + '</text>');
-
-  // Product description
   parts.push('<text x="800" y="2050" text-anchor="start" fill="#373435" font-family="Arial, sans-serif" font-size="567">Pulseira de silicone: Personalização baixo relevo + aplicação de tinta</text>');
 
-  // Size info
   var sizeText = order.tamanhoCm + " cm (" + order.tamanhoLabel + ")";
   parts.push('<text x="10500" y="3854" text-anchor="middle" fill="#373435" font-family="Arial, sans-serif" font-weight="bold" font-size="529">' + escapeXml(sizeText) + '</text>');
 
-  // "frente" label
+  // Quantity badge
+  if (order.quantidade && order.quantidade > 1) {
+    parts.push('<rect x="18500" y="300" width="2200" height="600" rx="100" fill="#F58634"/>');
+    parts.push('<text x="19600" y="720" text-anchor="middle" fill="#FFFFFF" font-family="Calibri, sans-serif" font-weight="bold" font-size="400">Qtd: ' + order.quantidade + '</text>');
+  }
+
+  // ===== CAMADA 3: Labels =====
   parts.push('<text x="10500" y="4900" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">frente</text>');
+  parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
 
-  // Frente rectangle
-  parts.push('<rect id="' + prefix + 'frente" x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
+  // ===== CAMADA 4: Retângulos das pulseiras (cada um agrupado com seu conteúdo) =====
+  // Agrupando cada retângulo com seus textos/símbolos em <g> para que o CorelDRAW
+  // não interprete o retângulo como container bloqueado
 
-  // Verso rectangle
-  parts.push('<rect id="' + prefix + 'verso" x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
-
-  // Symbol + text na frente
+  // --- FRENTE ---
+  parts.push('<g id="' + prefix + 'frente">');
+  parts.push('<rect x="' + frenteX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
   var hasSymbolFrente = !!order.simboloFrente;
   if (hasSymbolFrente) {
     var totalFrenteW = symbolSize + symbolGap + frenteTextW;
@@ -160,8 +146,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   } else {
     parts.push('<text x="' + frenteCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontFrente) + '" font-weight="' + (boldFrente ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoFrente) + '</text>');
   }
+  parts.push('</g>');
 
-  // Symbol + text no verso
+  // --- VERSO ---
+  parts.push('<g id="' + prefix + 'verso">');
+  parts.push('<rect x="' + versoX + '" y="5267" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
   var hasSymbolVerso = !!order.simboloVerso;
   if (hasSymbolVerso) {
     var totalVersoW = symbolSize + symbolGap + versoTextW;
@@ -173,31 +162,24 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   } else {
     parts.push('<text x="' + versoCenterX + '" y="5977" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + escapeXml(fontVerso) + '" font-weight="' + (boldVerso ? "bold" : "normal") + '" font-size="' + fontSize + '">' + escapeXml(order.textoVerso) + '</text>');
   }
+  parts.push('</g>');
 
-  // "dentro" label
-  parts.push('<text x="10500" y="7350" text-anchor="middle" fill="#727376" font-family="Arial, sans-serif" font-style="italic" font-size="503">dentro</text>');
-
-  // Inside rectangles
-  parts.push('<rect id="' + prefix + 'dentro1" x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
-  parts.push('<rect id="' + prefix + 'dentro2" x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
-
-  // Inside texts (Calibri)
+  // --- DENTRO1 ---
   var dentro1CenterX = Math.round((frenteX + padding + frenteX + rectW - padding) / 2);
-  var dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
   var insideFont = "Calibri, 'Segoe UI', sans-serif";
+  parts.push('<g id="' + prefix + 'dentro1">');
+  parts.push('<rect x="' + frenteX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
   parts.push('<text x="' + dentro1CenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro1) + '</text>');
   parts.push('<text x="' + dentro1CenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro1) + '</text>');
+  parts.push('</g>');
+
+  // --- DENTRO2 ---
+  var dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
+  parts.push('<g id="' + prefix + 'dentro2">');
+  parts.push('<rect x="' + versoX + '" y="7606" width="' + rectW + '" height="' + rectH + '" fill="' + braceletHex + '"/>');
   parts.push('<text x="' + dentro2CenterX + '" y="8076" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l1Dentro2) + '</text>');
   parts.push('<text x="' + dentro2CenterX + '" y="8486" text-anchor="middle" fill="' + textOnBracelet + '" font-family="' + insideFont + '" font-weight="bold" font-size="406">' + escapeXml(order.l2Dentro2) + '</text>');
-
-  // Footer bar
-  parts.push('<rect x="0" y="10790" width="' + W + '" height="500" fill="#A9ABAE"/>');
-
-  // Quantity badge
-  if (order.quantidade && order.quantidade > 1) {
-    parts.push('<rect x="18500" y="300" width="2200" height="600" rx="100" fill="#F58634"/>');
-    parts.push('<text x="19600" y="720" text-anchor="middle" fill="#FFFFFF" font-family="Calibri, sans-serif" font-weight="bold" font-size="400">Qtd: ' + order.quantidade + '</text>');
-  }
+  parts.push('</g>');
 
   parts.push('</svg>');
 
