@@ -1,5 +1,14 @@
 import type { BraceletOrder, BraceletSymbol } from "@/lib/constants";
-import { BRACELET_COLORS, BRACELET_SYMBOLS, FRONT_BACK_FONTS, getHalfCmFromSize, getHalfWidthSvg, getSizePrefixFromSize } from "@/lib/constants";
+import {
+  BRACELET_COLORS,
+  BRACELET_SYMBOLS,
+  FRONT_BACK_FONTS,
+  getHalfCmFromSize,
+  getHalfWidthSvg,
+  getSizePrefixFromSize,
+  getSymbolColor,
+  SYMBOL_MAX_SIZE,
+} from "@/lib/constants";
 
 interface BraceletPreviewProps {
   order: BraceletOrder;
@@ -8,7 +17,9 @@ interface BraceletPreviewProps {
 
 function getBraceletColor(colorName: string) {
   const color = BRACELET_COLORS.find((c) => c.name === colorName);
-  return color ? { hex: color.hex, textColor: color.textColor } : { hex: "#000000", textColor: "#FFFFFF" };
+  return color
+    ? { hex: color.hex, textColor: color.textColor }
+    : { hex: "#000000", textColor: "#FFFFFF" };
 }
 
 function getFontFamily(fontName: string): string {
@@ -20,27 +31,43 @@ function isBoldFont(fontName: string): boolean {
   return fontName === "Calibri Negrito";
 }
 
-// Renderiza símbolo usando <g transform> ao invés de <svg> aninhado
-// Isso evita que o CorelDRAW bloqueie os elementos
-function SymbolGroup({ symbol, x, y, size }: { symbol: BraceletSymbol; x: number; y: number; size: number }) {
-  const vb = symbol.viewBox.split(" ").map(Number);
-  const vbMinX = vb[0];
-  const vbMinY = vb[1];
-  const vbW = vb[2];
-  const vbH = vb[3];
+function SymbolGroup({
+  symbolId,
+  braceletColor,
+  x,
+  y,
+  size,
+}: {
+  symbolId: string;
+  braceletColor: string;
+  x: number;
+  y: number;
+  size: number;
+}) {
+  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
+  if (!symbol) return null;
 
-  const scale = Math.min(size / vbW, size / vbH);
-  const scaledW = vbW * scale;
-  const scaledH = vbH * scale;
-  const offsetX = x + (size - scaledW) / 2;
-  const offsetY = y + (size - scaledH) / 2;
-  const tx = offsetX - vbMinX * scale;
-  const ty = offsetY - vbMinY * scale;
+  const vb = symbol.viewBox.split(" ").map(Number);
+  const scale = Math.min(size / vb[2], size / vb[3]);
+  const scaledW = vb[2] * scale;
+  const scaledH = vb[3] * scale;
+  const tx = x + (size - scaledW) / 2 - vb[0] * scale;
+  const ty = y + (size - scaledH) / 2 - vb[1] * scale;
+
+  const overrideColor = getSymbolColor(symbolId, braceletColor);
 
   return (
-    <g transform={`translate(${tx.toFixed(2)},${ty.toFixed(2)}) scale(${scale.toFixed(6)})`}>
+    <g
+      transform={`translate(${tx.toFixed(2)},${ty.toFixed(2)}) scale(${scale.toFixed(6)})`}
+    >
       {symbol.paths.map((p, i) => (
-        <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+        <path
+          key={i}
+          d={p.d}
+          fill={overrideColor !== null ? overrideColor : p.fill}
+          fillRule="evenodd"
+          clipRule="evenodd"
+        />
       ))}
     </g>
   );
@@ -50,7 +77,10 @@ function estimateTextWidth(text: string, fontSize: number): number {
   return Math.round(text.length * fontSize * 0.55);
 }
 
-export default function BraceletPreview({ order, compact = false }: BraceletPreviewProps) {
+export default function BraceletPreview({
+  order,
+  compact = false,
+}: BraceletPreviewProps) {
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
   const textColor = order.corTexto || colorInfo.textColor;
@@ -75,85 +105,199 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
   const frenteX = startX;
   const versoX = startX + rectW;
 
-  const padding = 750;
-  const frenteUsableStart = frenteX + padding;
-  const frenteUsableEnd = frenteX + rectW - padding;
-  const versoUsableStart = versoX + padding;
-  const versoUsableEnd = versoX + rectW - padding;
+  const frenteCX = Math.round(frenteX + rectW / 2);
+  const versoCX = Math.round(versoX + rectW / 2);
 
-  const frenteCenterX = Math.round((frenteUsableStart + frenteUsableEnd) / 2);
-  const versoCenterX = Math.round((versoUsableStart + versoUsableEnd) / 2);
-
-  const symbolFrente = BRACELET_SYMBOLS.find((s) => s.id === order.simboloFrente);
-  const symbolVerso = BRACELET_SYMBOLS.find((s) => s.id === order.simboloVerso);
-
-  const symbolSize = rectH - 100;
-  const symbolY = 5267 + 50;
+  // Tamanho máximo do símbolo: 7.5mm = 750 SVG units
+  const symSz = SYMBOL_MAX_SIZE;
+  const frenteY = 5267;
+  const dentroY = 7606;
+  const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
   const fontSize = 423;
-  const symbolGap = 100;
+  const insideFontSize = 406;
+  const symGap = 100;
 
+  // ---- FRENTE: símbolo1 + texto + símbolo2 ----
+  const hasSym1 = !!order.simboloFrente;
+  const hasSym2 = !!order.simboloFrente2;
   const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
-  const versoTextW = estimateTextWidth(order.textoVerso, fontSize);
+  let totalFrenteW = frenteTextW;
+  if (hasSym1) totalFrenteW += symSz + symGap;
+  if (hasSym2) totalFrenteW += symGap + symSz;
+  const frenteGroupStart = frenteCX - Math.round(totalFrenteW / 2);
+  const sym1X = frenteGroupStart;
+  const textFrenteX =
+    frenteGroupStart +
+    (hasSym1 ? symSz + symGap : 0) +
+    Math.round(frenteTextW / 2);
+  const sym2X =
+    textFrenteX + Math.round(frenteTextW / 2) + symGap;
 
-  let symbolFrenteX = 0, textFrenteX = frenteCenterX;
-  if (symbolFrente) {
-    const totalFrenteW = symbolSize + symbolGap + frenteTextW;
-    const frenteGroupStart = frenteCenterX - Math.round(totalFrenteW / 2);
-    symbolFrenteX = frenteGroupStart;
-    textFrenteX = frenteGroupStart + symbolSize + symbolGap + Math.round(frenteTextW / 2);
+  // Frente text Y (sempre centralizado)
+  const frenteTextY = frenteY + Math.round(rectH * 0.58);
+
+  // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
+  const versoL1 = order.textoVerso || "";
+  const versoL2 = order.l2Verso || "";
+  const hasVersoL2 = versoL2.length > 0;
+  const hasSV = !!order.simboloVerso;
+  const versoTextW = estimateTextWidth(versoL1, fontSize);
+  let totalVersoW = versoTextW;
+  if (hasSV) totalVersoW += symSz + symGap;
+  const versoGroupStart = versoCX - Math.round(totalVersoW / 2);
+  const symVX = versoGroupStart;
+  const textVersoX =
+    versoGroupStart +
+    (hasSV ? symSz + symGap : 0) +
+    Math.round(versoTextW / 2);
+
+  let versoTextY1: number;
+  let versoTextY2: number;
+  if (hasVersoL2) {
+    versoTextY1 = frenteY + Math.round(rectH * 0.38);
+    versoTextY2 = frenteY + Math.round(rectH * 0.72);
+  } else {
+    versoTextY1 = frenteY + Math.round(rectH * 0.58);
+    versoTextY2 = 0;
   }
 
-  let symbolVersoX = 0, textVersoX = versoCenterX;
-  if (symbolVerso) {
-    const totalVersoW = symbolSize + symbolGap + versoTextW;
-    const versoGroupStart = versoCenterX - Math.round(totalVersoW / 2);
-    symbolVersoX = versoGroupStart;
-    textVersoX = versoGroupStart + symbolSize + symbolGap + Math.round(versoTextW / 2);
+  // ---- DENTRO: centralizado se 1 linha ----
+  const dentro1CX = Math.round(frenteX + rectW / 2);
+  const dentro2CX = Math.round(versoX + rectW / 2);
+
+  const hasD1L2 = (order.l2Dentro1 || "").length > 0;
+  const hasD2L2 = (order.l2Dentro2 || "").length > 0;
+
+  let d1Y1: number, d1Y2: number;
+  if (hasD1L2) {
+    d1Y1 = dentroY + Math.round(rectH * 0.38);
+    d1Y2 = dentroY + Math.round(rectH * 0.72);
+  } else {
+    d1Y1 = dentroY + Math.round(rectH * 0.58);
+    d1Y2 = 0;
   }
 
-  const dentro1CenterX = Math.round((frenteX + padding + frenteX + rectW - padding) / 2);
-  const dentro2CenterX = Math.round((versoX + padding + versoX + rectW - padding) / 2);
+  let d2Y1: number, d2Y2: number;
+  if (hasD2L2) {
+    d2Y1 = dentroY + Math.round(rectH * 0.38);
+    d2Y2 = dentroY + Math.round(rectH * 0.72);
+  } else {
+    d2Y1 = dentroY + Math.round(rectH * 0.58);
+    d2Y2 = 0;
+  }
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto" style={{ maxHeight: compact ? "200px" : "400px" }}>
+    <svg
+      viewBox={`0 0 ${W} ${H}`}
+      className="w-full h-auto"
+      style={{ maxHeight: compact ? "200px" : "400px" }}
+    >
       <rect x="0" y="0" width={W} height={H} fill="#FFFFFF" />
       <rect x="0" y="0" width={W} height="1200" fill="#606062" />
       <rect x="0" y="1200" width={W} height="1500" fill="#D2D3D5" />
 
-      <text x="800" y="850" textAnchor="start" fill="#FEFEFE" fontFamily="Calibri, sans-serif" fontWeight="bold" fontSize="768">
+      <text
+        x="800"
+        y="850"
+        textAnchor="start"
+        fill="#FEFEFE"
+        fontFamily="Calibri, sans-serif"
+        fontWeight="bold"
+        fontSize="768"
+      >
         Cliente: {order.nomeCliente}
       </text>
 
       {order.quantidade && order.quantidade > 1 && (
         <g>
-          <rect x="18500" y="300" width="2200" height="600" rx="100" fill="#F58634" />
-          <text x="19600" y="720" textAnchor="middle" fill="#FFFFFF" fontFamily="Calibri, sans-serif" fontWeight="bold" fontSize="400">
+          <rect
+            x="18500"
+            y="300"
+            width="2200"
+            height="600"
+            rx="100"
+            fill="#F58634"
+          />
+          <text
+            x="19600"
+            y="720"
+            textAnchor="middle"
+            fill="#FFFFFF"
+            fontFamily="Calibri, sans-serif"
+            fontWeight="bold"
+            fontSize="400"
+          >
             Qtd: {order.quantidade}
           </text>
         </g>
       )}
 
-      <text x="800" y="2050" textAnchor="start" fill="#373435" fontFamily="Arial, sans-serif" fontSize="500">
+      <text
+        x="800"
+        y="2050"
+        textAnchor="start"
+        fill="#373435"
+        fontFamily="Arial, sans-serif"
+        fontSize="500"
+      >
         Pulseira de silicone: Personalização baixo relevo + aplicação de tinta
       </text>
 
-      <text x="10500" y="3854" textAnchor="middle" fill="#373435" fontFamily="Arial, sans-serif" fontWeight="bold" fontSize="529">
+      <text
+        x="10500"
+        y="3854"
+        textAnchor="middle"
+        fill="#373435"
+        fontFamily="Arial, sans-serif"
+        fontWeight="bold"
+        fontSize="529"
+      >
         {order.tamanhoCm} cm ({order.tamanhoLabel})
       </text>
 
-      <text x="10500" y="4900" textAnchor="middle" fill="#727376" fontFamily="Arial, sans-serif" fontStyle="italic" fontSize="503">
+      <text
+        x="10500"
+        y="4900"
+        textAnchor="middle"
+        fill="#727376"
+        fontFamily="Arial, sans-serif"
+        fontStyle="italic"
+        fontSize="503"
+      >
         frente
       </text>
 
-      <rect id={`${prefix}frente`} x={frenteX} y="5267" width={rectW} height={rectH} fill={braceletHex} />
-      <rect id={`${prefix}verso`} x={versoX} y="5267" width={rectW} height={rectH} fill={braceletHex} />
+      {/* 4 retângulos de pulseira */}
+      <rect
+        id={`${prefix}frente`}
+        x={frenteX}
+        y={frenteY}
+        width={rectW}
+        height={rectH}
+        fill={braceletHex}
+      />
+      <rect
+        id={`${prefix}verso`}
+        x={versoX}
+        y={frenteY}
+        width={rectW}
+        height={rectH}
+        fill={braceletHex}
+      />
 
-      {symbolFrente && (
-        <SymbolGroup symbol={symbolFrente} x={symbolFrenteX} y={symbolY} size={symbolSize} />
+      {/* FRENTE: símbolo1 + texto + símbolo2 */}
+      {hasSym1 && (
+        <SymbolGroup
+          symbolId={order.simboloFrente!}
+          braceletColor={order.cor}
+          x={sym1X}
+          y={symFrenteY}
+          size={symSz}
+        />
       )}
       <text
         x={textFrenteX}
-        y="5977"
+        y={frenteTextY}
         textAnchor="middle"
         fill={textColor}
         fontFamily={fontFrente}
@@ -162,43 +306,135 @@ export default function BraceletPreview({ order, compact = false }: BraceletPrev
       >
         {order.textoFrente}
       </text>
+      {hasSym2 && (
+        <SymbolGroup
+          symbolId={order.simboloFrente2!}
+          braceletColor={order.cor}
+          x={sym2X}
+          y={symFrenteY}
+          size={symSz}
+        />
+      )}
 
-      {symbolVerso && (
-        <SymbolGroup symbol={symbolVerso} x={symbolVersoX} y={symbolY} size={symbolSize} />
+      {/* VERSO: símbolo + texto (1 ou 2 linhas) */}
+      {hasSV && (
+        <SymbolGroup
+          symbolId={order.simboloVerso!}
+          braceletColor={order.cor}
+          x={symVX}
+          y={symFrenteY}
+          size={symSz}
+        />
       )}
       <text
         x={textVersoX}
-        y="5977"
+        y={versoTextY1}
         textAnchor="middle"
         fill={textColor}
         fontFamily={fontVerso}
         fontWeight={boldVerso ? "bold" : "normal"}
         fontSize={fontSize}
       >
-        {order.textoVerso}
+        {versoL1}
       </text>
+      {hasVersoL2 && (
+        <text
+          x={textVersoX}
+          y={versoTextY2}
+          textAnchor="middle"
+          fill={textColor}
+          fontFamily={fontVerso}
+          fontWeight={boldVerso ? "bold" : "normal"}
+          fontSize={fontSize}
+        >
+          {versoL2}
+        </text>
+      )}
 
-      <text x="10500" y="7350" textAnchor="middle" fill="#727376" fontFamily="Arial, sans-serif" fontStyle="italic" fontSize="503">
+      <text
+        x="10500"
+        y="7350"
+        textAnchor="middle"
+        fill="#727376"
+        fontFamily="Arial, sans-serif"
+        fontStyle="italic"
+        fontSize="503"
+      >
         dentro
       </text>
 
-      <rect id={`${prefix}dentro1`} x={frenteX} y="7606" width={rectW} height={rectH} fill={braceletHex} />
-      <rect id={`${prefix}dentro2`} x={versoX} y="7606" width={rectW} height={rectH} fill={braceletHex} />
+      <rect
+        id={`${prefix}dentro1`}
+        x={frenteX}
+        y={dentroY}
+        width={rectW}
+        height={rectH}
+        fill={braceletHex}
+      />
+      <rect
+        id={`${prefix}dentro2`}
+        x={versoX}
+        y={dentroY}
+        width={rectW}
+        height={rectH}
+        fill={braceletHex}
+      />
 
-      <text x={dentro1CenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      {/* DENTRO1: 1 ou 2 linhas, centralizado se 1 */}
+      <text
+        x={dentro1CX}
+        y={d1Y1}
+        textAnchor="middle"
+        fill={textColor}
+        fontFamily={insideFont}
+        fontWeight="bold"
+        fontSize={insideFontSize}
+      >
         {order.l1Dentro1}
       </text>
-      <text x={dentro1CenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
-        {order.l2Dentro1}
-      </text>
-      <text x={dentro2CenterX} y="8076" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
+      {hasD1L2 && (
+        <text
+          x={dentro1CX}
+          y={d1Y2}
+          textAnchor="middle"
+          fill={textColor}
+          fontFamily={insideFont}
+          fontWeight="bold"
+          fontSize={insideFontSize}
+        >
+          {order.l2Dentro1}
+        </text>
+      )}
+
+      {/* DENTRO2: 1 ou 2 linhas, centralizado se 1 */}
+      <text
+        x={dentro2CX}
+        y={d2Y1}
+        textAnchor="middle"
+        fill={textColor}
+        fontFamily={insideFont}
+        fontWeight="bold"
+        fontSize={insideFontSize}
+      >
         {order.l1Dentro2}
       </text>
-      <text x={dentro2CenterX} y="8486" textAnchor="middle" fill={textColor} fontFamily={insideFont} fontWeight="bold" fontSize="406">
-        {order.l2Dentro2}
-      </text>
+      {hasD2L2 && (
+        <text
+          x={dentro2CX}
+          y={d2Y2}
+          textAnchor="middle"
+          fill={textColor}
+          fontFamily={insideFont}
+          fontWeight="bold"
+          fontSize={insideFontSize}
+        >
+          {order.l2Dentro2}
+        </text>
+      )}
 
-      {!compact && <rect x="0" y="10790" width={W} height="500" fill="#A9ABAE" />}
+      {!compact && (
+        <rect x="0" y="10790" width={W} height="500" fill="#A9ABAE" />
+      )}
     </svg>
   );
 }

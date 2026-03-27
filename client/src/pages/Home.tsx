@@ -39,6 +39,7 @@ function createEmptyOrder(index: number): BraceletOrder {
     nomeCliente: "",
     textoFrente: "",
     textoVerso: "",
+    l2Verso: "",
     l1Dentro1: "",
     l2Dentro1: "",
     l1Dentro2: "",
@@ -279,7 +280,7 @@ export default function Home() {
                     <strong className="text-foreground">TAMANHO:</strong> {BRACELET_SIZES.map((s) => s.name + " (" + s.cm + "cm)").join(", ")}
                   </p>
                   <p>
-                    <strong className="text-foreground">SIMBOLO_FRENTE / SIMBOLO_VERSO:</strong> {BRACELET_SYMBOLS.map((s) => s.id).join(", ")}
+                    <strong className="text-foreground">SIMBOLO_FRENTE / SIMBOLO_FRENTE2 / SIMBOLO_VERSO:</strong> {BRACELET_SYMBOLS.map((s) => s.id).join(", ")}
                   </p>
                 </div>
               </CardContent>

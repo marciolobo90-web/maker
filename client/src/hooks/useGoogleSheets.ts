@@ -127,6 +127,7 @@ export function useGoogleSheets() {
           nomeCliente: getCol(row, "NOME_CLIENTE") || "Cliente " + (i + 1),
           textoFrente: getCol(row, "TEXTO_FRENTE") || "",
           textoVerso: getCol(row, "TEXTO_VERSO") || "",
+          l2Verso: getCol(row, "L2_VERSO") || "",
           l1Dentro1: getCol(row, "L1_DENTRO1") || "",
           l2Dentro1: getCol(row, "L2_DENTRO1") || "",
           l1Dentro2: getCol(row, "L1_DENTRO2") || "",
@@ -139,6 +140,7 @@ export function useGoogleSheets() {
           tamanhoLabel: sizeInfo.tamanhoLabel,
           tamanhoCm: sizeInfo.tamanhoCm,
           simboloFrente: getCol(row, "SIMBOLO_FRENTE") || undefined,
+          simboloFrente2: getCol(row, "SIMBOLO_FRENTE2") || undefined,
           simboloVerso: getCol(row, "SIMBOLO_VERSO") || undefined,
           quantidade: isNaN(qty) ? 1 : qty,
         };
@@ -184,6 +186,7 @@ export function useGoogleSheets() {
           nomeCliente: getCol(row, "NOME_CLIENTE") || "Cliente " + (i + 1),
           textoFrente: getCol(row, "TEXTO_FRENTE") || "",
           textoVerso: getCol(row, "TEXTO_VERSO") || "",
+          l2Verso: getCol(row, "L2_VERSO") || "",
           l1Dentro1: getCol(row, "L1_DENTRO1") || "",
           l2Dentro1: getCol(row, "L2_DENTRO1") || "",
           l1Dentro2: getCol(row, "L1_DENTRO2") || "",
@@ -196,6 +199,7 @@ export function useGoogleSheets() {
           tamanhoLabel: sizeInfo.tamanhoLabel,
           tamanhoCm: sizeInfo.tamanhoCm,
           simboloFrente: getCol(row, "SIMBOLO_FRENTE") || undefined,
+          simboloFrente2: getCol(row, "SIMBOLO_FRENTE2") || undefined,
           simboloVerso: getCol(row, "SIMBOLO_VERSO") || undefined,
           quantidade: isNaN(qty) ? 1 : qty,
         };

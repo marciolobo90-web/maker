@@ -6,10 +6,13 @@ import {
   getHalfCmFromSize,
   getHalfWidthSvg,
   getSizePrefixFromSize,
+  getSymbolColor,
+  SYMBOL_MAX_SIZE,
 } from "./constants";
 
 function getSymbolPaths(
   symbolId: string | undefined,
+  braceletColor: string,
   x: number,
   y: number,
   size: number
@@ -23,10 +26,26 @@ function getSymbolPaths(
   var sc = Math.min(size / vb[2], size / vb[3]);
   var tx = x + (size - vb[2] * sc) / 2 - vb[0] * sc;
   var ty = y + (size - vb[3] * sc) / 2 - vb[1] * sc;
-  // Each path gets its own transform attribute — NO <g> wrapper
+
+  // Determinar a cor do símbolo baseado na cor da pulseira
+  var overrideColor = getSymbolColor(symbolId, braceletColor);
+
   var paths = symbol.paths
     .map(function (pp) {
-      return '  <path transform="translate(' + tx.toFixed(2) + ',' + ty.toFixed(2) + ') scale(' + sc.toFixed(6) + ')" d="' + pp.d + '" fill="' + pp.fill + '"/>';
+      var fillColor = overrideColor !== null ? overrideColor : pp.fill;
+      return (
+        '  <path transform="translate(' +
+        tx.toFixed(2) +
+        "," +
+        ty.toFixed(2) +
+        ") scale(" +
+        sc.toFixed(6) +
+        ')" d="' +
+        pp.d +
+        '" fill="' +
+        fillColor +
+        '"/>'
+      );
     })
     .join("\n");
   return paths;
@@ -48,7 +67,9 @@ function getCol(colorName: string): { hex: string; text: string } {
   var c = BRACELET_COLORS.find(function (x) {
     return x.name === colorName;
   });
-  return c ? { hex: c.hex, text: c.textColor } : { hex: "#000000", text: "#FFFFFF" };
+  return c
+    ? { hex: c.hex, text: c.textColor }
+    : { hex: "#000000", text: "#FFFFFF" };
 }
 
 function esc(str: string): string {
@@ -83,13 +104,86 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var vX = sX + rW;
   var fCx = Math.round(fX + rW / 2);
   var vCx = Math.round(vX + rW / 2);
-  var symSz = rH - 100;
-  var symY = 5317;
+
+  // Tamanho máximo do símbolo: 7.5mm = 750 SVG units
+  var symSz = SYMBOL_MAX_SIZE;
+  var frenteY = 5267;
+  var dentroY = 7606;
+  var symFrenteY = frenteY + Math.round((rH - symSz) / 2);
+  var symDentroY = dentroY + Math.round((rH - symSz) / 2);
   var fs = 423;
   var ifs = 406;
   var symGap = 100;
-  var fTw = estW(order.textoFrente, fs);
-  var vTw = estW(order.textoVerso, fs);
+
+  // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)
+  var padding = 750;
+
+  // Calcular posições FRENTE com 2 símbolos possíveis
+  var frenteTextW = estW(order.textoFrente, fs);
+  var hasSym1 = !!order.simboloFrente;
+  var hasSym2 = !!order.simboloFrente2;
+  var totalFrenteW = frenteTextW;
+  if (hasSym1) totalFrenteW += symSz + symGap;
+  if (hasSym2) totalFrenteW += symGap + symSz;
+  var frenteGroupStart = fCx - Math.round(totalFrenteW / 2);
+  var sym1X = frenteGroupStart;
+  var textFrenteX = frenteGroupStart + (hasSym1 ? symSz + symGap : 0) + Math.round(frenteTextW / 2);
+  var sym2X = textFrenteX + Math.round(frenteTextW / 2) + symGap;
+
+  // Calcular posições VERSO (agora com 2 linhas possíveis)
+  var versoL1 = order.textoVerso || "";
+  var versoL2 = order.l2Verso || "";
+  var hasVersoL2 = versoL2.length > 0;
+  var versoTextW = estW(versoL1, fs);
+  var hasSV = !!order.simboloVerso;
+  var totalVersoW = versoTextW;
+  if (hasSV) totalVersoW += symSz + symGap;
+  var versoGroupStart = vCx - Math.round(totalVersoW / 2);
+  var symVX = versoGroupStart;
+  var textVersoX = versoGroupStart + (hasSV ? symSz + symGap : 0) + Math.round(versoTextW / 2);
+
+  // Y positions para verso (1 ou 2 linhas)
+  var versoTextY1: number;
+  var versoTextY2: number;
+  if (hasVersoL2) {
+    versoTextY1 = frenteY + Math.round(rH * 0.38);
+    versoTextY2 = frenteY + Math.round(rH * 0.72);
+  } else {
+    versoTextY1 = frenteY + Math.round(rH * 0.58);
+    versoTextY2 = 0;
+  }
+
+  // Frente text Y (sempre centralizado)
+  var frenteTextY = frenteY + Math.round(rH * 0.58);
+
+  // Calcular posições DENTRO com centralização vertical
+  var dentro1CX = Math.round(fX + rW / 2);
+  var dentro2CX = Math.round(vX + rW / 2);
+
+  var hasD1L2 = (order.l2Dentro1 || "").length > 0;
+  var hasD2L2 = (order.l2Dentro2 || "").length > 0;
+
+  // Y positions para dentro1 (1 ou 2 linhas)
+  var d1Y1: number;
+  var d1Y2: number;
+  if (hasD1L2) {
+    d1Y1 = dentroY + Math.round(rH * 0.38);
+    d1Y2 = dentroY + Math.round(rH * 0.72);
+  } else {
+    d1Y1 = dentroY + Math.round(rH * 0.58);
+    d1Y2 = 0;
+  }
+
+  // Y positions para dentro2 (1 ou 2 linhas)
+  var d2Y1: number;
+  var d2Y2: number;
+  if (hasD2L2) {
+    d2Y1 = dentroY + Math.round(rH * 0.38);
+    d2Y2 = dentroY + Math.round(rH * 0.72);
+  } else {
+    d2Y1 = dentroY + Math.round(rH * 0.58);
+    d2Y2 = 0;
+  }
 
   var p: string[] = [];
 
@@ -107,61 +201,20 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // ============================================================
   // REGRA COREL: Todos os retângulos ANTES de todos os textos
-  // Retângulos que ficam depois de textos sobrepostos = bloqueados
   // ============================================================
 
   // 1) Todos os 4 retângulos de pulseira juntos
   p.push(
-    '  <rect id="' +
-      pfx +
-      'frente" fill="' +
-      bHex +
-      '" x="' +
-      fX +
-      '" y="5267.18" width="' +
-      rW +
-      '" height="' +
-      rH +
-      '"/>'
+    '  <rect id="' + pfx + 'frente" fill="' + bHex + '" x="' + fX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' +
-      pfx +
-      'verso" fill="' +
-      bHex +
-      '" x="' +
-      vX +
-      '" y="5267.18" width="' +
-      rW +
-      '" height="' +
-      rH +
-      '"/>'
+    '  <rect id="' + pfx + 'verso" fill="' + bHex + '" x="' + vX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' +
-      pfx +
-      'dentro1" fill="' +
-      bHex +
-      '" x="' +
-      fX +
-      '" y="7605.9" width="' +
-      rW +
-      '" height="' +
-      rH +
-      '"/>'
+    '  <rect id="' + pfx + 'dentro1" fill="' + bHex + '" x="' + fX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' +
-      pfx +
-      'dentro2" fill="' +
-      bHex +
-      '" x="' +
-      vX +
-      '" y="7605.9" width="' +
-      rW +
-      '" height="' +
-      rH +
-      '"/>'
+    '  <rect id="' + pfx + 'dentro2" fill="' + bHex + '" x="' + vX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
 
   // 2) Backgrounds cabeçalho
@@ -215,131 +268,49 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     '  <text x="10500" y="7350" text-anchor="middle" fill="#727376" font-style="italic" font-size="502.53" font-family="Arial">dentro</text>'
   );
 
-  // Texto e símbolo FRENTE
-  if (order.simboloFrente) {
-    var totFW = symSz + symGap + fTw;
-    var fGS = fCx - Math.round(totFW / 2);
-    var sFX = fGS;
-    var tFX = fGS + symSz + symGap + Math.round(fTw / 2);
-    p.push(getSymbolPaths(order.simboloFrente, sFX, symY, symSz));
+  // ---- FRENTE: símbolo1 + texto + símbolo2 ----
+  if (hasSym1) {
+    p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, symFrenteY, symSz));
+  }
+  p.push(
+    '  <text x="' + textFrenteX + '" y="' + frenteTextY + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
+  );
+  if (hasSym2) {
+    p.push(getSymbolPaths(order.simboloFrente2, order.cor, sym2X, symFrenteY, symSz));
+  }
+
+  // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
+  if (hasSV) {
+    p.push(getSymbolPaths(order.simboloVerso, order.cor, symVX, symFrenteY, symSz));
+  }
+  p.push(
+    '  <text x="' + textVersoX + '" y="' + versoTextY1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(versoL1) + "</text>"
+  );
+  if (hasVersoL2) {
     p.push(
-      '  <text x="' +
-        tFX +
-        '" y="5976.82" text-anchor="middle" fill="' +
-        tCol +
-        '" font-weight="' +
-        (fBold ? "bold" : "normal") +
-        '" font-size="' +
-        fs +
-        '" font-family="' +
-        esc(fFam) +
-        '">' +
-        esc(order.textoFrente) +
-        "</text>"
-    );
-  } else {
-    p.push(
-      '  <text x="' +
-        fCx +
-        '" y="5976.82" text-anchor="middle" fill="' +
-        tCol +
-        '" font-weight="' +
-        (fBold ? "bold" : "normal") +
-        '" font-size="' +
-        fs +
-        '" font-family="' +
-        esc(fFam) +
-        '">' +
-        esc(order.textoFrente) +
-        "</text>"
+      '  <text x="' + textVersoX + '" y="' + versoTextY2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(versoL2) + "</text>"
     );
   }
 
-  // Texto e símbolo VERSO
-  if (order.simboloVerso) {
-    var totVW = symSz + symGap + vTw;
-    var vGS = vCx - Math.round(totVW / 2);
-    var sVX = vGS;
-    var tVX = vGS + symSz + symGap + Math.round(vTw / 2);
-    p.push(getSymbolPaths(order.simboloVerso, sVX, symY, symSz));
+  // ---- DENTRO1: 1 ou 2 linhas, centralizado se 1 ----
+  p.push(
+    '  <text x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
+  );
+  if (hasD1L2) {
     p.push(
-      '  <text x="' +
-        tVX +
-        '" y="5976.82" text-anchor="middle" fill="' +
-        tCol +
-        '" font-weight="' +
-        (vBold ? "bold" : "normal") +
-        '" font-size="' +
-        fs +
-        '" font-family="' +
-        esc(vFam) +
-        '">' +
-        esc(order.textoVerso) +
-        "</text>"
-    );
-  } else {
-    p.push(
-      '  <text x="' +
-        vCx +
-        '" y="5976.82" text-anchor="middle" fill="' +
-        tCol +
-        '" font-weight="' +
-        (vBold ? "bold" : "normal") +
-        '" font-size="' +
-        fs +
-        '" font-family="' +
-        esc(vFam) +
-        '">' +
-        esc(order.textoVerso) +
-        "</text>"
+      '  <text x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
     );
   }
 
-  // Textos dentro
+  // ---- DENTRO2: 1 ou 2 linhas, centralizado se 1 ----
   p.push(
-    '  <text x="' +
-      fCx +
-      '" y="8135.55" text-anchor="middle" fill="' +
-      tCol +
-      '" font-weight="bold" font-size="' +
-      ifs +
-      '" font-family="Calibri">' +
-      esc(order.l1Dentro1) +
-      "</text>"
+    '  <text x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
   );
-  p.push(
-    '  <text x="' +
-      fCx +
-      '" y="8544.43" text-anchor="middle" fill="' +
-      tCol +
-      '" font-weight="bold" font-size="' +
-      ifs +
-      '" font-family="Calibri">' +
-      esc(order.l2Dentro1) +
-      "</text>"
-  );
-  p.push(
-    '  <text x="' +
-      vCx +
-      '" y="8135.55" text-anchor="middle" fill="' +
-      tCol +
-      '" font-weight="bold" font-size="' +
-      ifs +
-      '" font-family="Calibri">' +
-      esc(order.l1Dentro2) +
-      "</text>"
-  );
-  p.push(
-    '  <text x="' +
-      vCx +
-      '" y="8544.43" text-anchor="middle" fill="' +
-      tCol +
-      '" font-weight="bold" font-size="' +
-      ifs +
-      '" font-family="Calibri">' +
-      esc(order.l2Dentro2) +
-      "</text>"
-  );
+  if (hasD2L2) {
+    p.push(
+      '  <text x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+    );
+  }
 
   // Badge quantidade texto
   if (order.quantidade && order.quantidade > 1) {

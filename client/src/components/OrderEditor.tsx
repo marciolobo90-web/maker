@@ -53,15 +53,21 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         </div>
 
         {/* Texto Frente */}
-        <div>
+        <div className="col-span-2">
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Frente</Label>
           <Input value={form.textoFrente} onChange={(e) => update("textoFrente", e.target.value)} className="mt-1 bg-secondary border-border" />
         </div>
 
-        {/* Texto Verso */}
+        {/* Texto Verso L1 */}
         <div>
-          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso</Label>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso (Linha 1)</Label>
           <Input value={form.textoVerso} onChange={(e) => update("textoVerso", e.target.value)} className="mt-1 bg-secondary border-border" />
+        </div>
+
+        {/* Texto Verso L2 */}
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso (Linha 2)</Label>
+          <Input value={form.l2Verso || ""} onChange={(e) => update("l2Verso", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
         </div>
 
         {/* Dentro L1/L2 */}
@@ -71,7 +77,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L2 Dentro (esq)</Label>
-          <Input value={form.l2Dentro1} onChange={(e) => update("l2Dentro1", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input value={form.l2Dentro1} onChange={(e) => update("l2Dentro1", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L1 Dentro (dir)</Label>
@@ -79,7 +85,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L2 Dentro (dir)</Label>
-          <Input value={form.l2Dentro2} onChange={(e) => update("l2Dentro2", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input value={form.l2Dentro2} onChange={(e) => update("l2Dentro2", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
         </div>
 
         {/* Cor */}
@@ -153,10 +159,35 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
           </Select>
         </div>
 
-        {/* Símbolo Frente */}
+        {/* Símbolo Frente (antes do texto) */}
         <div>
-          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Frente</Label>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Frente (antes)</Label>
           <Select value={form.simboloFrente || "none"} onValueChange={(v) => update("simboloFrente", v === "none" ? undefined : v)}>
+            <SelectTrigger className="mt-1 bg-secondary border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {BRACELET_SYMBOLS.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  <div className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox={s.viewBox} className="shrink-0">
+                      {s.paths.map((p, i) => (
+                        <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+                      ))}
+                    </svg>
+                    {s.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Símbolo Frente 2 (depois do texto) */}
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Frente (depois)</Label>
+          <Select value={form.simboloFrente2 || "none"} onValueChange={(v) => update("simboloFrente2", v === "none" ? undefined : v)}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
