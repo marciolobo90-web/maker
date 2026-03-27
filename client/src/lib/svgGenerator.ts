@@ -142,19 +142,22 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var symVX = versoGroupStart;
   var textVersoX = versoGroupStart + (hasSV ? symSz + symGap : 0) + Math.round(versoTextW / 2);
 
+  // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
+  var textYOffset = 70;
+
   // Y positions para verso (1 ou 2 linhas)
   var versoTextY1: number;
   var versoTextY2: number;
   if (hasVersoL2) {
-    versoTextY1 = frenteY + Math.round(rH * 0.38);
-    versoTextY2 = frenteY + Math.round(rH * 0.72);
+    versoTextY1 = frenteY + Math.round(rH * 0.38) + textYOffset;
+    versoTextY2 = frenteY + Math.round(rH * 0.72) + textYOffset;
   } else {
-    versoTextY1 = frenteY + Math.round(rH * 0.58);
+    versoTextY1 = frenteY + Math.round(rH * 0.58) + textYOffset;
     versoTextY2 = 0;
   }
 
   // Frente text Y (sempre centralizado)
-  var frenteTextY = frenteY + Math.round(rH * 0.58);
+  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset;
 
   // Calcular posições DENTRO com centralização vertical
   var dentro1CX = Math.round(fX + rW / 2);
@@ -167,10 +170,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var d1Y1: number;
   var d1Y2: number;
   if (hasD1L2) {
-    d1Y1 = dentroY + Math.round(rH * 0.38);
-    d1Y2 = dentroY + Math.round(rH * 0.72);
+    d1Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
+    d1Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
   } else {
-    d1Y1 = dentroY + Math.round(rH * 0.58);
+    d1Y1 = dentroY + Math.round(rH * 0.58) + textYOffset;
     d1Y2 = 0;
   }
 
@@ -178,10 +181,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var d2Y1: number;
   var d2Y2: number;
   if (hasD2L2) {
-    d2Y1 = dentroY + Math.round(rH * 0.38);
-    d2Y2 = dentroY + Math.round(rH * 0.72);
+    d2Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
+    d2Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
   } else {
-    d2Y1 = dentroY + Math.round(rH * 0.58);
+    d2Y1 = dentroY + Math.round(rH * 0.58) + textYOffset;
     d2Y2 = 0;
   }
 

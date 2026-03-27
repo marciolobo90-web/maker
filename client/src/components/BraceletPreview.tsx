@@ -133,8 +133,11 @@ export default function BraceletPreview({
   const sym2X =
     textFrenteX + Math.round(frenteTextW / 2) + symGap;
 
+  // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
+  const textYOffset = 70;
+
   // Frente text Y (sempre centralizado)
-  const frenteTextY = frenteY + Math.round(rectH * 0.58);
+  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset;
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   const versoL1 = order.textoVerso || "";
@@ -154,10 +157,10 @@ export default function BraceletPreview({
   let versoTextY1: number;
   let versoTextY2: number;
   if (hasVersoL2) {
-    versoTextY1 = frenteY + Math.round(rectH * 0.38);
-    versoTextY2 = frenteY + Math.round(rectH * 0.72);
+    versoTextY1 = frenteY + Math.round(rectH * 0.38) + textYOffset;
+    versoTextY2 = frenteY + Math.round(rectH * 0.72) + textYOffset;
   } else {
-    versoTextY1 = frenteY + Math.round(rectH * 0.58);
+    versoTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset;
     versoTextY2 = 0;
   }
 
@@ -170,19 +173,19 @@ export default function BraceletPreview({
 
   let d1Y1: number, d1Y2: number;
   if (hasD1L2) {
-    d1Y1 = dentroY + Math.round(rectH * 0.38);
-    d1Y2 = dentroY + Math.round(rectH * 0.72);
+    d1Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
+    d1Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
   } else {
-    d1Y1 = dentroY + Math.round(rectH * 0.58);
+    d1Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
     d1Y2 = 0;
   }
 
   let d2Y1: number, d2Y2: number;
   if (hasD2L2) {
-    d2Y1 = dentroY + Math.round(rectH * 0.38);
-    d2Y2 = dentroY + Math.round(rectH * 0.72);
+    d2Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
+    d2Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
   } else {
-    d2Y1 = dentroY + Math.round(rectH * 0.58);
+    d2Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
     d2Y2 = 0;
   }
 
