@@ -27,7 +27,8 @@ import { generateBraceletSVG, downloadSVG, downloadAllSVGs } from "@/lib/svgGene
 import {
   BRACELET_COLORS,
   BRACELET_SIZES,
-  FRONT_BACK_FONTS,
+  FRONT_FONTS,
+  VERSO_FONT,
   BRACELET_SYMBOLS,
   EXPECTED_COLUMNS,
   type BraceletOrder,
@@ -46,8 +47,8 @@ function createEmptyOrder(index: number): BraceletOrder {
     l2Dentro2: "",
     cor: "Preto",
     corTexto: "#FFFFFF",
-    fonteFrente: "Bahnschrift",
-    fonteVerso: "Bahnschrift",
+    fonteFrente: "Segoe Print Negrito",
+    fonteVerso: "Calibri Negrito",
     tamanho: "M adulto",
     tamanhoLabel: "M adulto",
     tamanhoCm: "18,5",
@@ -274,7 +275,7 @@ export default function Home() {
                     <strong className="text-foreground">COR:</strong> {BRACELET_COLORS.map((c) => c.name).join(", ")}
                   </p>
                   <p>
-                    <strong className="text-foreground">FONTE_FRENTE / FONTE_VERSO:</strong> {FRONT_BACK_FONTS.map((f) => f.name).join(", ")}
+                    <strong className="text-foreground">FONTE_FRENTE:</strong> {FRONT_FONTS.map((f) => f.name).join(", ")} <span className="opacity-60">(verso sempre {VERSO_FONT.name})</span>
                   </p>
                   <p>
                     <strong className="text-foreground">TAMANHO:</strong> {BRACELET_SIZES.map((s) => s.name + " (" + s.cm + "cm)").join(", ")}
@@ -448,8 +449,8 @@ export default function Home() {
                     </div>
                     <div className="bg-card border border-border rounded-lg p-3">
                       <p className="text-xs text-muted-foreground uppercase tracking-wider">Fonte Verso</p>
-                      <p className="text-sm font-medium mt-1" style={{ fontFamily: getFontPreview(currentOrder.fonteVerso) }}>
-                        {currentOrder.fonteVerso}
+                      <p className="text-sm font-medium mt-1" style={{ fontFamily: VERSO_FONT.family, fontWeight: "bold" }}>
+                        {VERSO_FONT.label} <span className="text-xs text-muted-foreground">(fixo)</span>
                       </p>
                     </div>
                   </div>
@@ -471,6 +472,6 @@ export default function Home() {
 }
 
 function getFontPreview(fontName: string): string {
-  const font = FRONT_BACK_FONTS.find((f) => f.name === fontName);
+  const font = FRONT_FONTS.find((f) => f.name === fontName);
   return font ? font.family : "Arial, sans-serif";
 }

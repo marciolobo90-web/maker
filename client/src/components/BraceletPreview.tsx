@@ -2,7 +2,8 @@ import type { BraceletOrder, BraceletSymbol } from "@/lib/constants";
 import {
   BRACELET_COLORS,
   BRACELET_SYMBOLS,
-  FRONT_BACK_FONTS,
+  FRONT_FONTS,
+  VERSO_FONT,
   getHalfCmFromSize,
   getHalfWidthSvg,
   getSizePrefixFromSize,
@@ -23,12 +24,13 @@ function getBraceletColor(colorName: string) {
 }
 
 function getFontFamily(fontName: string): string {
-  const font = FRONT_BACK_FONTS.find((f) => f.name === fontName);
+  const font = FRONT_FONTS.find((f) => f.name === fontName);
   return font ? font.family : "Calibri, 'Segoe UI', sans-serif";
 }
 
-function isBoldFont(fontName: string): boolean {
-  return fontName === "Calibri Negrito";
+// Todas as fontes disponíveis são negrito
+function isBoldFont(_fontName: string): boolean {
+  return true;
 }
 
 function SymbolGroup({
@@ -84,10 +86,11 @@ export default function BraceletPreview({
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
   const textColor = order.corTexto || colorInfo.textColor;
-  const fontFrente = getFontFamily(order.fonteFrente || "Bahnschrift");
-  const fontVerso = getFontFamily(order.fonteVerso || "Bahnschrift");
-  const boldFrente = isBoldFont(order.fonteFrente);
-  const boldVerso = isBoldFont(order.fonteVerso);
+  const fontFrente = getFontFamily(order.fonteFrente || "Segoe Print Negrito");
+  // Verso sempre Calibri Negrito
+  const fontVerso = VERSO_FONT.family;
+  const boldFrente = true;
+  const boldVerso = true;
   const insideFont = "Calibri, 'Segoe UI', sans-serif";
 
   const W = 21000;

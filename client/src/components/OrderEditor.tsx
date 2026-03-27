@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BraceletOrder } from "@/lib/constants";
-import { BRACELET_COLORS, FRONT_BACK_FONTS, BRACELET_SIZES, BRACELET_SYMBOLS } from "@/lib/constants";
+import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -133,30 +133,22 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {FRONT_BACK_FONTS.map((f) => (
+              {FRONT_FONTS.map((f) => (
                 <SelectItem key={f.name} value={f.name}>
-                  <span style={{ fontFamily: f.family }}>{f.label}</span>
+                  <span style={{ fontFamily: f.family, fontWeight: "bold" }}>{f.label}</span>
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Fonte Verso */}
+        {/* Fonte Verso (fixa) */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Fonte Verso</Label>
-          <Select value={form.fonteVerso} onValueChange={(v) => update("fonteVerso", v)}>
-            <SelectTrigger className="mt-1 bg-secondary border-border">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {FRONT_BACK_FONTS.map((f) => (
-                <SelectItem key={f.name} value={f.name}>
-                  <span style={{ fontFamily: f.family }}>{f.label}</span>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="mt-1 px-3 py-2 bg-secondary border border-border rounded-md text-sm text-muted-foreground">
+            <span style={{ fontFamily: VERSO_FONT.family, fontWeight: "bold" }}>{VERSO_FONT.label}</span>
+            <span className="text-xs ml-2 opacity-60">(fixo)</span>
+          </div>
         </div>
 
         {/* Símbolo Frente (antes do texto) */}

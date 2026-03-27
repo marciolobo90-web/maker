@@ -2,7 +2,8 @@ import {
   type BraceletOrder,
   BRACELET_SYMBOLS,
   BRACELET_COLORS,
-  FRONT_BACK_FONTS,
+  FRONT_FONTS,
+  VERSO_FONT,
   getHalfCmFromSize,
   getHalfWidthSvg,
   getSizePrefixFromSize,
@@ -52,15 +53,16 @@ function getSymbolPaths(
 }
 
 function getFontClean(fontName: string): string {
-  var f = FRONT_BACK_FONTS.find(function (x) {
+  var f = FRONT_FONTS.find(function (x) {
     return x.name === fontName;
   });
   var fam = f ? f.family : "Calibri, sans-serif";
   return fam.split(",")[0].replace(/'/g, "").trim();
 }
 
+// Todas as 3 fontes da frente são negrito; Calibri Negrito do verso também
 function isBoldFont(fontName: string): boolean {
-  return fontName === "Calibri Negrito";
+  return true;
 }
 
 function getCol(colorName: string): { hex: string; text: string } {
@@ -88,10 +90,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var col = getCol(order.cor);
   var bHex = col.hex;
   var tCol = order.corTexto || col.text;
-  var fFam = getFontClean(order.fonteFrente || "Bahnschrift");
-  var vFam = getFontClean(order.fonteVerso || "Bahnschrift");
+  var fFam = getFontClean(order.fonteFrente || "Segoe Print Negrito");
+  // Verso sempre Calibri Negrito
+  var vFam = VERSO_FONT.family.split(",")[0].replace(/'/g, "").trim();
   var fBold = isBoldFont(order.fonteFrente);
-  var vBold = isBoldFont(order.fonteVerso);
+  var vBold = true;
 
   var sName = order.tamanhoLabel || order.tamanho;
   var hCm = getHalfCmFromSize(sName);

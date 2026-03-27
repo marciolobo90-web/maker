@@ -59,11 +59,22 @@ export interface FontOption {
   label: string;
 }
 
-export const FRONT_BACK_FONTS: FontOption[] = [
-  { name: "Bahnschrift", family: "'Bahnschrift', 'DIN Alternate', 'Segoe UI', sans-serif", label: "Bahnschrift" },
+// Fontes disponíveis para a FRENTE da pulseira
+export const FRONT_FONTS: FontOption[] = [
+  { name: "Segoe Print Negrito", family: "'Segoe Print', 'Bradley Hand', cursive", label: "Segoe Print Negrito" },
   { name: "Calibri Negrito", family: "Calibri, 'Segoe UI', sans-serif", label: "Calibri Negrito" },
-  { name: "Comic Sans", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans" },
+  { name: "Comic Sans MS Negrito", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans MS Negrito" },
 ];
+
+// Alias para compatibilidade (usado em imports existentes)
+export const FRONT_BACK_FONTS = FRONT_FONTS;
+
+// Fonte fixa do VERSO: sempre Calibri Negrito
+export const VERSO_FONT: FontOption = {
+  name: "Calibri Negrito",
+  family: "Calibri, 'Segoe UI', sans-serif",
+  label: "Calibri Negrito",
+};
 
 export const INSIDE_FONT: FontOption = {
   name: "Calibri",
