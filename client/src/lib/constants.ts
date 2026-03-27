@@ -38,17 +38,17 @@ export const BRACELET_COLORS: BraceletColor[] = [
 // Retorna a cor que o símbolo deve ter baseado na cor da pulseira
 // Regras:
 // - Autismo: sempre mantém cores originais (retorna null = usar original)
-// - Alerta (vermelho): sempre branco, NUNCA preto (mesmo em pulseira clara)
+// - Alerta: sempre vermelho (#ED3237), exceto na pulseira vermelha onde fica branco
 // - Pulseira clara (isLight): símbolo preto
 // - Pulseira escura: símbolo branco
 export function getSymbolColor(symbolId: string, braceletColorName: string): string | null {
   if (symbolId === "autismo") return null; // sempre cores originais
   const color = BRACELET_COLORS.find((c) => c.name === braceletColorName);
   if (!color) return "#FFFFFF";
-  // Alerta médico: sempre branco (nunca preto), exceto em pulseira branca
+  // Alerta médico: sempre vermelho, exceto na pulseira vermelha onde fica branco
   if (symbolId === "alerta") {
     if (braceletColorName === "Vermelho") return "#FFFFFF";
-    return color.isLight ? "#000000" : "#FFFFFF";
+    return "#ED3237"; // vermelho em todas as outras cores
   }
   return color.isLight ? "#000000" : "#FFFFFF";
 }
@@ -154,7 +154,7 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [
   {
     id: "alerta",
     name: "Alerta Médico",
-    viewBox: "10075 14425 850 850",
+    viewBox: "10104 14475 784 751",
     keepOriginalColors: false,
     paths: [
       {
@@ -166,7 +166,7 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [
   {
     id: "brasil",
     name: "Brasil",
-    viewBox: "10077 14550 845 600",
+    viewBox: "10127 14600 746 501",
     keepOriginalColors: false,
     paths: [
       {
@@ -178,7 +178,7 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [
   {
     id: "autismo",
     name: "Autismo",
-    viewBox: "9954 14456 1093 776",
+    viewBox: "10003 14504 994 678",
     keepOriginalColors: true, // SEMPRE mantém as cores originais
     paths: [
       {
@@ -198,7 +198,7 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [
   {
     id: "bola",
     name: "Bola de Futebol",
-    viewBox: "10075 14425 850 850",
+    viewBox: "10124 14474 751 751",
     keepOriginalColors: false,
     paths: [
       {
