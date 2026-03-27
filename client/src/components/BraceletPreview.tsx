@@ -9,7 +9,12 @@ import {
   getSizePrefixFromSize,
   getSymbolColor,
   SYMBOL_MAX_SIZE,
+  AUTISMO_SYMBOL_SIZE,
 } from "@/lib/constants";
+
+function getSymbolSize(symbolId: string): number {
+  return symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+}
 
 interface BraceletPreviewProps {
   order: BraceletOrder;
@@ -123,15 +128,17 @@ export default function BraceletPreview({
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
   const hasSym1 = !!order.simboloFrente;
   const hasSym2 = !!order.simboloFrente2;
+  const sym1Width = hasSym1 ? getSymbolSize(order.simboloFrente!) : 0;
+  const sym2Width = hasSym2 ? getSymbolSize(order.simboloFrente2!) : 0;
   const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
   let totalFrenteW = frenteTextW;
-  if (hasSym1) totalFrenteW += symSz + symGap;
-  if (hasSym2) totalFrenteW += symGap + symSz;
+  if (hasSym1) totalFrenteW += sym1Width + symGap;
+  if (hasSym2) totalFrenteW += symGap + sym2Width;
   const frenteGroupStart = frenteCX - Math.round(totalFrenteW / 2);
   const sym1X = frenteGroupStart;
   const textFrenteX =
     frenteGroupStart +
-    (hasSym1 ? symSz + symGap : 0) +
+    (hasSym1 ? sym1Width + symGap : 0) +
     Math.round(frenteTextW / 2);
   const sym2X =
     textFrenteX + Math.round(frenteTextW / 2) + symGap;
@@ -147,14 +154,15 @@ export default function BraceletPreview({
   const versoL2 = order.l2Verso || "";
   const hasVersoL2 = versoL2.length > 0;
   const hasSV = !!order.simboloVerso;
+  const svSymWidth = hasSV ? getSymbolSize(order.simboloVerso!) : 0;
   const versoTextW = estimateTextWidth(versoL1, fontSize);
   let totalVersoW = versoTextW;
-  if (hasSV) totalVersoW += symSz + symGap;
+  if (hasSV) totalVersoW += svSymWidth + symGap;
   const versoGroupStart = versoCX - Math.round(totalVersoW / 2);
   const symVX = versoGroupStart;
   const textVersoX =
     versoGroupStart +
-    (hasSV ? symSz + symGap : 0) +
+    (hasSV ? svSymWidth + symGap : 0) +
     Math.round(versoTextW / 2);
 
   let versoTextY1: number;
@@ -297,8 +305,8 @@ export default function BraceletPreview({
           symbolId={order.simboloFrente!}
           braceletColor={order.cor}
           x={sym1X}
-          y={symFrenteY}
-          size={symSz}
+          y={frenteY + Math.round((rectH - sym1Width) / 2)}
+          size={sym1Width}
         />
       )}
       <text
@@ -317,8 +325,8 @@ export default function BraceletPreview({
           symbolId={order.simboloFrente2!}
           braceletColor={order.cor}
           x={sym2X}
-          y={symFrenteY}
-          size={symSz}
+          y={frenteY + Math.round((rectH - sym2Width) / 2)}
+          size={sym2Width}
         />
       )}
 
@@ -328,8 +336,8 @@ export default function BraceletPreview({
           symbolId={order.simboloVerso!}
           braceletColor={order.cor}
           x={symVX}
-          y={symFrenteY}
-          size={symSz}
+          y={frenteY + Math.round((rectH - svSymWidth) / 2)}
+          size={svSymWidth}
         />
       )}
       <text

@@ -122,6 +122,9 @@ export function getSizePrefixFromSize(sizeName: string): string {
 
 // Tamanho máximo do símbolo: 7.5mm = 750 SVG units
 export const SYMBOL_MAX_SIZE = 750;
+// Autismo: 7mm de altura = precisa de bounding box de 1027 para que
+// Math.min(1027/994, 1027/678) resulte em altura ~700 SVG units = 7mm
+export const AUTISMO_SYMBOL_SIZE = 1027;
 
 export interface BraceletOrder {
   id: string;

@@ -9,7 +9,12 @@ import {
   getSizePrefixFromSize,
   getSymbolColor,
   SYMBOL_MAX_SIZE,
+  AUTISMO_SYMBOL_SIZE,
 } from "./constants";
+
+function getSymbolSize(symbolId: string): number {
+  return symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+}
 
 function getSymbolPaths(
   symbolId: string | undefined,
@@ -125,12 +130,14 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var frenteTextW = estW(order.textoFrente, fs);
   var hasSym1 = !!order.simboloFrente;
   var hasSym2 = !!order.simboloFrente2;
+  var sym1Width = hasSym1 ? getSymbolSize(order.simboloFrente || "") : 0;
+  var sym2Width = hasSym2 ? getSymbolSize(order.simboloFrente2 || "") : 0;
   var totalFrenteW = frenteTextW;
-  if (hasSym1) totalFrenteW += symSz + symGap;
-  if (hasSym2) totalFrenteW += symGap + symSz;
+  if (hasSym1) totalFrenteW += sym1Width + symGap;
+  if (hasSym2) totalFrenteW += symGap + sym2Width;
   var frenteGroupStart = fCx - Math.round(totalFrenteW / 2);
   var sym1X = frenteGroupStart;
-  var textFrenteX = frenteGroupStart + (hasSym1 ? symSz + symGap : 0) + Math.round(frenteTextW / 2);
+  var textFrenteX = frenteGroupStart + (hasSym1 ? sym1Width + symGap : 0) + Math.round(frenteTextW / 2);
   var sym2X = textFrenteX + Math.round(frenteTextW / 2) + symGap;
 
   // Calcular posições VERSO (agora com 2 linhas possíveis)
@@ -139,11 +146,12 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var hasVersoL2 = versoL2.length > 0;
   var versoTextW = estW(versoL1, fs);
   var hasSV = !!order.simboloVerso;
+  var svWidth = hasSV ? getSymbolSize(order.simboloVerso || "") : 0;
   var totalVersoW = versoTextW;
-  if (hasSV) totalVersoW += symSz + symGap;
+  if (hasSV) totalVersoW += svWidth + symGap;
   var versoGroupStart = vCx - Math.round(totalVersoW / 2);
   var symVX = versoGroupStart;
-  var textVersoX = versoGroupStart + (hasSV ? symSz + symGap : 0) + Math.round(versoTextW / 2);
+  var textVersoX = versoGroupStart + (hasSV ? svWidth + symGap : 0) + Math.round(versoTextW / 2);
 
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   var textYOffset = 70;
@@ -276,18 +284,24 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
   if (hasSym1) {
-    p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, symFrenteY, symSz));
+    var s1Sz = getSymbolSize(order.simboloFrente || "");
+    var s1Y = frenteY + Math.round((rH - s1Sz) / 2);
+    p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, s1Y, s1Sz));
   }
   p.push(
     '  <text x="' + textFrenteX + '" y="' + frenteTextY + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
   );
   if (hasSym2) {
-    p.push(getSymbolPaths(order.simboloFrente2, order.cor, sym2X, symFrenteY, symSz));
+    var s2Sz = getSymbolSize(order.simboloFrente2 || "");
+    var s2Y = frenteY + Math.round((rH - s2Sz) / 2);
+    p.push(getSymbolPaths(order.simboloFrente2, order.cor, sym2X, s2Y, s2Sz));
   }
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   if (hasSV) {
-    p.push(getSymbolPaths(order.simboloVerso, order.cor, symVX, symFrenteY, symSz));
+    var svSz = getSymbolSize(order.simboloVerso || "");
+    var svY = frenteY + Math.round((rH - svSz) / 2);
+    p.push(getSymbolPaths(order.simboloVerso, order.cor, symVX, svY, svSz));
   }
   p.push(
     '  <text x="' + textVersoX + '" y="' + versoTextY1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(versoL1) + "</text>"
