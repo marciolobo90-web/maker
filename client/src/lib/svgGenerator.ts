@@ -8,22 +8,43 @@ import {
   getSizePrefixFromSize,
 } from "./constants";
 
-function getSymbolGroupTag(symbolId: string | undefined, x: number, y: number, size: number): string {
+function getSymbolGroupTag(
+  symbolId: string | undefined,
+  x: number,
+  y: number,
+  size: number
+): string {
   if (!symbolId) return "";
-  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
+  var symbol = BRACELET_SYMBOLS.find(function (s) {
+    return s.id === symbolId;
+  });
   if (!symbol) return "";
-  const vb = symbol.viewBox.split(" ").map(Number);
-  const scale = Math.min(size / vb[2], size / vb[3]);
-  const tx = x + (size - vb[2] * scale) / 2 - vb[0] * scale;
-  const ty = y + (size - vb[3] * scale) / 2 - vb[1] * scale;
-  const paths = symbol.paths.map(function(pp) {
-    return '  <path d="' + pp.d + '" fill="' + pp.fill + '"/>';
-  }).join("\n");
-  return ' <g transform="translate(' + tx.toFixed(2) + "," + ty.toFixed(2) + ") scale(" + scale.toFixed(6) + ')">\n' + paths + "\n </g>";
+  var vb = symbol.viewBox.split(" ").map(Number);
+  var sc = Math.min(size / vb[2], size / vb[3]);
+  var tx = x + (size - vb[2] * sc) / 2 - vb[0] * sc;
+  var ty = y + (size - vb[3] * sc) / 2 - vb[1] * sc;
+  var paths = symbol.paths
+    .map(function (pp) {
+      return '  <path d="' + pp.d + '" fill="' + pp.fill + '"/>';
+    })
+    .join("\n");
+  return (
+    ' <g transform="translate(' +
+    tx.toFixed(2) +
+    "," +
+    ty.toFixed(2) +
+    ") scale(" +
+    sc.toFixed(6) +
+    ')">\n' +
+    paths +
+    "\n </g>"
+  );
 }
 
 function getFontClean(fontName: string): string {
-  var f = FRONT_BACK_FONTS.find(function(x) { return x.name === fontName; });
+  var f = FRONT_BACK_FONTS.find(function (x) {
+    return x.name === fontName;
+  });
   var fam = f ? f.family : "Calibri, sans-serif";
   return fam.split(",")[0].replace(/'/g, "").trim();
 }
@@ -33,16 +54,22 @@ function isBoldFont(fontName: string): boolean {
 }
 
 function getCol(colorName: string): { hex: string; text: string } {
-  var c = BRACELET_COLORS.find(function(x) { return x.name === colorName; });
+  var c = BRACELET_COLORS.find(function (x) {
+    return x.name === colorName;
+  });
   return c ? { hex: c.hex, text: c.textColor } : { hex: "#000000", text: "#FFFFFF" };
 }
 
 function esc(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-function estW(text: string, fs: number): number {
-  return Math.round(text.length * fs * 0.55);
+function estW(text: string, fontSize: number): number {
+  return Math.round(text.length * fontSize * 0.55);
 }
 
 export function generateBraceletSVG(order: BraceletOrder): string {
@@ -75,58 +102,127 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   var p: string[] = [];
 
+  // SVG header — formato CorelDRAW
   p.push('<?xml version="1.0" encoding="UTF-8"?>');
-  p.push('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">');
-  p.push('<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="210mm" height="297mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 21000 29700" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">');
+  p.push(
+    '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+  );
+  p.push(
+    '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="210mm" height="297mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 21000 29700" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">'
+  );
 
   p.push(' <g id="Camada_x0020_1">');
   p.push('  <metadata id="CorelCorpID_0Corel-Layer"/>');
 
-  // Retângulos pulseira: frente, dentro1, dentro2
-  p.push('  <rect id="_' + pfx + 'frente" fill="' + bHex + '" x="' + fX + '" y="5267.18" width="' + rW + '" height="' + rH + '"/>');
-  p.push('  <rect id="_' + pfx + 'dentro1" fill="' + bHex + '" x="' + fX + '" y="7605.9" width="' + rW + '" height="' + rH + '"/>');
-  p.push('  <rect id="_' + pfx + 'dentro2" fill="' + bHex + '" x="' + vX + '" y="7605.9" width="' + rW + '" height="' + rH + '"/>');
+  // ============================================================
+  // REGRA COREL: Todos os retângulos ANTES de todos os textos
+  // Retângulos que ficam depois de textos sobrepostos = bloqueados
+  // ============================================================
 
-  // Backgrounds cabeçalho
-  p.push('  <rect fill="#D2D3D5" x="-0.01" y="-0.02" width="20999.99" height="2700"/>');
-  p.push('  <rect fill="#606062" x="0" y="-0.02" width="20999.99" height="1200"/>');
+  // 1) Todos os 4 retângulos de pulseira juntos
+  p.push(
+    '  <rect id="_' +
+      pfx +
+      'frente" fill="' +
+      bHex +
+      '" x="' +
+      fX +
+      '" y="5267.18" width="' +
+      rW +
+      '" height="' +
+      rH +
+      '"/>'
+  );
+  p.push(
+    '  <rect id="_' +
+      pfx +
+      'verso" fill="' +
+      bHex +
+      '" x="' +
+      vX +
+      '" y="5267.18" width="' +
+      rW +
+      '" height="' +
+      rH +
+      '"/>'
+  );
+  p.push(
+    '  <rect id="_' +
+      pfx +
+      'dentro1" fill="' +
+      bHex +
+      '" x="' +
+      fX +
+      '" y="7605.9" width="' +
+      rW +
+      '" height="' +
+      rH +
+      '"/>'
+  );
+  p.push(
+    '  <rect id="_' +
+      pfx +
+      'dentro2" fill="' +
+      bHex +
+      '" x="' +
+      vX +
+      '" y="7605.9" width="' +
+      rW +
+      '" height="' +
+      rH +
+      '"/>'
+  );
+
+  // 2) Backgrounds cabeçalho
+  p.push(
+    '  <rect fill="#D2D3D5" x="-0.01" y="-0.02" width="20999.99" height="2700"/>'
+  );
+  p.push(
+    '  <rect fill="#606062" x="0" y="-0.02" width="20999.99" height="1200"/>'
+  );
+
+  // 3) Rodapé
+  p.push(
+    '  <rect fill="#A9ABAE" x="0" y="10790.53" width="20999.99" height="500"/>'
+  );
+
+  // 4) Badge quantidade (se > 1)
+  if (order.quantidade && order.quantidade > 1) {
+    p.push(
+      '  <rect fill="#F58634" x="18500" y="300" width="2200" height="600" rx="100"/>'
+    );
+  }
+
+  // ============================================================
+  // AGORA todos os textos e símbolos (DEPOIS dos retângulos)
+  // ============================================================
 
   // Nome do cliente
-  p.push('  <text x="800" y="850" text-anchor="start" fill="#FEFEFE" font-weight="bold" font-size="767.66" font-family="Calibri">Cliente: ' + esc(order.nomeCliente) + '</text>');
+  p.push(
+    '  <text x="800" y="850" text-anchor="start" fill="#FEFEFE" font-weight="bold" font-size="767.66" font-family="Calibri">Cliente: ' +
+      esc(order.nomeCliente) +
+      "</text>"
+  );
 
   // Descrição
-  p.push('  <text x="800" y="2050" text-anchor="start" fill="#373435" font-size="567.28" font-family="Arial">Pulseira de silicone: Personalização baixo relevo + aplicação de tinta</text>');
-
-  // Rodapé
-  p.push('  <rect fill="#A9ABAE" x="0" y="10790.53" width="20999.99" height="500"/>');
+  p.push(
+    '  <text x="800" y="2050" text-anchor="start" fill="#373435" font-size="567.28" font-family="Arial">Pulseira de silicone: Personalização baixo relevo + aplicação de tinta</text>'
+  );
 
   // Tamanho
-  p.push('  <text x="10500" y="3853.85" text-anchor="middle" fill="#373435" font-weight="bold" font-size="529.17" font-family="Arial">' + esc(order.tamanhoCm + " cm (" + order.tamanhoLabel + ")") + '</text>');
+  p.push(
+    '  <text x="10500" y="3853.85" text-anchor="middle" fill="#373435" font-weight="bold" font-size="529.17" font-family="Arial">' +
+      esc(order.tamanhoCm + " cm (" + order.tamanhoLabel + ")") +
+      "</text>"
+  );
 
   // Labels
-  p.push('  <text x="10500" y="7350" text-anchor="middle" fill="#727376" font-style="italic" font-size="502.53" font-family="Arial">dentro</text>');
-  p.push('  <text x="10500" y="4900" text-anchor="middle" fill="#727376" font-style="italic" font-size="502.53" font-family="Arial">frente</text>');
-
-  // Textos dentro
-  p.push('  <text x="' + fCx + '" y="8135.55" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + '</text>');
-  p.push('  <text x="' + fCx + '" y="8544.43" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + '</text>');
-  p.push('  <text x="' + vCx + '" y="8135.55" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + '</text>');
-  p.push('  <text x="' + vCx + '" y="8544.43" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + '</text>');
-
-  // Retângulo VERSO — depois dos textos internos
-  p.push('  <rect id="_' + pfx + 'verso" fill="' + bHex + '" x="' + vX + '" y="5267.18" width="' + rW + '" height="' + rH + '"/>');
-
-  // Texto e símbolo VERSO
-  if (order.simboloVerso) {
-    var totVW = symSz + symGap + vTw;
-    var vGS = vCx - Math.round(totVW / 2);
-    var sVX = vGS;
-    var tVX = vGS + symSz + symGap + Math.round(vTw / 2);
-    p.push(getSymbolGroupTag(order.simboloVerso, sVX, symY, symSz));
-    p.push('  <text x="' + tVX + '" y="5976.82" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(order.textoVerso) + '</text>');
-  } else {
-    p.push('  <text x="' + vCx + '" y="5976.82" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(order.textoVerso) + '</text>');
-  }
+  p.push(
+    '  <text x="10500" y="4900" text-anchor="middle" fill="#727376" font-style="italic" font-size="502.53" font-family="Arial">frente</text>'
+  );
+  p.push(
+    '  <text x="10500" y="7350" text-anchor="middle" fill="#727376" font-style="italic" font-size="502.53" font-family="Arial">dentro</text>'
+  );
 
   // Texto e símbolo FRENTE
   if (order.simboloFrente) {
@@ -135,19 +231,136 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var sFX = fGS;
     var tFX = fGS + symSz + symGap + Math.round(fTw / 2);
     p.push(getSymbolGroupTag(order.simboloFrente, sFX, symY, symSz));
-    p.push('  <text x="' + tFX + '" y="5976.82" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + '</text>');
+    p.push(
+      '  <text x="' +
+        tFX +
+        '" y="5976.82" text-anchor="middle" fill="' +
+        tCol +
+        '" font-weight="' +
+        (fBold ? "bold" : "normal") +
+        '" font-size="' +
+        fs +
+        '" font-family="' +
+        esc(fFam) +
+        '">' +
+        esc(order.textoFrente) +
+        "</text>"
+    );
   } else {
-    p.push('  <text x="' + fCx + '" y="5976.82" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + '</text>');
+    p.push(
+      '  <text x="' +
+        fCx +
+        '" y="5976.82" text-anchor="middle" fill="' +
+        tCol +
+        '" font-weight="' +
+        (fBold ? "bold" : "normal") +
+        '" font-size="' +
+        fs +
+        '" font-family="' +
+        esc(fFam) +
+        '">' +
+        esc(order.textoFrente) +
+        "</text>"
+    );
   }
 
-  // Badge quantidade
+  // Texto e símbolo VERSO
+  if (order.simboloVerso) {
+    var totVW = symSz + symGap + vTw;
+    var vGS = vCx - Math.round(totVW / 2);
+    var sVX = vGS;
+    var tVX = vGS + symSz + symGap + Math.round(vTw / 2);
+    p.push(getSymbolGroupTag(order.simboloVerso, sVX, symY, symSz));
+    p.push(
+      '  <text x="' +
+        tVX +
+        '" y="5976.82" text-anchor="middle" fill="' +
+        tCol +
+        '" font-weight="' +
+        (vBold ? "bold" : "normal") +
+        '" font-size="' +
+        fs +
+        '" font-family="' +
+        esc(vFam) +
+        '">' +
+        esc(order.textoVerso) +
+        "</text>"
+    );
+  } else {
+    p.push(
+      '  <text x="' +
+        vCx +
+        '" y="5976.82" text-anchor="middle" fill="' +
+        tCol +
+        '" font-weight="' +
+        (vBold ? "bold" : "normal") +
+        '" font-size="' +
+        fs +
+        '" font-family="' +
+        esc(vFam) +
+        '">' +
+        esc(order.textoVerso) +
+        "</text>"
+    );
+  }
+
+  // Textos dentro
+  p.push(
+    '  <text x="' +
+      fCx +
+      '" y="8135.55" text-anchor="middle" fill="' +
+      tCol +
+      '" font-weight="bold" font-size="' +
+      ifs +
+      '" font-family="Calibri">' +
+      esc(order.l1Dentro1) +
+      "</text>"
+  );
+  p.push(
+    '  <text x="' +
+      fCx +
+      '" y="8544.43" text-anchor="middle" fill="' +
+      tCol +
+      '" font-weight="bold" font-size="' +
+      ifs +
+      '" font-family="Calibri">' +
+      esc(order.l2Dentro1) +
+      "</text>"
+  );
+  p.push(
+    '  <text x="' +
+      vCx +
+      '" y="8135.55" text-anchor="middle" fill="' +
+      tCol +
+      '" font-weight="bold" font-size="' +
+      ifs +
+      '" font-family="Calibri">' +
+      esc(order.l1Dentro2) +
+      "</text>"
+  );
+  p.push(
+    '  <text x="' +
+      vCx +
+      '" y="8544.43" text-anchor="middle" fill="' +
+      tCol +
+      '" font-weight="bold" font-size="' +
+      ifs +
+      '" font-family="Calibri">' +
+      esc(order.l2Dentro2) +
+      "</text>"
+  );
+
+  // Badge quantidade texto
   if (order.quantidade && order.quantidade > 1) {
-    p.push('  <rect fill="#F58634" x="18500" y="300" width="2200" height="600" rx="100"/>');
-    p.push('  <text x="19600" y="720" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="400" font-family="Calibri">Qtd: ' + order.quantidade + '</text>');
+    p.push(
+      '  <text x="19600" y="720" text-anchor="middle" fill="#FFFFFF" font-weight="bold" font-size="400" font-family="Calibri">Qtd: ' +
+        order.quantidade +
+        "</text>"
+    );
   }
 
-  p.push(' </g>');
-  p.push('</svg>');
+  p.push(" </g>");
+  p.push("</svg>");
 
   return p.join("\n");
 }
@@ -165,9 +378,13 @@ export function downloadSVG(svgContent: string, filename: string): void {
 }
 
 export function downloadAllSVGs(orders: BraceletOrder[]): void {
-  orders.forEach(function(order, index) {
+  orders.forEach(function (order, index) {
     var svg = generateBraceletSVG(order);
-    var filename = (order.nomeCliente || "pulseira_" + (index + 1)).replace(/\s+/g, "_") + ".svg";
-    setTimeout(function() { downloadSVG(svg, filename); }, index * 200);
+    var filename =
+      (order.nomeCliente || "pulseira_" + (index + 1)).replace(/\s+/g, "_") +
+      ".svg";
+    setTimeout(function () {
+      downloadSVG(svg, filename);
+    }, index * 200);
   });
 }
