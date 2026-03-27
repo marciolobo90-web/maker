@@ -8,7 +8,7 @@ import {
   getSizePrefixFromSize,
 } from "./constants";
 
-function getSymbolGroupTag(
+function getSymbolPaths(
   symbolId: string | undefined,
   x: number,
   y: number,
@@ -23,22 +23,13 @@ function getSymbolGroupTag(
   var sc = Math.min(size / vb[2], size / vb[3]);
   var tx = x + (size - vb[2] * sc) / 2 - vb[0] * sc;
   var ty = y + (size - vb[3] * sc) / 2 - vb[1] * sc;
+  // Each path gets its own transform attribute — NO <g> wrapper
   var paths = symbol.paths
     .map(function (pp) {
-      return '  <path d="' + pp.d + '" fill="' + pp.fill + '"/>';
+      return '  <path transform="translate(' + tx.toFixed(2) + ',' + ty.toFixed(2) + ') scale(' + sc.toFixed(6) + ')" d="' + pp.d + '" fill="' + pp.fill + '"/>';
     })
     .join("\n");
-  return (
-    ' <g transform="translate(' +
-    tx.toFixed(2) +
-    "," +
-    ty.toFixed(2) +
-    ") scale(" +
-    sc.toFixed(6) +
-    ')">\n' +
-    paths +
-    "\n </g>"
-  );
+  return paths;
 }
 
 function getFontClean(fontName: string): string {
@@ -121,7 +112,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // 1) Todos os 4 retângulos de pulseira juntos
   p.push(
-    '  <rect id="_' +
+    '  <rect id="' +
       pfx +
       'frente" fill="' +
       bHex +
@@ -134,7 +125,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
       '"/>'
   );
   p.push(
-    '  <rect id="_' +
+    '  <rect id="' +
       pfx +
       'verso" fill="' +
       bHex +
@@ -147,7 +138,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
       '"/>'
   );
   p.push(
-    '  <rect id="_' +
+    '  <rect id="' +
       pfx +
       'dentro1" fill="' +
       bHex +
@@ -160,7 +151,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
       '"/>'
   );
   p.push(
-    '  <rect id="_' +
+    '  <rect id="' +
       pfx +
       'dentro2" fill="' +
       bHex +
@@ -230,7 +221,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var fGS = fCx - Math.round(totFW / 2);
     var sFX = fGS;
     var tFX = fGS + symSz + symGap + Math.round(fTw / 2);
-    p.push(getSymbolGroupTag(order.simboloFrente, sFX, symY, symSz));
+    p.push(getSymbolPaths(order.simboloFrente, sFX, symY, symSz));
     p.push(
       '  <text x="' +
         tFX +
@@ -270,7 +261,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var vGS = vCx - Math.round(totVW / 2);
     var sVX = vGS;
     var tVX = vGS + symSz + symGap + Math.round(vTw / 2);
-    p.push(getSymbolGroupTag(order.simboloVerso, sVX, symY, symSz));
+    p.push(getSymbolPaths(order.simboloVerso, sVX, symY, symSz));
     p.push(
       '  <text x="' +
         tVX +
