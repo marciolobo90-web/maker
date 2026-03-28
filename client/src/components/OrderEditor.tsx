@@ -135,7 +135,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             <SelectContent>
               {FRONT_FONTS.map((f) => (
                 <SelectItem key={f.name} value={f.name}>
-                  <span style={{ fontFamily: f.family, fontWeight: "bold" }}>{f.label}</span>
+                  <span style={{ fontFamily: f.family, fontWeight: f.name === "Kids Station" || f.name === "Milky Matcha" ? "normal" : "bold" }}>{f.label}</span>
                 </SelectItem>
               ))}
             </SelectContent>

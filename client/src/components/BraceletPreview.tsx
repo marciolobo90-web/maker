@@ -33,9 +33,13 @@ function getFontFamily(fontName: string): string {
   return font ? font.family : "Calibri, 'Segoe UI', sans-serif";
 }
 
-// Todas as fontes disponíveis são negrito
-function isBoldFont(_fontName: string): boolean {
-  return true;
+function getFontSvgSize(fontName: string): number {
+  const font = FRONT_FONTS.find((f) => f.name === fontName);
+  return font?.svgFontSize || 635;
+}
+
+function isBoldFont(fontName: string): boolean {
+  return fontName !== "Kids Station" && fontName !== "Milky Matcha";
 }
 
 function SymbolGroup({
@@ -94,7 +98,7 @@ export default function BraceletPreview({
   const fontFrente = getFontFamily(order.fonteFrente || "Segoe Print Negrito");
   // Verso sempre Calibri Negrito
   const fontVerso = VERSO_FONT.family;
-  const boldFrente = true;
+  const boldFrente = isBoldFont(order.fonteFrente || "Segoe Print Negrito");
   const boldVerso = true;
   const insideFont = "Calibri, 'Segoe UI', sans-serif";
 
@@ -121,7 +125,9 @@ export default function BraceletPreview({
   const frenteY = 5267;
   const dentroY = 7606;
   const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
-  const fontSize = 423;
+  // Tamanho de fonte da frente varia por fonte selecionada
+  const fontSize = getFontSvgSize(order.fonteFrente || "Segoe Print Negrito");
+  const versoFontSize = 706; // Calibri Negrito 20pt fixo
   const insideFontSize = 406;
   const symGap = 100;
 
@@ -155,7 +161,7 @@ export default function BraceletPreview({
   const hasVersoL2 = versoL2.length > 0;
   const hasSV = !!order.simboloVerso;
   const svSymWidth = hasSV ? getSymbolSize(order.simboloVerso!) : 0;
-  const versoTextW = estimateTextWidth(versoL1, fontSize);
+  const versoTextW = estimateTextWidth(versoL1, versoFontSize);
   let totalVersoW = versoTextW;
   if (hasSV) totalVersoW += svSymWidth + symGap;
   const versoGroupStart = versoCX - Math.round(totalVersoW / 2);
@@ -347,7 +353,7 @@ export default function BraceletPreview({
         fill={textColor}
         fontFamily={fontVerso}
         fontWeight={boldVerso ? "bold" : "normal"}
-        fontSize={fontSize}
+        fontSize={versoFontSize}
       >
         {versoL1}
       </text>
@@ -359,7 +365,7 @@ export default function BraceletPreview({
           fill={textColor}
           fontFamily={fontVerso}
           fontWeight={boldVerso ? "bold" : "normal"}
-          fontSize={fontSize}
+          fontSize={versoFontSize}
         >
           {versoL2}
         </text>

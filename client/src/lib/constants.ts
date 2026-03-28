@@ -18,7 +18,7 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Azul Claro", hex: "#00A3E0", textColor: "#FFFFFF", isLight: false },
   { name: "Azul Marinho", hex: "#00205B", textColor: "#FFFFFF", isLight: false },
   { name: "Vinho", hex: "#9B2335", textColor: "#FFFFFF", isLight: false },
-  { name: "Laranja", hex: "#FE5000", textColor: "#FFFFFF", isLight: false },
+  { name: "Laranja", hex: "#FE5000", textColor: "#000000", isLight: true },
   { name: "Preto", hex: "#000000", textColor: "#FFFFFF", isLight: false },
   { name: "Roxo", hex: "#582C83", textColor: "#FFFFFF", isLight: false },
   { name: "Lilás", hex: "#7B61A4", textColor: "#FFFFFF", isLight: false },
@@ -27,7 +27,7 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Verde Limão", hex: "#44D62C", textColor: "#000000", isLight: true },
   { name: "Verde Água", hex: "#00B388", textColor: "#FFFFFF", isLight: false },
   { name: "Vermelho", hex: "#E4002B", textColor: "#FFFFFF", isLight: false },
-  { name: "Rosa Claro", hex: "#F99FC9", textColor: "#000000", isLight: true },
+  { name: "Rosa Claro", hex: "#F99FC9", textColor: "#FFFFFF", isLight: false },
   { name: "Rosa Médio", hex: "#E0457B", textColor: "#FFFFFF", isLight: false },
   { name: "Pink", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
   { name: "Colorido", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
@@ -57,13 +57,19 @@ export interface FontOption {
   name: string;
   family: string;
   label: string;
+  svgFontSize?: number; // tamanho em SVG units para a frente (calculado de pt)
 }
 
 // Fontes disponíveis para a FRENTE da pulseira
+// svgFontSize: conversão de pt para SVG units (1pt ≈ 35.28 SVG units em 100 units/mm)
+// Kids Station 24pt = 847, Comic Sans Negrito 18pt = 635, Calibri Negrito 20pt = 706,
+// Milky Matcha 14pt = 494, Segoe Print Negrito 18pt = 635
 export const FRONT_FONTS: FontOption[] = [
-  { name: "Segoe Print Negrito", family: "'Segoe Print', 'Bradley Hand', cursive", label: "Segoe Print Negrito" },
-  { name: "Calibri Negrito", family: "Calibri, 'Segoe UI', sans-serif", label: "Calibri Negrito" },
-  { name: "Comic Sans MS Negrito", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans MS Negrito" },
+  { name: "Kids Station", family: "'Kids Station', 'Comic Sans MS', cursive", label: "Kids Station", svgFontSize: 847 },
+  { name: "Comic Sans MS Negrito", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans MS Negrito", svgFontSize: 635 },
+  { name: "Calibri Negrito", family: "Calibri, 'Segoe UI', sans-serif", label: "Calibri Negrito", svgFontSize: 706 },
+  { name: "Milky Matcha", family: "'Milky Matcha', 'Comic Sans MS', cursive", label: "Milky Matcha", svgFontSize: 494 },
+  { name: "Segoe Print Negrito", family: "'Segoe Print', 'Bradley Hand', cursive", label: "Segoe Print Negrito", svgFontSize: 635 },
 ];
 
 // Alias para compatibilidade (usado em imports existentes)

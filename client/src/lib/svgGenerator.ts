@@ -57,17 +57,16 @@ function getSymbolPaths(
   return paths;
 }
 
-function getFontClean(fontName: string): string {
+function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontSize: number } {
   var f = FRONT_FONTS.find(function (x) {
     return x.name === fontName;
   });
   var fam = f ? f.family : "Calibri, sans-serif";
-  return fam.split(",")[0].replace(/'/g, "").trim();
-}
-
-// Todas as 3 fontes da frente são negrito; Calibri Negrito do verso também
-function isBoldFont(fontName: string): boolean {
-  return true;
+  var clean = fam.split(",")[0].replace(/'/g, "").trim();
+  // Kids Station e Milky Matcha não são negrito; as demais são
+  var bold = fontName !== "Kids Station" && fontName !== "Milky Matcha";
+  var svgFontSize = f && f.svgFontSize ? f.svgFontSize : 635;
+  return { clean: clean, bold: bold, svgFontSize: svgFontSize };
 }
 
 function getCol(colorName: string): { hex: string; text: string } {
@@ -95,10 +94,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var col = getCol(order.cor);
   var bHex = col.hex;
   var tCol = order.corTexto || col.text;
-  var fFam = getFontClean(order.fonteFrente || "Segoe Print Negrito");
+  var fontInfo = getFontInfo(order.fonteFrente || "Segoe Print Negrito");
+  var fFam = fontInfo.clean;
+  var fBold = fontInfo.bold;
   // Verso sempre Calibri Negrito
   var vFam = VERSO_FONT.family.split(",")[0].replace(/'/g, "").trim();
-  var fBold = isBoldFont(order.fonteFrente);
   var vBold = true;
 
   var sName = order.tamanhoLabel || order.tamanho;
@@ -119,8 +119,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var dentroY = 7606;
   var symFrenteY = frenteY + Math.round((rH - symSz) / 2);
   var symDentroY = dentroY + Math.round((rH - symSz) / 2);
-  var fs = 423;
-  var ifs = 406;
+  // Tamanho de fonte da frente varia por fonte selecionada
+  var fs = fontInfo.svgFontSize;
+  var ifs = 406; // dentro mantém Calibri no tamanho padrão
+  var vfs = 706; // verso mantém Calibri Negrito 20pt = 706 SVG units
   var symGap = 100;
 
   // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)
@@ -144,7 +146,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var versoL1 = order.textoVerso || "";
   var versoL2 = order.l2Verso || "";
   var hasVersoL2 = versoL2.length > 0;
-  var versoTextW = estW(versoL1, fs);
+  var versoTextW = estW(versoL1, vfs);
   var hasSV = !!order.simboloVerso;
   var svWidth = hasSV ? getSymbolSize(order.simboloVerso || "") : 0;
   var totalVersoW = versoTextW;
@@ -210,8 +212,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     '<svg xmlns="http://www.w3.org/2000/svg" xml:space="preserve" width="210mm" height="297mm" version="1.1" style="shape-rendering:geometricPrecision; text-rendering:geometricPrecision; image-rendering:optimizeQuality; fill-rule:evenodd; clip-rule:evenodd" viewBox="0 0 21000 29700" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xodm="http://www.corel.com/coreldraw/odm/2003">'
   );
 
-  p.push(' <g id="Camada_x0020_1">');
-  p.push('  <metadata id="CorelCorpID_0Corel-Layer"/>');
+  // Sem <g> wrapper para evitar agrupamento/bloqueio no CorelDRAW
+  // Cada elemento fica solto na raiz do SVG
 
   // ============================================================
   // REGRA COREL: Todos os retângulos ANTES de todos os textos
@@ -304,11 +306,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloVerso, order.cor, symVX, svY, svSz));
   }
   p.push(
-    '  <text x="' + textVersoX + '" y="' + versoTextY1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(versoL1) + "</text>"
+    '  <text x="' + textVersoX + '" y="' + versoTextY1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + vfs + '" font-family="' + esc(vFam) + '">' + esc(versoL1) + "</text>"
   );
   if (hasVersoL2) {
     p.push(
-      '  <text x="' + textVersoX + '" y="' + versoTextY2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(vFam) + '">' + esc(versoL2) + "</text>"
+      '  <text x="' + textVersoX + '" y="' + versoTextY2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + vfs + '" font-family="' + esc(vFam) + '">' + esc(versoL2) + "</text>"
     );
   }
 
@@ -341,7 +343,6 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     );
   }
 
-  p.push(" </g>");
   p.push("</svg>");
 
   return p.join("\n");
