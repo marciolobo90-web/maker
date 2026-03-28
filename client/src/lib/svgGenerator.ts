@@ -121,8 +121,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var symDentroY = dentroY + Math.round((rH - symSz) / 2);
   // Tamanho de fonte da frente varia por fonte selecionada
   var fs = fontInfo.svgFontSize;
-  var ifs = 406; // dentro mantém Calibri no tamanho padrão
-  var vfs = 706; // verso mantém Calibri Negrito 20pt = 706 SVG units
+  var ifs = 423; // dentro: Calibri Negrito 12pt = 423 SVG units
+  var vfs = 423; // verso: Calibri Negrito 12pt = 423 SVG units
   var symGap = 100;
 
   // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)

@@ -1,6 +1,23 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Custom fonts - Kids Station & Milky Matcha */
+@font-face {
+  font-family: 'Kids Station';
+  src: url('https://d2xsxph8kpxj0f.cloudfront.net/310419663030925363/Y5uoqej3R3jCoeogm8d5Z4/kids-station_1cfc14b1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Milky Matcha';
+  src: url('https://d2xsxph8kpxj0f.cloudfront.net/310419663030925363/Y5uoqej3R3jCoeogm8d5Z4/milky-matcha_c30d0527.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

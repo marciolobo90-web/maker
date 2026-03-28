@@ -127,8 +127,8 @@ export default function BraceletPreview({
   const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
   // Tamanho de fonte da frente varia por fonte selecionada
   const fontSize = getFontSvgSize(order.fonteFrente || "Segoe Print Negrito");
-  const versoFontSize = 706; // Calibri Negrito 20pt fixo
-  const insideFontSize = 406;
+  const versoFontSize = 423; // Calibri Negrito 12pt fixo
+  const insideFontSize = 423; // Calibri Negrito 12pt fixo
   const symGap = 100;
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
