@@ -57,7 +57,7 @@ function getSymbolPaths(
   return paths;
 }
 
-function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontSize: number } {
+function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontSize: number; fontYOffset: number } {
   var f = FRONT_FONTS.find(function (x) {
     return x.name === fontName;
   });
@@ -66,7 +66,8 @@ function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontS
   // Kids Station e Milky Matcha não são negrito; as demais são
   var bold = fontName !== "Kids Station" && fontName !== "Milky Matcha";
   var svgFontSize = f && f.svgFontSize ? f.svgFontSize : 635;
-  return { clean: clean, bold: bold, svgFontSize: svgFontSize };
+  var fontYOffset = f && f.fontYOffset ? f.fontYOffset : 0;
+  return { clean: clean, bold: bold, svgFontSize: svgFontSize, fontYOffset: fontYOffset };
 }
 
 function getCol(colorName: string): { hex: string; text: string } {
@@ -169,8 +170,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     versoTextY2 = 0;
   }
 
-  // Frente text Y (sempre centralizado)
-  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset;
+  // Frente text Y (sempre centralizado) + offset extra por fonte
+  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset;
 
   // Calcular posições DENTRO com centralização vertical
   var dentro1CX = Math.round(fX + rW / 2);

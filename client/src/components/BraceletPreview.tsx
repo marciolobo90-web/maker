@@ -38,6 +38,11 @@ function getFontSvgSize(fontName: string): number {
   return font?.svgFontSize || 635;
 }
 
+function getFontYOffset(fontName: string): number {
+  const font = FRONT_FONTS.find((f) => f.name === fontName);
+  return font?.fontYOffset || 0;
+}
+
 function isBoldFont(fontName: string): boolean {
   return fontName !== "Kids Station" && fontName !== "Milky Matcha";
 }
@@ -152,8 +157,9 @@ export default function BraceletPreview({
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   const textYOffset = 70;
 
-  // Frente text Y (sempre centralizado)
-  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset;
+  // Frente text Y (sempre centralizado) + offset extra por fonte
+  const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
+  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset;
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   const versoL1 = order.textoVerso || "";
