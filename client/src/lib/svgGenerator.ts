@@ -220,17 +220,19 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // ============================================================
 
   // 1) Todos os 4 retângulos de pulseira juntos
+  // Contorno cinza (20% preto) apenas na pulseira branca
+  var strokeAttr = order.cor === "Branco" ? ' stroke="#CCCCCC" stroke-width="20"' : '';
   p.push(
-    '  <rect id="' + pfx + 'frente" fill="' + bHex + '" x="' + fX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'frente" fill="' + bHex + '"' + strokeAttr + ' x="' + fX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'verso" fill="' + bHex + '" x="' + vX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'verso" fill="' + bHex + '"' + strokeAttr + ' x="' + vX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'dentro1" fill="' + bHex + '" x="' + fX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'dentro1" fill="' + bHex + '"' + strokeAttr + ' x="' + fX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'dentro2" fill="' + bHex + '" x="' + vX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'dentro2" fill="' + bHex + '"' + strokeAttr + ' x="' + vX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
 
   // 2) Backgrounds cabeçalho

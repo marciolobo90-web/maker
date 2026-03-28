@@ -295,6 +295,7 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={braceletHex}
+        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
       <rect
         id={`${prefix}verso`}
@@ -303,6 +304,7 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={braceletHex}
+        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
 
       {/* FRENTE: símbolo1 + texto + símbolo2 */}
@@ -390,6 +392,7 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={braceletHex}
+        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
       <rect
         id={`${prefix}dentro2`}
@@ -398,6 +401,7 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={braceletHex}
+        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
 
       {/* DENTRO1: 1 ou 2 linhas, centralizado se 1 */}
