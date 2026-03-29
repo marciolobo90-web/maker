@@ -7,7 +7,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "gato",
     name: "Gato",
-    viewBox: "0 0 1600 770",
+    viewBox: "329 14 933 751",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -20,7 +20,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "dinossauro1",
     name: "Dinossauro 1",
-    viewBox: "0 0 1600 770",
+    viewBox: "13 -19 1558 797",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -30,7 +30,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "dinossauro2",
     name: "Dinossauro 2",
-    viewBox: "0 0 1600 770",
+    viewBox: "58 14 1475 751",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -40,7 +40,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "gota",
     name: "Gota",
-    viewBox: "0 0 770 770",
+    viewBox: "176 83 409 606",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -50,7 +50,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "cachorro",
     name: "Cachorro",
-    viewBox: "0 0 1600 770",
+    viewBox: "398 14 795 750",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -65,7 +65,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "controle",
     name: "Controle",
-    viewBox: "0 0 1600 770",
+    viewBox: "234 6 1123 758",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -75,7 +75,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "carro",
     name: "Carro",
-    viewBox: "0 0 1600 770",
+    viewBox: "92 14 1407 751",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -88,7 +88,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "aviao",
     name: "Avião",
-    viewBox: "0 0 1600 770",
+    viewBox: "78 4 1440 762",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -98,7 +98,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "unicornio",
     name: "Unicórnio",
-    viewBox: "0 0 1000 770",
+    viewBox: "51 14 888 750",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -108,7 +108,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "saturno",
     name: "Saturno",
-    viewBox: "0 0 1600 770",
+    viewBox: "166 14 1267 751",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -118,7 +118,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "estrela",
     name: "Estrela",
-    viewBox: "0 0 1600 770",
+    viewBox: "370 14 850 758",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -128,7 +128,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "foguete",
     name: "Foguete",
-    viewBox: "0 0 1600 770",
+    viewBox: "98 0 1394 765",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -138,7 +138,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "espada",
     name: "Espada",
-    viewBox: "0 0 770 770",
+    viewBox: "6 14 748 750",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -148,7 +148,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "flor",
     name: "Flor",
-    viewBox: "0 0 770 770",
+    viewBox: "-19 14 776 751",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -158,7 +158,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "coracao",
     name: "Coração",
-    viewBox: "0 0 770 770",
+    viewBox: "1 1 758 763",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
@@ -168,7 +168,7 @@ export const EXTRA_SYMBOLS: BraceletSymbol[] = [
   {
     id: "borboleta",
     name: "Borboleta",
-    viewBox: "0 0 1600 770",
+    viewBox: "261 14 1069 750",
     keepOriginalColors: false,
     scaleByHeight: true,
     paths: [
