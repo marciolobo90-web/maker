@@ -70,7 +70,9 @@ function SymbolGroup({
 
   const vb = symbol.viewBox.split(" ").map(Number);
   // Escala pela altura = 7,5mm (altura fixa, largura proporcional)
-  const scale = size / vb[3];
+  // Sempre usa SYMBOL_MAX_SIZE para a altura, 'size' é a largura renderizada para posicionamento
+  const targetH = symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+  const scale = targetH / vb[3];
   const scaledW = vb[2] * scale;
   const scaledH = vb[3] * scale;
   const tx = x + (size - scaledW) / 2 - vb[0] * scale;

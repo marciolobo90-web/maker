@@ -37,7 +37,9 @@ function getSymbolPaths(
   if (!symbol) return "";
   var vb = symbol.viewBox.split(" ").map(Number);
   // Escala pela altura = 7,5mm (altura fixa, largura proporcional)
-  var sc = size / vb[3];
+  // Sempre usa SYMBOL_MAX_SIZE para a altura, ignorando 'size' que é a largura renderizada para posicionamento
+  var targetH = symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+  var sc = targetH / vb[3];
   var renderedW = vb[2] * sc;
   var renderedH = vb[3] * sc;
   var tx = x + (size - renderedW) / 2 - vb[0] * sc;
