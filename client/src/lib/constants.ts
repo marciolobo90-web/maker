@@ -128,8 +128,8 @@ export function getSizePrefixFromSize(sizeName: string): string {
   return getSizeInfo(sizeName).sizePrefix;
 }
 
-// Tamanho máximo do símbolo: 65% da altura da pulseira (1200 * 0.65 = 780 SVG units = 7.8mm)
-export const SYMBOL_MAX_SIZE = 780;
+// Tamanho máximo do símbolo: 7.5mm = 750 SVG units
+export const SYMBOL_MAX_SIZE = 750;
 // Autismo: 7mm de altura = precisa de bounding box de 1027 para que
 // Math.min(1027/994, 1027/678) resulte em altura ~700 SVG units = 7mm
 export const AUTISMO_SYMBOL_SIZE = 1027;
