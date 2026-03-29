@@ -2,6 +2,7 @@
 // Pulseira Maker - Constantes do Sistema
 // Design: Industrial Workshop
 // ========================================
+import { EXTRA_SYMBOLS } from "./symbolsData";
 
 export interface BraceletColor {
   name: string;
@@ -171,7 +172,7 @@ export interface BraceletSymbol {
   keepOriginalColors?: boolean; // se true, nunca muda as cores (ex: autismo)
 }
 
-export const BRACELET_SYMBOLS: BraceletSymbol[] = [
+const BRACKET_SYMBOLS_BASE: BraceletSymbol[] = [
   {
     id: "alerta",
     name: "Alerta Médico",
@@ -229,6 +230,11 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [
     ],
   },
 ];
+
+// Concatenar símbolos extras ao array principal
+BRACKET_SYMBOLS_BASE.push(...EXTRA_SYMBOLS);
+
+export const BRACELET_SYMBOLS: BraceletSymbol[] = BRACKET_SYMBOLS_BASE;
 
 // Google Sheets URL pattern
 export const SHEETS_URL_PATTERN = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/;
