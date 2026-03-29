@@ -14,13 +14,6 @@ import {
 
 function getSymbolSize(symbolId: string): number {
   if (symbolId === "autismo") return AUTISMO_SYMBOL_SIZE;
-  var symbol = BRACELET_SYMBOLS.find(function (s) { return s.id === symbolId; });
-  if (symbol && symbol.scaleByHeight) {
-    // Para símbolos scaleByHeight, a largura renderizada é proporcional
-    var vb = symbol.viewBox.split(" ").map(Number);
-    var sc = SYMBOL_MAX_SIZE / vb[3]; // escala pela altura
-    return Math.round(vb[2] * sc); // largura renderizada
-  }
   return SYMBOL_MAX_SIZE;
 }
 
@@ -37,9 +30,8 @@ function getSymbolPaths(
   });
   if (!symbol) return "";
   var vb = symbol.viewBox.split(" ").map(Number);
-  // scaleByHeight: escala pela altura (7,5mm fixo na altura)
-  // padrão: escala pelo maior lado (7,5mm no maior lado)
-  var sc = symbol.scaleByHeight ? (size / vb[3]) : Math.min(size / vb[2], size / vb[3]);
+  // Escala pelo maior lado: 65% da altura da pulseira (780 SVG units)
+  var sc = Math.min(size / vb[2], size / vb[3]);
   var renderedW = vb[2] * sc;
   var renderedH = vb[3] * sc;
   var tx = x + (size - renderedW) / 2 - vb[0] * sc;
