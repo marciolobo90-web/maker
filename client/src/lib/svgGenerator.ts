@@ -14,7 +14,13 @@ import {
 
 function getSymbolSize(symbolId: string): number {
   if (symbolId === "autismo") return AUTISMO_SYMBOL_SIZE;
-  return SYMBOL_MAX_SIZE;
+  // Para símbolos novos (não alerta/bola/pata/autismo/brasil), escala pela altura = 7,5mm
+  // Retorna a largura renderizada para cálculos de posicionamento
+  var symbol = BRACELET_SYMBOLS.find(function (s) { return s.id === symbolId; });
+  if (!symbol) return SYMBOL_MAX_SIZE;
+  var vb = symbol.viewBox.split(" ").map(Number);
+  var sc = SYMBOL_MAX_SIZE / vb[3]; // escala pela altura
+  return Math.round(vb[2] * sc); // retorna largura renderizada
 }
 
 function getSymbolPaths(
@@ -30,8 +36,8 @@ function getSymbolPaths(
   });
   if (!symbol) return "";
   var vb = symbol.viewBox.split(" ").map(Number);
-  // Escala pelo maior lado = 7,5mm (garante que nunca ultrapassa a pulseira)
-  var sc = Math.min(size / vb[2], size / vb[3]);
+  // Escala pela altura = 7,5mm (altura fixa, largura proporcional)
+  var sc = size / vb[3];
   var renderedW = vb[2] * sc;
   var renderedH = vb[3] * sc;
   var tx = x + (size - renderedW) / 2 - vb[0] * sc;
