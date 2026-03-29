@@ -170,6 +170,7 @@ export interface BraceletSymbol {
   viewBox: string;
   paths: SymbolPath[];
   keepOriginalColors?: boolean; // se true, nunca muda as cores (ex: autismo)
+  scaleByHeight?: boolean; // se true, escala pela altura (7,5mm) ao invés do maior lado
 }
 
 const BRACKET_SYMBOLS_BASE: BraceletSymbol[] = [

@@ -13,7 +13,14 @@ import {
 } from "@/lib/constants";
 
 function getSymbolSize(symbolId: string): number {
-  return symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+  if (symbolId === "autismo") return AUTISMO_SYMBOL_SIZE;
+  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
+  if (symbol && symbol.scaleByHeight) {
+    const vb = symbol.viewBox.split(" ").map(Number);
+    const sc = SYMBOL_MAX_SIZE / vb[3];
+    return Math.round(vb[2] * sc);
+  }
+  return SYMBOL_MAX_SIZE;
 }
 
 interface BraceletPreviewProps {
@@ -64,7 +71,8 @@ function SymbolGroup({
   if (!symbol) return null;
 
   const vb = symbol.viewBox.split(" ").map(Number);
-  const scale = Math.min(size / vb[2], size / vb[3]);
+  // scaleByHeight: escala pela altura (7,5mm fixo na altura)
+  const scale = symbol.scaleByHeight ? (size / vb[3]) : Math.min(size / vb[2], size / vb[3]);
   const scaledW = vb[2] * scale;
   const scaledH = vb[3] * scale;
   const tx = x + (size - scaledW) / 2 - vb[0] * scale;
