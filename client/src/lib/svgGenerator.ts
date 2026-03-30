@@ -334,24 +334,72 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     );
   }
 
-  // ---- DENTRO1: 1 ou 2 linhas, centralizado se 1 ----
-  p.push(
-    '  <text x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
-  );
-  if (hasD1L2) {
+  // ---- DENTRO1: símbolo WhatsApp (opcional) + 1 ou 2 linhas ----
+  var hasSD1 = !!order.simboloDentro1;
+  if (hasSD1) {
+    var sd1Width = getSymbolSize(order.simboloDentro1 || "");
+    var d1TextW1 = estW(order.l1Dentro1, ifs);
+    var d1TextW2 = hasD1L2 ? estW(order.l2Dentro1, ifs) : 0;
+    var d1MaxTextW = Math.max(d1TextW1, d1TextW2);
+    var totalD1W = sd1Width + symGap + d1MaxTextW;
+    var d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
+    var sd1X = d1GroupStart;
+    var sd1Sz = sd1Width;
+    var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
+    var sd1Y = dentroY + Math.round((rH - sd1TargetH) / 2);
+    p.push(getSymbolPaths(order.simboloDentro1, order.cor, sd1X, sd1Y, sd1Sz));
+    var d1TextX = d1GroupStart + sd1Width + symGap + Math.round(d1MaxTextW / 2);
     p.push(
-      '  <text x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+      '  <text x="' + d1TextX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
     );
+    if (hasD1L2) {
+      p.push(
+        '  <text x="' + d1TextX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+      );
+    }
+  } else {
+    p.push(
+      '  <text x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
+    );
+    if (hasD1L2) {
+      p.push(
+        '  <text x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+      );
+    }
   }
 
-  // ---- DENTRO2: 1 ou 2 linhas, centralizado se 1 ----
-  p.push(
-    '  <text x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
-  );
-  if (hasD2L2) {
+  // ---- DENTRO2: símbolo WhatsApp (opcional) + 1 ou 2 linhas ----
+  var hasSD2 = !!order.simboloDentro2;
+  if (hasSD2) {
+    var sd2Width = getSymbolSize(order.simboloDentro2 || "");
+    var d2TextW1 = estW(order.l1Dentro2, ifs);
+    var d2TextW2 = hasD2L2 ? estW(order.l2Dentro2, ifs) : 0;
+    var d2MaxTextW = Math.max(d2TextW1, d2TextW2);
+    var totalD2W = sd2Width + symGap + d2MaxTextW;
+    var d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
+    var sd2X = d2GroupStart;
+    var sd2Sz = sd2Width;
+    var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");
+    var sd2Y = dentroY + Math.round((rH - sd2TargetH) / 2);
+    p.push(getSymbolPaths(order.simboloDentro2, order.cor, sd2X, sd2Y, sd2Sz));
+    var d2TextX = d2GroupStart + sd2Width + symGap + Math.round(d2MaxTextW / 2);
     p.push(
-      '  <text x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+      '  <text x="' + d2TextX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
     );
+    if (hasD2L2) {
+      p.push(
+        '  <text x="' + d2TextX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+      );
+    }
+  } else {
+    p.push(
+      '  <text x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
+    );
+    if (hasD2L2) {
+      p.push(
+        '  <text x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+      );
+    }
   }
 
   // Badge quantidade texto

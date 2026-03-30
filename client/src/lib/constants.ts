@@ -161,6 +161,8 @@ export interface BraceletOrder {
   simboloFrente?: string;   // símbolo antes do texto na frente
   simboloFrente2?: string;  // símbolo depois do texto na frente (novo)
   simboloVerso?: string;
+  simboloDentro1?: string;  // símbolo WhatsApp antes do texto no dentro1
+  simboloDentro2?: string;  // símbolo WhatsApp antes do texto no dentro2
   quantidade?: number;
 }
 
@@ -267,5 +269,7 @@ export const EXPECTED_COLUMNS = [
   "SIMBOLO_FRENTE",
   "SIMBOLO_FRENTE2",
   "SIMBOLO_VERSO",
+  "SIMBOLO_DENTRO1",
+  "SIMBOLO_DENTRO2",
   "QUANTIDADE",
 ];

@@ -142,6 +142,8 @@ export function useGoogleSheets() {
           simboloFrente: getCol(row, "SIMBOLO_FRENTE") || undefined,
           simboloFrente2: getCol(row, "SIMBOLO_FRENTE2") || undefined,
           simboloVerso: getCol(row, "SIMBOLO_VERSO") || undefined,
+          simboloDentro1: getCol(row, "SIMBOLO_DENTRO1") || undefined,
+          simboloDentro2: getCol(row, "SIMBOLO_DENTRO2") || undefined,
           quantidade: isNaN(qty) ? 1 : qty,
         };
       });
@@ -201,6 +203,8 @@ export function useGoogleSheets() {
           simboloFrente: getCol(row, "SIMBOLO_FRENTE") || undefined,
           simboloFrente2: getCol(row, "SIMBOLO_FRENTE2") || undefined,
           simboloVerso: getCol(row, "SIMBOLO_VERSO") || undefined,
+          simboloDentro1: getCol(row, "SIMBOLO_DENTRO1") || undefined,
+          simboloDentro2: getCol(row, "SIMBOLO_DENTRO2") || undefined,
           quantidade: isNaN(qty) ? 1 : qty,
         };
       });

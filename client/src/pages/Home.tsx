@@ -283,6 +283,9 @@ export default function Home() {
                   <p>
                     <strong className="text-foreground">SIMBOLO_FRENTE / SIMBOLO_FRENTE2 / SIMBOLO_VERSO:</strong> {BRACELET_SYMBOLS.map((s) => s.id).join(", ")}
                   </p>
+                  <p>
+                    <strong className="text-foreground">SIMBOLO_DENTRO1 / SIMBOLO_DENTRO2:</strong> whatsapp <span className="opacity-60">(apenas WhatsApp, posicionado antes do texto)</span>
+                  </p>
                 </div>
               </CardContent>
             </Card>

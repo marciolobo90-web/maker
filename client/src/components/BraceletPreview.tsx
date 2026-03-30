@@ -424,57 +424,167 @@ export default function BraceletPreview({
         {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
 
-      {/* DENTRO1: 1 ou 2 linhas, centralizado se 1 */}
-      <text
-        x={dentro1CX}
-        y={d1Y1}
-        textAnchor="middle"
-        fill={textColor}
-        fontFamily={insideFont}
-        fontWeight="bold"
-        fontSize={insideFontSize}
-      >
-        {order.l1Dentro1}
-      </text>
-      {hasD1L2 && (
-        <text
-          x={dentro1CX}
-          y={d1Y2}
-          textAnchor="middle"
-          fill={textColor}
-          fontFamily={insideFont}
-          fontWeight="bold"
-          fontSize={insideFontSize}
-        >
-          {order.l2Dentro1}
-        </text>
-      )}
+      {/* DENTRO1: símbolo WhatsApp (opcional) + 1 ou 2 linhas */}
+      {(() => {
+        const hasSD1 = !!order.simboloDentro1;
+        if (hasSD1) {
+          const sd1Width = getSymbolSize(order.simboloDentro1!);
+          const d1TextW1 = estimateTextWidth(order.l1Dentro1, insideFontSize);
+          const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, insideFontSize) : 0;
+          const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
+          const totalD1W = sd1Width + symGap + d1MaxTextW;
+          const d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
+          const sd1X = d1GroupStart;
+          const sd1TargetH = getTargetHeight(order.simboloDentro1!);
+          const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
+          const d1TextX = d1GroupStart + sd1Width + symGap + Math.round(d1MaxTextW / 2);
+          return (
+            <>
+              <SymbolGroup
+                symbolId={order.simboloDentro1!}
+                braceletColor={order.cor}
+                x={sd1X}
+                y={sd1Y}
+                size={sd1Width}
+              />
+              <text
+                x={d1TextX}
+                y={d1Y1}
+                textAnchor="middle"
+                fill={textColor}
+                fontFamily={insideFont}
+                fontWeight="bold"
+                fontSize={insideFontSize}
+              >
+                {order.l1Dentro1}
+              </text>
+              {hasD1L2 && (
+                <text
+                  x={d1TextX}
+                  y={d1Y2}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={insideFontSize}
+                >
+                  {order.l2Dentro1}
+                </text>
+              )}
+            </>
+          );
+        } else {
+          return (
+            <>
+              <text
+                x={dentro1CX}
+                y={d1Y1}
+                textAnchor="middle"
+                fill={textColor}
+                fontFamily={insideFont}
+                fontWeight="bold"
+                fontSize={insideFontSize}
+              >
+                {order.l1Dentro1}
+              </text>
+              {hasD1L2 && (
+                <text
+                  x={dentro1CX}
+                  y={d1Y2}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={insideFontSize}
+                >
+                  {order.l2Dentro1}
+                </text>
+              )}
+            </>
+          );
+        }
+      })()}
 
-      {/* DENTRO2: 1 ou 2 linhas, centralizado se 1 */}
-      <text
-        x={dentro2CX}
-        y={d2Y1}
-        textAnchor="middle"
-        fill={textColor}
-        fontFamily={insideFont}
-        fontWeight="bold"
-        fontSize={insideFontSize}
-      >
-        {order.l1Dentro2}
-      </text>
-      {hasD2L2 && (
-        <text
-          x={dentro2CX}
-          y={d2Y2}
-          textAnchor="middle"
-          fill={textColor}
-          fontFamily={insideFont}
-          fontWeight="bold"
-          fontSize={insideFontSize}
-        >
-          {order.l2Dentro2}
-        </text>
-      )}
+      {/* DENTRO2: símbolo WhatsApp (opcional) + 1 ou 2 linhas */}
+      {(() => {
+        const hasSD2 = !!order.simboloDentro2;
+        if (hasSD2) {
+          const sd2Width = getSymbolSize(order.simboloDentro2!);
+          const d2TextW1 = estimateTextWidth(order.l1Dentro2, insideFontSize);
+          const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, insideFontSize) : 0;
+          const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
+          const totalD2W = sd2Width + symGap + d2MaxTextW;
+          const d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
+          const sd2X = d2GroupStart;
+          const sd2TargetH = getTargetHeight(order.simboloDentro2!);
+          const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
+          const d2TextX = d2GroupStart + sd2Width + symGap + Math.round(d2MaxTextW / 2);
+          return (
+            <>
+              <SymbolGroup
+                symbolId={order.simboloDentro2!}
+                braceletColor={order.cor}
+                x={sd2X}
+                y={sd2Y}
+                size={sd2Width}
+              />
+              <text
+                x={d2TextX}
+                y={d2Y1}
+                textAnchor="middle"
+                fill={textColor}
+                fontFamily={insideFont}
+                fontWeight="bold"
+                fontSize={insideFontSize}
+              >
+                {order.l1Dentro2}
+              </text>
+              {hasD2L2 && (
+                <text
+                  x={d2TextX}
+                  y={d2Y2}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={insideFontSize}
+                >
+                  {order.l2Dentro2}
+                </text>
+              )}
+            </>
+          );
+        } else {
+          return (
+            <>
+              <text
+                x={dentro2CX}
+                y={d2Y1}
+                textAnchor="middle"
+                fill={textColor}
+                fontFamily={insideFont}
+                fontWeight="bold"
+                fontSize={insideFontSize}
+              >
+                {order.l1Dentro2}
+              </text>
+              {hasD2L2 && (
+                <text
+                  x={dentro2CX}
+                  y={d2Y2}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={insideFontSize}
+                >
+                  {order.l2Dentro2}
+                </text>
+              )}
+            </>
+          );
+        }
+      })()}
 
       {!compact && (
         <rect x="0" y="10790" width={W} height="500" fill="#A9ABAE" />

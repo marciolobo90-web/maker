@@ -226,6 +226,62 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
           </Select>
         </div>
 
+        {/* Símbolo Dentro 1 (WhatsApp) */}
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Dentro (esq)</Label>
+          <Select value={form.simboloDentro1 || "none"} onValueChange={(v) => update("simboloDentro1", v === "none" ? undefined : v)}>
+            <SelectTrigger className="mt-1 bg-secondary border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {(() => {
+                const whats = BRACELET_SYMBOLS.find((s) => s.id === "whatsapp");
+                return whats ? (
+                  <SelectItem value={whats.id}>
+                    <div className="flex items-center gap-2">
+                      <svg width="16" height="16" viewBox={whats.viewBox} className="shrink-0">
+                        {whats.paths.map((p, i) => (
+                          <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+                        ))}
+                      </svg>
+                      {whats.name}
+                    </div>
+                  </SelectItem>
+                ) : null;
+              })()}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Símbolo Dentro 2 (WhatsApp) */}
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Dentro (dir)</Label>
+          <Select value={form.simboloDentro2 || "none"} onValueChange={(v) => update("simboloDentro2", v === "none" ? undefined : v)}>
+            <SelectTrigger className="mt-1 bg-secondary border-border">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {(() => {
+                const whats = BRACELET_SYMBOLS.find((s) => s.id === "whatsapp");
+                return whats ? (
+                  <SelectItem value={whats.id}>
+                    <div className="flex items-center gap-2">
+                      <svg width="16" height="16" viewBox={whats.viewBox} className="shrink-0">
+                        {whats.paths.map((p, i) => (
+                          <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+                        ))}
+                      </svg>
+                      {whats.name}
+                    </div>
+                  </SelectItem>
+                ) : null;
+              })()}
+            </SelectContent>
+          </Select>
+        </div>
+
         {/* Quantidade */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Quantidade</Label>
