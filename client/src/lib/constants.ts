@@ -135,6 +135,7 @@ export const SYMBOL_CUSTOM_HEIGHT: Record<string, number> = {
   brasil: 400,   // 4mm de altura
   gota: 600,     // 6mm de altura
   autismo: 700,  // 7mm de altura
+  whatsapp: 600, // 6mm de altura
 };
 
 // Mantido para compatibilidade
