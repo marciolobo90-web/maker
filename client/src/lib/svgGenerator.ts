@@ -188,7 +188,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   }
 
   // Frente text Y (sempre centralizado) + offset extra por fonte
-  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset;
+  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset + 60;
 
   // Calcular posições DENTRO com centralização vertical
   var dentro1CX = Math.round(fX + rW / 2);

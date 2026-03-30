@@ -173,7 +173,7 @@ export default function BraceletPreview({
 
   // Frente text Y (sempre centralizado) + offset extra por fonte
   const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
-  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset;
+  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset + 60;
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   const versoL1 = order.textoVerso || "";
