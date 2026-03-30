@@ -9,6 +9,7 @@ export interface BraceletColor {
   hex: string;
   textColor: string;
   isLight: boolean; // true = personalização em preto, false = personalização em branco
+  gradient?: boolean; // true = usar gradiente colorido em vez de cor sólida
 }
 
 // Cores baseadas na tabela Pantone oficial do fornecedor
@@ -31,7 +32,7 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Rosa Claro", hex: "#F99FC9", textColor: "#FFFFFF", isLight: false },
   { name: "Rosa Médio", hex: "#E0457B", textColor: "#FFFFFF", isLight: false },
   { name: "Pink", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
-  { name: "Colorido", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
+  { name: "Colorido", hex: "#E6007E", textColor: "#FFFFFF", isLight: false, gradient: true },
   { name: "Mesclado Azul", hex: "#003DA5", textColor: "#FFFFFF", isLight: false },
   { name: "Mesclado Rosa", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
 ];

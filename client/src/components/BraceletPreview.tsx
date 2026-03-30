@@ -113,6 +113,7 @@ export default function BraceletPreview({
 }: BraceletPreviewProps) {
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
+  const isColorido = order.cor === "Colorido";
   const textColor = order.corTexto || colorInfo.textColor;
   const fontFrente = getFontFamily(order.fonteFrente || "Segoe Print Negrito");
   // Verso sempre Calibri Negrito
@@ -307,6 +308,21 @@ export default function BraceletPreview({
         frente
       </text>
 
+      {/* Gradiente colorido */}
+      {isColorido && (
+        <defs>
+          <linearGradient id="coloridoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+            <stop offset="0" stopColor="#00A6D6" />
+            <stop offset="0.09" stopColor="#7F53B8" />
+            <stop offset="0.168" stopColor="#FF0099" />
+            <stop offset="0.38" stopColor="#FCDA11" />
+            <stop offset="0.568" stopColor="#00A6D6" />
+            <stop offset="0.788" stopColor="#FF0099" />
+            <stop offset="1" stopColor="#FCDA11" />
+          </linearGradient>
+        </defs>
+      )}
+
       {/* 4 retângulos de pulseira */}
       <rect
         id={`${prefix}frente`}
@@ -314,7 +330,7 @@ export default function BraceletPreview({
         y={frenteY}
         width={rectW}
         height={rectH}
-        fill={braceletHex}
+        fill={isColorido ? "url(#coloridoGrad)" : braceletHex}
         {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
       <rect
@@ -323,7 +339,7 @@ export default function BraceletPreview({
         y={frenteY}
         width={rectW}
         height={rectH}
-        fill={braceletHex}
+        fill={isColorido ? "url(#coloridoGrad)" : braceletHex}
         {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
 
@@ -411,7 +427,7 @@ export default function BraceletPreview({
         y={dentroY}
         width={rectW}
         height={rectH}
-        fill={braceletHex}
+        fill={isColorido ? "url(#coloridoGrad)" : braceletHex}
         {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
       <rect
@@ -420,7 +436,7 @@ export default function BraceletPreview({
         y={dentroY}
         width={rectW}
         height={rectH}
-        fill={braceletHex}
+        fill={isColorido ? "url(#coloridoGrad)" : braceletHex}
         {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
       />
 

@@ -112,6 +112,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var col = getCol(order.cor);
   var bHex = col.hex;
   var tCol = order.corTexto || col.text;
+  var isColorido = order.cor === "Colorido";
   var fontInfo = getFontInfo(order.fonteFrente || "Segoe Print Negrito");
   var fFam = fontInfo.clean;
   var fBold = fontInfo.bold;
@@ -233,6 +234,21 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // Sem <g> wrapper para evitar agrupamento/bloqueio no CorelDRAW
   // Cada elemento fica solto na raiz do SVG
 
+  // Gradiente colorido (defs) — inserido antes dos elementos
+  if (isColorido) {
+    p.push(' <defs>');
+    p.push('  <linearGradient id="coloridoGrad" gradientUnits="objectBoundingBox" x1="0%" y1="50%" x2="100%" y2="50%">');
+    p.push('   <stop offset="0" style="stop-opacity:1; stop-color:#00A6D6"/>');
+    p.push('   <stop offset="0.0901961" style="stop-opacity:1; stop-color:#7F53B8"/>');
+    p.push('   <stop offset="0.168627" style="stop-opacity:1; stop-color:#FF0099"/>');
+    p.push('   <stop offset="0.380392" style="stop-opacity:1; stop-color:#FCDA11"/>');
+    p.push('   <stop offset="0.568627" style="stop-opacity:1; stop-color:#00A6D6"/>');
+    p.push('   <stop offset="0.788235" style="stop-opacity:1; stop-color:#FF0099"/>');
+    p.push('   <stop offset="1" style="stop-opacity:1; stop-color:#FCDA11"/>');
+    p.push('  </linearGradient>');
+    p.push(' </defs>');
+  }
+
   // ============================================================
   // REGRA COREL: Todos os retângulos ANTES de todos os textos
   // ============================================================
@@ -240,17 +256,18 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   // 1) Todos os 4 retângulos de pulseira juntos
   // Contorno cinza (20% preto) apenas na pulseira branca
   var strokeAttr = order.cor === "Branco" ? ' stroke="#CCCCCC" stroke-width="20"' : '';
+  var rectFill = isColorido ? 'url(#coloridoGrad)' : bHex;
   p.push(
-    '  <rect id="' + pfx + 'frente" fill="' + bHex + '"' + strokeAttr + ' x="' + fX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'frente" fill="' + rectFill + '"' + strokeAttr + ' x="' + fX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'verso" fill="' + bHex + '"' + strokeAttr + ' x="' + vX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'verso" fill="' + rectFill + '"' + strokeAttr + ' x="' + vX + '" y="' + frenteY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'dentro1" fill="' + bHex + '"' + strokeAttr + ' x="' + fX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'dentro1" fill="' + rectFill + '"' + strokeAttr + ' x="' + fX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
   p.push(
-    '  <rect id="' + pfx + 'dentro2" fill="' + bHex + '"' + strokeAttr + ' x="' + vX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
+    '  <rect id="' + pfx + 'dentro2" fill="' + rectFill + '"' + strokeAttr + ' x="' + vX + '" y="' + dentroY + '" width="' + rW + '" height="' + rH + '"/>'
   );
 
   // 2) Backgrounds cabeçalho
