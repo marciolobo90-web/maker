@@ -10,16 +10,21 @@ import {
   getSymbolColor,
   SYMBOL_MAX_SIZE,
   AUTISMO_SYMBOL_SIZE,
+  SYMBOL_CUSTOM_HEIGHT,
 } from "./constants";
 
+function getTargetHeight(symbolId: string): number {
+  if (SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined) return SYMBOL_CUSTOM_HEIGHT[symbolId];
+  return SYMBOL_MAX_SIZE;
+}
+
 function getSymbolSize(symbolId: string): number {
-  if (symbolId === "autismo") return AUTISMO_SYMBOL_SIZE;
-  // Para símbolos novos (não alerta/bola/pata/autismo/brasil), escala pela altura = 7,5mm
-  // Retorna a largura renderizada para cálculos de posicionamento
+  // Retorna a largura renderizada para cálculos de posicionamento horizontal
   var symbol = BRACELET_SYMBOLS.find(function (s) { return s.id === symbolId; });
   if (!symbol) return SYMBOL_MAX_SIZE;
   var vb = symbol.viewBox.split(" ").map(Number);
-  var sc = SYMBOL_MAX_SIZE / vb[3]; // escala pela altura
+  var targetH = getTargetHeight(symbolId);
+  var sc = targetH / vb[3]; // escala pela altura
   return Math.round(vb[2] * sc); // retorna largura renderizada
 }
 
@@ -38,7 +43,7 @@ function getSymbolPaths(
   var vb = symbol.viewBox.split(" ").map(Number);
   // Escala pela altura = 7,5mm (altura fixa, largura proporcional)
   // Sempre usa SYMBOL_MAX_SIZE para a altura, ignorando 'size' que é a largura renderizada para posicionamento
-  var targetH = symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+  var targetH = getTargetHeight(symbolId);
   var sc = targetH / vb[3];
   var renderedW = vb[2] * sc;
   var renderedH = vb[3] * sc;

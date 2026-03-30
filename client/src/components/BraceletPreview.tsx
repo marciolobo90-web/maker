@@ -10,15 +10,21 @@ import {
   getSymbolColor,
   SYMBOL_MAX_SIZE,
   AUTISMO_SYMBOL_SIZE,
+  SYMBOL_CUSTOM_HEIGHT,
 } from "@/lib/constants";
 
+function getTargetHeight(symbolId: string): number {
+  if (SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined) return SYMBOL_CUSTOM_HEIGHT[symbolId];
+  return SYMBOL_MAX_SIZE;
+}
+
 function getSymbolSize(symbolId: string): number {
-  if (symbolId === "autismo") return AUTISMO_SYMBOL_SIZE;
   const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
   if (!symbol) return SYMBOL_MAX_SIZE;
   const vb = symbol.viewBox.split(" ").map(Number);
-  const sc = SYMBOL_MAX_SIZE / vb[3]; // escala pela altura
-  return Math.round(vb[2] * sc); // retorna largura renderizada
+  const targetH = getTargetHeight(symbolId);
+  const sc = targetH / vb[3];
+  return Math.round(vb[2] * sc);
 }
 
 interface BraceletPreviewProps {
@@ -71,7 +77,7 @@ function SymbolGroup({
   const vb = symbol.viewBox.split(" ").map(Number);
   // Escala pela altura = 7,5mm (altura fixa, largura proporcional)
   // Sempre usa SYMBOL_MAX_SIZE para a altura, 'size' é a largura renderizada para posicionamento
-  const targetH = symbolId === "autismo" ? AUTISMO_SYMBOL_SIZE : SYMBOL_MAX_SIZE;
+  const targetH = getTargetHeight(symbolId);
   const scale = targetH / vb[3];
   const scaledW = vb[2] * scale;
   const scaledH = vb[3] * scale;
