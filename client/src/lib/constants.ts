@@ -20,7 +20,7 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Azul Claro", hex: "#00A3E0", textColor: "#FFFFFF", isLight: false },
   { name: "Azul Marinho", hex: "#00205B", textColor: "#FFFFFF", isLight: false },
   { name: "Vinho", hex: "#9B2335", textColor: "#FFFFFF", isLight: false },
-  { name: "Laranja", hex: "#FE5000", textColor: "#000000", isLight: true },
+  { name: "Laranja", hex: "#FE5000", textColor: "#FFFFFF", isLight: false },
   { name: "Preto", hex: "#000000", textColor: "#FFFFFF", isLight: false },
   { name: "Roxo", hex: "#582C83", textColor: "#FFFFFF", isLight: false },
   { name: "Lilás", hex: "#7B61A4", textColor: "#FFFFFF", isLight: false },
@@ -29,8 +29,8 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Verde Limão", hex: "#44D62C", textColor: "#000000", isLight: true },
   { name: "Verde Água", hex: "#00B388", textColor: "#FFFFFF", isLight: false },
   { name: "Vermelho", hex: "#E4002B", textColor: "#FFFFFF", isLight: false },
-  { name: "Rosa Claro", hex: "#F99FC9", textColor: "#FFFFFF", isLight: false },
-  { name: "Rosa Médio", hex: "#E0457B", textColor: "#FFFFFF", isLight: false },
+  { name: "Rosa Claro", hex: "#F7BDD6", textColor: "#FFFFFF", isLight: false },
+  { name: "Rosa Médio", hex: "#F38EB8", textColor: "#FFFFFF", isLight: false },
   { name: "Pink", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
   { name: "Colorido", hex: "#E6007E", textColor: "#FFFFFF", isLight: false, gradient: true },
   { name: "Mesclado Azul", hex: "#003DA5", textColor: "#FFFFFF", isLight: false, gradient: true },
@@ -47,9 +47,9 @@ export function getSymbolColor(symbolId: string, braceletColorName: string): str
   if (symbolId === "autismo") return null; // sempre cores originais
   const color = BRACELET_COLORS.find((c) => c.name === braceletColorName);
   if (!color) return "#FFFFFF";
-  // Alerta médico e Gota: sempre vermelho, exceto na pulseira vermelha onde fica branco
+  // Alerta médico e Gota: sempre vermelho, exceto em certas cores onde fica branco
   if (symbolId === "alerta" || symbolId === "gota") {
-    if (braceletColorName === "Vermelho") return "#FFFFFF";
+    if (braceletColorName === "Vermelho" || braceletColorName === "Pink" || braceletColorName === "Rosa Médio" || braceletColorName === "Laranja") return "#FFFFFF";
     return "#ED3237"; // vermelho em todas as outras cores
   }
   return color.isLight ? "#000000" : "#FFFFFF";
