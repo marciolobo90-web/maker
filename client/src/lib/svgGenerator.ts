@@ -238,13 +238,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   if (isGradient) {
     p.push(' <defs>');
     if (order.cor === "Colorido") {
-      p.push('  <linearGradient id="coloridoGrad" gradientUnits="objectBoundingBox" x1="0%" y1="50%" x2="100%" y2="50%">');
-      p.push('   <stop offset="0" style="stop-opacity:1; stop-color:#00A6D6"/>');
-      p.push('   <stop offset="0.0901961" style="stop-opacity:1; stop-color:#7F53B8"/>');
-      p.push('   <stop offset="0.168627" style="stop-opacity:1; stop-color:#FF0099"/>');
-      p.push('   <stop offset="0.380392" style="stop-opacity:1; stop-color:#FCDA11"/>');
-      p.push('   <stop offset="0.568627" style="stop-opacity:1; stop-color:#00A6D6"/>');
-      p.push('   <stop offset="0.788235" style="stop-opacity:1; stop-color:#FF0099"/>');
+      p.push('  <linearGradient id="coloridoGrad" gradientUnits="objectBoundingBox" x1="0%" y1="50%" x2="99.99%" y2="50%">');
+      p.push('   <stop offset="0" style="stop-opacity:1; stop-color:#FCDA11"/>');
+      p.push('   <stop offset="0.2" style="stop-opacity:1; stop-color:#00A6D6"/>');
+      p.push('   <stop offset="0.729412" style="stop-opacity:1; stop-color:#FF0099"/>');
       p.push('   <stop offset="1" style="stop-opacity:1; stop-color:#FCDA11"/>');
       p.push('  </linearGradient>');
     } else if (order.cor === "Mesclado Rosa") {

@@ -315,12 +315,9 @@ export default function BraceletPreview({
         <defs>
           {order.cor === "Colorido" && (
             <linearGradient id="coloridoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
-              <stop offset="0" stopColor="#00A6D6" />
-              <stop offset="0.09" stopColor="#7F53B8" />
-              <stop offset="0.168" stopColor="#FF0099" />
-              <stop offset="0.38" stopColor="#FCDA11" />
-              <stop offset="0.568" stopColor="#00A6D6" />
-              <stop offset="0.788" stopColor="#FF0099" />
+              <stop offset="0" stopColor="#FCDA11" />
+              <stop offset="0.2" stopColor="#00A6D6" />
+              <stop offset="0.729" stopColor="#FF0099" />
               <stop offset="1" stopColor="#FCDA11" />
             </linearGradient>
           )}
