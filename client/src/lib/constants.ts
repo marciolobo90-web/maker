@@ -9,7 +9,7 @@ export interface BraceletColor {
   hex: string;
   textColor: string;
   isLight: boolean; // true = personalização em preto, false = personalização em branco
-  gradient?: boolean; // true = usar gradiente colorido em vez de cor sólida
+  gradient?: boolean; // true = usar gradiente colorido (linearGradient) em vez de cor sólida
 }
 
 // Cores baseadas na tabela Pantone oficial do fornecedor
