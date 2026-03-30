@@ -67,10 +67,10 @@ export interface FontOption {
 // Kids Station 24pt = 847, Comic Sans Negrito 18pt = 635, Calibri Negrito 20pt = 706,
 // Milky Matcha 14pt = 494, Segoe Print Negrito 18pt = 635
 export const FRONT_FONTS: FontOption[] = [
-  { name: "Kids Station", family: "'Kids Station', 'Comic Sans MS', cursive", label: "Kids Station", svgFontSize: 847, fontYOffset: 120 },
+  { name: "Kids Station", family: "'Kids Station', 'Comic Sans MS', cursive", label: "Kids Station", svgFontSize: 847, fontYOffset: 70 },
   { name: "Comic Sans MS Negrito", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans MS Negrito", svgFontSize: 635 },
   { name: "Calibri Negrito", family: "Calibri, 'Segoe UI', sans-serif", label: "Calibri Negrito", svgFontSize: 706 },
-  { name: "Milky Matcha", family: "'Milky Matcha', 'Comic Sans MS', cursive", label: "Milky Matcha", svgFontSize: 494, fontYOffset: 90 },
+  { name: "Milky Matcha", family: "'Milky Matcha', 'Comic Sans MS', cursive", label: "Milky Matcha", svgFontSize: 494, fontYOffset: 20 },
   { name: "Segoe Print Negrito", family: "'Segoe Print', 'Bradley Hand', cursive", label: "Segoe Print Negrito", svgFontSize: 635 },
 ];
 
