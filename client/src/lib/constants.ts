@@ -33,8 +33,8 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Rosa Médio", hex: "#E0457B", textColor: "#FFFFFF", isLight: false },
   { name: "Pink", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
   { name: "Colorido", hex: "#E6007E", textColor: "#FFFFFF", isLight: false, gradient: true },
-  { name: "Mesclado Azul", hex: "#003DA5", textColor: "#FFFFFF", isLight: false },
-  { name: "Mesclado Rosa", hex: "#E6007E", textColor: "#FFFFFF", isLight: false },
+  { name: "Mesclado Azul", hex: "#003DA5", textColor: "#FFFFFF", isLight: false, gradient: true },
+  { name: "Mesclado Rosa", hex: "#E6007E", textColor: "#FFFFFF", isLight: false, gradient: true },
 ];
 
 // Retorna a cor que o símbolo deve ter baseado na cor da pulseira
