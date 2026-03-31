@@ -27,7 +27,7 @@ export const BRACELET_COLORS: BraceletColor[] = [
   { name: "Marrom", hex: "#6C4B2A", textColor: "#FFFFFF", isLight: false },
   { name: "Amarelo", hex: "#FEDD00", textColor: "#000000", isLight: true },
   { name: "Verde Limão", hex: "#44D62C", textColor: "#000000", isLight: true },
-  { name: "Verde Água", hex: "#00B388", textColor: "#FFFFFF", isLight: false },
+  { name: "Verde Água", hex: "#57C7C2", textColor: "#FFFFFF", isLight: false },
   { name: "Vermelho", hex: "#E4002B", textColor: "#FFFFFF", isLight: false },
   { name: "Rosa Claro", hex: "#F7BDD6", textColor: "#FFFFFF", isLight: false },
   { name: "Rosa Médio", hex: "#F38EB8", textColor: "#FFFFFF", isLight: false },
