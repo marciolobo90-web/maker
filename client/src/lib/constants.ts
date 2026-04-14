@@ -142,6 +142,112 @@ export const SYMBOL_CUSTOM_HEIGHT: Record<string, number> = {
 // Mantido para compatibilidade
 export const AUTISMO_SYMBOL_SIZE = 700;
 
+// ========================================
+// Área máxima de personalização na FRENTE (em cm)
+// Cada tamanho de pulseira tem um limite de largura para texto + símbolos
+// ========================================
+export const FRONT_MAX_AREA_CM: Record<string, number> = {
+  "Bebê": 5.0,
+  "PP infantil": 5.5,
+  "P infantil": 6.0,
+  "M infantil": 6.5,
+  "G infantil": 7.0,
+  "PP adulto": 7.5,
+  "P adulto": 8.0,
+  "M adulto": 8.5,
+  "G adulto": 9.0,
+  "GG adulto": 9.5,
+};
+
+// Converte cm para SVG units (1cm = 1000 SVG units, pois 1mm = 100 SVG units)
+export function getFrontMaxWidthSvg(sizeName: string): number {
+  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
+  const name = size ? size.name : "M adulto";
+  const cm = FRONT_MAX_AREA_CM[name] || 8.5;
+  return Math.round(cm * 1000);
+}
+
+// Fonte mínima: 12pt = 423 SVG units
+export const FRONT_MIN_FONT_SIZE = 423;
+
+// Estima largura de texto em SVG units (mesma fórmula usada em estW/estimateTextWidth)
+function estimateTextWidthShared(text: string, fontSize: number): number {
+  return Math.round(text.length * fontSize * 0.55);
+}
+
+// Calcula o tamanho de fonte ideal para a frente, reduzindo se necessário
+// Retorna o fontSize em SVG units
+export function calcFrontFontSize(
+  textoFrente: string,
+  fonteName: string,
+  sizeName: string,
+  simboloFrente?: string,
+  simboloFrente2?: string
+): number {
+  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const fontInfo = FRONT_FONTS.find((f) => f.name === fonteName);
+  const baseFontSize = fontInfo?.svgFontSize || 635;
+  const symGap = 100;
+
+  // Calcular largura dos símbolos
+  let symbolsWidth = 0;
+  if (simboloFrente) {
+    symbolsWidth += getSymbolWidthForCalc(simboloFrente) + symGap;
+  }
+  if (simboloFrente2) {
+    symbolsWidth += getSymbolWidthForCalc(simboloFrente2) + symGap;
+  }
+
+  const availableWidth = maxWidth - symbolsWidth;
+  if (availableWidth <= 0) return FRONT_MIN_FONT_SIZE;
+
+  // Se o texto cabe com o tamanho base, retorna o tamanho base
+  const textWidth = estimateTextWidthShared(textoFrente, baseFontSize);
+  if (textWidth <= availableWidth) return baseFontSize;
+
+  // Reduzir proporcionalmente
+  const ratio = availableWidth / textWidth;
+  const newFontSize = Math.round(baseFontSize * ratio);
+
+  // Não pode ser menor que 12pt
+  return Math.max(newFontSize, FRONT_MIN_FONT_SIZE);
+}
+
+// Verifica se é possível adicionar mais um caractere ao texto da frente
+// Retorna true se o texto com +1 caractere ainda cabe com fonte >= 12pt
+export function canAddCharToFront(
+  currentText: string,
+  fonteName: string,
+  sizeName: string,
+  simboloFrente?: string,
+  simboloFrente2?: string
+): boolean {
+  const testText = currentText + "W"; // W é um dos caracteres mais largos
+  const fontSize = calcFrontFontSize(testText, fonteName, sizeName, simboloFrente, simboloFrente2);
+  if (fontSize <= FRONT_MIN_FONT_SIZE) {
+    // Verificar se mesmo com 12pt o texto cabe
+    const maxWidth = getFrontMaxWidthSvg(sizeName);
+    const symGap = 100;
+    let symbolsWidth = 0;
+    if (simboloFrente) symbolsWidth += getSymbolWidthForCalc(simboloFrente) + symGap;
+    if (simboloFrente2) symbolsWidth += getSymbolWidthForCalc(simboloFrente2) + symGap;
+    const availableWidth = maxWidth - symbolsWidth;
+    const testWidth = estimateTextWidthShared(testText, FRONT_MIN_FONT_SIZE);
+    return testWidth <= availableWidth;
+  }
+  return true;
+}
+
+// Calcula largura renderizada de um símbolo (mesma lógica de getSymbolSize)
+function getSymbolWidthForCalc(symbolId: string): number {
+  const symbol = [...BRACKET_SYMBOLS_BASE, ...EXTRA_SYMBOLS].find((s) => s.id === symbolId);
+  if (!symbol) return SYMBOL_MAX_SIZE;
+  const vb = symbol.viewBox.split(" ").map(Number);
+  const targetH = SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined ? SYMBOL_CUSTOM_HEIGHT[symbolId] : SYMBOL_MAX_SIZE;
+  const sc = targetH / vb[3];
+  return Math.round(vb[2] * sc);
+}
+
 export interface BraceletOrder {
   id: string;
   nomeCliente: string;

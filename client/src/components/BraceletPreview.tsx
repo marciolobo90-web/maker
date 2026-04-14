@@ -11,6 +11,7 @@ import {
   SYMBOL_MAX_SIZE,
   AUTISMO_SYMBOL_SIZE,
   SYMBOL_CUSTOM_HEIGHT,
+  calcFrontFontSize,
 } from "@/lib/constants";
 
 function getTargetHeight(symbolId: string): number {
@@ -147,8 +148,14 @@ export default function BraceletPreview({
   const frenteY = 5267;
   const dentroY = 7606;
   const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
-  // Tamanho de fonte da frente varia por fonte selecionada
-  const fontSize = getFontSvgSize(order.fonteFrente || "Segoe Print Negrito");
+  // Tamanho de fonte da frente: auto-ajuste baseado na área máxima de personalização
+  const fontSize = calcFrontFontSize(
+    order.textoFrente,
+    order.fonteFrente || "Segoe Print Negrito",
+    sizeName,
+    order.simboloFrente,
+    order.simboloFrente2
+  );
   const versoFontSize = 423; // Calibri Negrito 12pt fixo
   const insideFontSize = 423; // Calibri Negrito 12pt fixo
   const symGap = 100;

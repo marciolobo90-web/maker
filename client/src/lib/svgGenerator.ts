@@ -11,6 +11,7 @@ import {
   SYMBOL_MAX_SIZE,
   AUTISMO_SYMBOL_SIZE,
   SYMBOL_CUSTOM_HEIGHT,
+  calcFrontFontSize,
 } from "./constants";
 
 function getTargetHeight(symbolId: string): number {
@@ -138,8 +139,14 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var dentroY = 7606;
   var symFrenteY = frenteY + Math.round((rH - symSz) / 2);
   var symDentroY = dentroY + Math.round((rH - symSz) / 2);
-  // Tamanho de fonte da frente varia por fonte selecionada
-  var fs = fontInfo.svgFontSize;
+  // Tamanho de fonte da frente: auto-ajuste baseado na área máxima de personalização
+  var fs = calcFrontFontSize(
+    order.textoFrente,
+    order.fonteFrente || "Segoe Print Negrito",
+    sName,
+    order.simboloFrente,
+    order.simboloFrente2
+  );
   var ifs = 423; // dentro: Calibri Negrito 12pt = 423 SVG units
   var vfs = 423; // verso: Calibri Negrito 12pt = 423 SVG units
   var symGap = 100;

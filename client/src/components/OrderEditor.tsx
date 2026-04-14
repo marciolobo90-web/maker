@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BraceletOrder } from "@/lib/constants";
-import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS } from "@/lib/constants";
+import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS, canAddCharToFront, calcFrontFontSize, FRONT_MIN_FONT_SIZE } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -55,7 +55,37 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         {/* Texto Frente */}
         <div className="col-span-2">
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Frente</Label>
-          <Input value={form.textoFrente} onChange={(e) => update("textoFrente", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input
+            value={form.textoFrente}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              // Se está apagando, sempre permitir
+              if (newValue.length <= form.textoFrente.length) {
+                update("textoFrente", newValue);
+                return;
+              }
+              // Se está adicionando, verificar se cabe
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToFront(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2)) {
+                update("textoFrente", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+          />
+          {(() => {
+            const sizeName = form.tamanhoLabel || form.tamanho;
+            const currentFs = calcFrontFontSize(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2);
+            const isReduced = currentFs < (FRONT_FONTS.find(f => f.name === form.fonteFrente)?.svgFontSize || 635);
+            const isAtLimit = currentFs <= FRONT_MIN_FONT_SIZE;
+            const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
+            if (isAtLimit) {
+              return <p className="text-xs text-destructive mt-1">Limite atingido (fonte: {ptSize}pt mínimo). Não é possível adicionar mais caracteres.</p>;
+            }
+            if (isReduced) {
+              return <p className="text-xs text-amber-500 mt-1">Fonte reduzida para {ptSize}pt para caber na área de personalização.</p>;
+            }
+            return null;
+          })()}
         </div>
 
         {/* Texto Verso L1 */}
