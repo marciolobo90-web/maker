@@ -303,9 +303,32 @@ export function canAddCharToVerso(
 }
 
 // ========================================
+// Área máxima de personalização do DENTRO (+1,5cm em relação à frente)
+// ========================================
+export const DENTRO_MAX_AREA_CM: Record<string, number> = {
+  "Bebê": 6.5,
+  "PP infantil": 7.0,
+  "P infantil": 7.5,
+  "M infantil": 8.0,
+  "G infantil": 8.5,
+  "PP adulto": 9.0,
+  "P adulto": 9.5,
+  "M adulto": 10.0,
+  "G adulto": 10.5,
+  "GG adulto": 11.0,
+};
+
+export function getDentroMaxWidthSvg(sizeName: string): number {
+  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
+  const name = size ? size.name : "M adulto";
+  const cm = DENTRO_MAX_AREA_CM[name] || 10.0;
+  return Math.round(cm * 1000);
+}
+
+// ========================================
 // Auto-ajuste de fonte para DENTRO (1 e 2)
 // Dentro usa Calibri Negrito base 12pt (423 SVG units)
-// Mesma área máxima da frente
+// Área máxima = frente + 1,5cm
 // ========================================
 export function calcDentroFontSize(
   l1Dentro: string,
@@ -313,7 +336,7 @@ export function calcDentroFontSize(
   sizeName: string,
   simboloDentro?: string
 ): number {
-  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const maxWidth = getDentroMaxWidthSvg(sizeName);
   const baseFontSize = 423; // Calibri Negrito 12pt
   const symGap = 100;
 
@@ -342,7 +365,7 @@ export function canAddCharToDentro(
   simboloDentro?: string
 ): boolean {
   const testText = currentText + "W";
-  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const maxWidth = getDentroMaxWidthSvg(sizeName);
   const symGap = 100;
   let symbolsWidth = 0;
   if (simboloDentro) symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
