@@ -303,19 +303,19 @@ export function canAddCharToVerso(
 }
 
 // ========================================
-// Área máxima de personalização do DENTRO (+1,5cm em relação à frente)
+// Área máxima de personalização do DENTRO (+2,5cm em relação à frente)
 // ========================================
 export const DENTRO_MAX_AREA_CM: Record<string, number> = {
-  "Bebê": 6.5,
-  "PP infantil": 7.0,
-  "P infantil": 7.5,
-  "M infantil": 8.0,
-  "G infantil": 8.5,
-  "PP adulto": 9.0,
-  "P adulto": 9.5,
-  "M adulto": 10.0,
-  "G adulto": 10.5,
-  "GG adulto": 11.0,
+  "Bebê": 7.5,
+  "PP infantil": 8.0,
+  "P infantil": 8.5,
+  "M infantil": 9.0,
+  "G infantil": 9.5,
+  "PP adulto": 10.0,
+  "P adulto": 10.5,
+  "M adulto": 11.0,
+  "G adulto": 11.5,
+  "GG adulto": 12.0,
 };
 
 export function getDentroMaxWidthSvg(sizeName: string): number {
