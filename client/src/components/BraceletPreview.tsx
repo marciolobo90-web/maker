@@ -12,6 +12,8 @@ import {
   AUTISMO_SYMBOL_SIZE,
   SYMBOL_CUSTOM_HEIGHT,
   calcFrontFontSize,
+  calcVersoFontSize,
+  calcDentroFontSize,
 } from "@/lib/constants";
 
 function getTargetHeight(symbolId: string): number {
@@ -156,8 +158,27 @@ export default function BraceletPreview({
     order.simboloFrente,
     order.simboloFrente2
   );
-  const versoFontSize = 423; // Calibri Negrito 12pt fixo
-  const insideFontSize = 423; // Calibri Negrito 12pt fixo
+  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
+  const versoFontSize = calcVersoFontSize(
+    order.textoVerso || "",
+    order.l2Verso || "",
+    sizeName,
+    order.simboloVerso
+  );
+  // Tamanho de fonte do dentro1: auto-ajuste
+  const inside1FontSize = calcDentroFontSize(
+    order.l1Dentro1 || "",
+    order.l2Dentro1 || "",
+    sizeName,
+    order.simboloDentro1
+  );
+  // Tamanho de fonte do dentro2: auto-ajuste
+  const inside2FontSize = calcDentroFontSize(
+    order.l1Dentro2 || "",
+    order.l2Dentro2 || "",
+    sizeName,
+    order.simboloDentro2
+  );
   const symGap = 100;
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
@@ -473,8 +494,8 @@ export default function BraceletPreview({
         const hasSD1 = !!order.simboloDentro1;
         if (hasSD1) {
           const sd1Width = getSymbolSize(order.simboloDentro1!);
-          const d1TextW1 = estimateTextWidth(order.l1Dentro1, insideFontSize);
-          const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, insideFontSize) : 0;
+          const d1TextW1 = estimateTextWidth(order.l1Dentro1, inside1FontSize);
+          const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
           const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
           const totalD1W = sd1Width + symGap + d1MaxTextW;
           const d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
@@ -498,7 +519,7 @@ export default function BraceletPreview({
                 fill={textColor}
                 fontFamily={insideFont}
                 fontWeight="bold"
-                fontSize={insideFontSize}
+                fontSize={inside1FontSize}
               >
                 {order.l1Dentro1}
               </text>
@@ -510,7 +531,7 @@ export default function BraceletPreview({
                   fill={textColor}
                   fontFamily={insideFont}
                   fontWeight="bold"
-                  fontSize={insideFontSize}
+                  fontSize={inside1FontSize}
                 >
                   {order.l2Dentro1}
                 </text>
@@ -527,7 +548,7 @@ export default function BraceletPreview({
                 fill={textColor}
                 fontFamily={insideFont}
                 fontWeight="bold"
-                fontSize={insideFontSize}
+                fontSize={inside1FontSize}
               >
                 {order.l1Dentro1}
               </text>
@@ -539,7 +560,7 @@ export default function BraceletPreview({
                   fill={textColor}
                   fontFamily={insideFont}
                   fontWeight="bold"
-                  fontSize={insideFontSize}
+                  fontSize={inside1FontSize}
                 >
                   {order.l2Dentro1}
                 </text>
@@ -554,8 +575,8 @@ export default function BraceletPreview({
         const hasSD2 = !!order.simboloDentro2;
         if (hasSD2) {
           const sd2Width = getSymbolSize(order.simboloDentro2!);
-          const d2TextW1 = estimateTextWidth(order.l1Dentro2, insideFontSize);
-          const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, insideFontSize) : 0;
+          const d2TextW1 = estimateTextWidth(order.l1Dentro2, inside2FontSize);
+          const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
           const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
           const totalD2W = sd2Width + symGap + d2MaxTextW;
           const d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
@@ -579,7 +600,7 @@ export default function BraceletPreview({
                 fill={textColor}
                 fontFamily={insideFont}
                 fontWeight="bold"
-                fontSize={insideFontSize}
+                fontSize={inside2FontSize}
               >
                 {order.l1Dentro2}
               </text>
@@ -591,7 +612,7 @@ export default function BraceletPreview({
                   fill={textColor}
                   fontFamily={insideFont}
                   fontWeight="bold"
-                  fontSize={insideFontSize}
+                  fontSize={inside2FontSize}
                 >
                   {order.l2Dentro2}
                 </text>
@@ -608,7 +629,7 @@ export default function BraceletPreview({
                 fill={textColor}
                 fontFamily={insideFont}
                 fontWeight="bold"
-                fontSize={insideFontSize}
+                fontSize={inside2FontSize}
               >
                 {order.l1Dentro2}
               </text>
@@ -620,7 +641,7 @@ export default function BraceletPreview({
                   fill={textColor}
                   fontFamily={insideFont}
                   fontWeight="bold"
-                  fontSize={insideFontSize}
+                  fontSize={inside2FontSize}
                 >
                   {order.l2Dentro2}
                 </text>

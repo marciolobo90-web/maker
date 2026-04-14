@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BraceletOrder } from "@/lib/constants";
-import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS, canAddCharToFront, calcFrontFontSize, FRONT_MIN_FONT_SIZE } from "@/lib/constants";
+import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS, canAddCharToFront, calcFrontFontSize, FRONT_MIN_FONT_SIZE, MIN_FONT_SIZE_12PT, calcVersoFontSize, canAddCharToVerso, calcDentroFontSize, canAddCharToDentro } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -91,31 +91,142 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         {/* Texto Verso L1 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso (Linha 1)</Label>
-          <Input value={form.textoVerso} onChange={(e) => update("textoVerso", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input
+            value={form.textoVerso}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= form.textoVerso.length) { update("textoVerso", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToVerso(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso)) {
+                update("textoVerso", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+          />
         </div>
 
         {/* Texto Verso L2 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso (Linha 2)</Label>
-          <Input value={form.l2Verso || ""} onChange={(e) => update("l2Verso", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
+          <Input
+            value={form.l2Verso || ""}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= (form.l2Verso || "").length) { update("l2Verso", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToVerso(form.l2Verso || "", form.textoVerso, sizeName, form.simboloVerso)) {
+                update("l2Verso", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional"
+          />
+          {(() => {
+            const sizeName = form.tamanhoLabel || form.tamanho;
+            const currentFs = calcVersoFontSize(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso);
+            const isReduced = currentFs < 423;
+            const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
+            const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
+            if (isAtLimit && (form.textoVerso.length > 0 || (form.l2Verso || "").length > 0)) {
+              return <p className="text-xs text-destructive mt-1">Verso: limite atingido ({ptSize}pt mínimo).</p>;
+            }
+            if (isReduced) {
+              return <p className="text-xs text-amber-500 mt-1">Verso: fonte reduzida para {ptSize}pt.</p>;
+            }
+            return null;
+          })()}
         </div>
 
         {/* Dentro L1/L2 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L1 Dentro (esq)</Label>
-          <Input value={form.l1Dentro1} onChange={(e) => update("l1Dentro1", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input
+            value={form.l1Dentro1}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= form.l1Dentro1.length) { update("l1Dentro1", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1)) {
+                update("l1Dentro1", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+          />
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L2 Dentro (esq)</Label>
-          <Input value={form.l2Dentro1} onChange={(e) => update("l2Dentro1", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
+          <Input
+            value={form.l2Dentro1}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= form.l2Dentro1.length) { update("l2Dentro1", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l2Dentro1, form.l1Dentro1, sizeName, form.simboloDentro1)) {
+                update("l2Dentro1", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional"
+          />
+          {(() => {
+            const sizeName = form.tamanhoLabel || form.tamanho;
+            const currentFs = calcDentroFontSize(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1);
+            const isReduced = currentFs < 423;
+            const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
+            const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
+            if (isAtLimit && (form.l1Dentro1.length > 0 || form.l2Dentro1.length > 0)) {
+              return <p className="text-xs text-destructive mt-1">Dentro (esq): limite atingido ({ptSize}pt mínimo).</p>;
+            }
+            if (isReduced) {
+              return <p className="text-xs text-amber-500 mt-1">Dentro (esq): fonte reduzida para {ptSize}pt.</p>;
+            }
+            return null;
+          })()}
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L1 Dentro (dir)</Label>
-          <Input value={form.l1Dentro2} onChange={(e) => update("l1Dentro2", e.target.value)} className="mt-1 bg-secondary border-border" />
+          <Input
+            value={form.l1Dentro2}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= form.l1Dentro2.length) { update("l1Dentro2", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2)) {
+                update("l1Dentro2", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+          />
         </div>
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">L2 Dentro (dir)</Label>
-          <Input value={form.l2Dentro2} onChange={(e) => update("l2Dentro2", e.target.value)} className="mt-1 bg-secondary border-border" placeholder="Opcional" />
+          <Input
+            value={form.l2Dentro2}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= form.l2Dentro2.length) { update("l2Dentro2", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l2Dentro2, form.l1Dentro2, sizeName, form.simboloDentro2)) {
+                update("l2Dentro2", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional"
+          />
+          {(() => {
+            const sizeName = form.tamanhoLabel || form.tamanho;
+            const currentFs = calcDentroFontSize(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2);
+            const isReduced = currentFs < 423;
+            const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
+            const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
+            if (isAtLimit && (form.l1Dentro2.length > 0 || form.l2Dentro2.length > 0)) {
+              return <p className="text-xs text-destructive mt-1">Dentro (dir): limite atingido ({ptSize}pt mínimo).</p>;
+            }
+            if (isReduced) {
+              return <p className="text-xs text-amber-500 mt-1">Dentro (dir): fonte reduzida para {ptSize}pt.</p>;
+            }
+            return null;
+          })()}
         </div>
 
         {/* Cor */}

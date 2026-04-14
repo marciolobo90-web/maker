@@ -168,7 +168,9 @@ export function getFrontMaxWidthSvg(sizeName: string): number {
 }
 
 // Fonte mínima: 12pt = 423 SVG units
-export const FRONT_MIN_FONT_SIZE = 423;
+export const MIN_FONT_SIZE_12PT = 423;
+// Alias para compatibilidade
+export const FRONT_MIN_FONT_SIZE = MIN_FONT_SIZE_12PT;
 
 // Estima largura de texto em SVG units (mesma fórmula usada em estW/estimateTextWidth)
 function estimateTextWidthShared(text: string, fontSize: number): number {
@@ -246,6 +248,108 @@ function getSymbolWidthForCalc(symbolId: string): number {
   const targetH = SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined ? SYMBOL_CUSTOM_HEIGHT[symbolId] : SYMBOL_MAX_SIZE;
   const sc = targetH / vb[3];
   return Math.round(vb[2] * sc);
+}
+
+// ========================================
+// Auto-ajuste de fonte para VERSO
+// Verso usa Calibri Negrito base 12pt (423 SVG units)
+// Mesma área máxima da frente
+// ========================================
+export function calcVersoFontSize(
+  textoVerso: string,
+  l2Verso: string,
+  sizeName: string,
+  simboloVerso?: string
+): number {
+  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const baseFontSize = 423; // Calibri Negrito 12pt
+  const symGap = 100;
+
+  let symbolsWidth = 0;
+  if (simboloVerso) {
+    symbolsWidth += getSymbolWidthForCalc(simboloVerso) + symGap;
+  }
+
+  const availableWidth = maxWidth - symbolsWidth;
+  if (availableWidth <= 0) return MIN_FONT_SIZE_12PT;
+
+  // Verificar a linha mais larga (L1 ou L2)
+  const textW1 = estimateTextWidthShared(textoVerso, baseFontSize);
+  const textW2 = l2Verso ? estimateTextWidthShared(l2Verso, baseFontSize) : 0;
+  const maxTextW = Math.max(textW1, textW2);
+  if (maxTextW <= availableWidth) return baseFontSize;
+
+  const ratio = availableWidth / maxTextW;
+  const newFontSize = Math.round(baseFontSize * ratio);
+  return Math.max(newFontSize, MIN_FONT_SIZE_12PT);
+}
+
+export function canAddCharToVerso(
+  currentText: string,
+  otherLine: string,
+  sizeName: string,
+  simboloVerso?: string
+): boolean {
+  const testText = currentText + "W";
+  // Testar com a linha mais larga
+  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const symGap = 100;
+  let symbolsWidth = 0;
+  if (simboloVerso) symbolsWidth += getSymbolWidthForCalc(simboloVerso) + symGap;
+  const availableWidth = maxWidth - symbolsWidth;
+  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_12PT);
+  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_12PT);
+  return Math.max(testW, otherW) <= availableWidth;
+}
+
+// ========================================
+// Auto-ajuste de fonte para DENTRO (1 e 2)
+// Dentro usa Calibri Negrito base 12pt (423 SVG units)
+// Mesma área máxima da frente
+// ========================================
+export function calcDentroFontSize(
+  l1Dentro: string,
+  l2Dentro: string,
+  sizeName: string,
+  simboloDentro?: string
+): number {
+  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const baseFontSize = 423; // Calibri Negrito 12pt
+  const symGap = 100;
+
+  let symbolsWidth = 0;
+  if (simboloDentro) {
+    symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
+  }
+
+  const availableWidth = maxWidth - symbolsWidth;
+  if (availableWidth <= 0) return MIN_FONT_SIZE_12PT;
+
+  const textW1 = estimateTextWidthShared(l1Dentro, baseFontSize);
+  const textW2 = l2Dentro ? estimateTextWidthShared(l2Dentro, baseFontSize) : 0;
+  const maxTextW = Math.max(textW1, textW2);
+  if (maxTextW <= availableWidth) return baseFontSize;
+
+  const ratio = availableWidth / maxTextW;
+  const newFontSize = Math.round(baseFontSize * ratio);
+  return Math.max(newFontSize, MIN_FONT_SIZE_12PT);
+}
+
+export function canAddCharToDentro(
+  currentText: string,
+  otherLine: string,
+  sizeName: string,
+  simboloDentro?: string
+): boolean {
+  const testText = currentText + "W";
+  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const symGap = 100;
+  let symbolsWidth = 0;
+  if (simboloDentro) symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
+  const availableWidth = maxWidth - symbolsWidth;
+  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_12PT);
+  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_12PT);
+  return Math.max(testW, otherW) <= availableWidth;
 }
 
 export interface BraceletOrder {

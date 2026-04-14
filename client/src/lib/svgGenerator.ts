@@ -12,6 +12,8 @@ import {
   AUTISMO_SYMBOL_SIZE,
   SYMBOL_CUSTOM_HEIGHT,
   calcFrontFontSize,
+  calcVersoFontSize,
+  calcDentroFontSize,
 } from "./constants";
 
 function getTargetHeight(symbolId: string): number {
@@ -147,8 +149,27 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     order.simboloFrente,
     order.simboloFrente2
   );
-  var ifs = 423; // dentro: Calibri Negrito 12pt = 423 SVG units
-  var vfs = 423; // verso: Calibri Negrito 12pt = 423 SVG units
+  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
+  var vfs = calcVersoFontSize(
+    order.textoVerso || "",
+    order.l2Verso || "",
+    sName,
+    order.simboloVerso
+  );
+  // Tamanho de fonte do dentro1: auto-ajuste baseado na área máxima
+  var ifs1 = calcDentroFontSize(
+    order.l1Dentro1 || "",
+    order.l2Dentro1 || "",
+    sName,
+    order.simboloDentro1
+  );
+  // Tamanho de fonte do dentro2: auto-ajuste baseado na área máxima
+  var ifs2 = calcDentroFontSize(
+    order.l1Dentro2 || "",
+    order.l2Dentro2 || "",
+    sName,
+    order.simboloDentro2
+  );
   var symGap = 100;
 
   // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)
@@ -380,8 +401,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var hasSD1 = !!order.simboloDentro1;
   if (hasSD1) {
     var sd1Width = getSymbolSize(order.simboloDentro1 || "");
-    var d1TextW1 = estW(order.l1Dentro1, ifs);
-    var d1TextW2 = hasD1L2 ? estW(order.l2Dentro1, ifs) : 0;
+    var d1TextW1 = estW(order.l1Dentro1, ifs1);
+    var d1TextW2 = hasD1L2 ? estW(order.l2Dentro1, ifs1) : 0;
     var d1MaxTextW = Math.max(d1TextW1, d1TextW2);
     var totalD1W = sd1Width + symGap + d1MaxTextW;
     var d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
@@ -392,20 +413,20 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloDentro1, order.cor, sd1X, sd1Y, sd1Sz));
     var d1TextX = d1GroupStart + sd1Width + symGap + Math.round(d1MaxTextW / 2);
     p.push(
-      '  <text x="' + d1TextX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
+      '  <text x="' + d1TextX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
     );
     if (hasD1L2) {
       p.push(
-        '  <text x="' + d1TextX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+        '  <text x="' + d1TextX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
       );
     }
   } else {
     p.push(
-      '  <text x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
+      '  <text x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
     );
     if (hasD1L2) {
       p.push(
-        '  <text x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+        '  <text x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
       );
     }
   }
@@ -414,8 +435,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var hasSD2 = !!order.simboloDentro2;
   if (hasSD2) {
     var sd2Width = getSymbolSize(order.simboloDentro2 || "");
-    var d2TextW1 = estW(order.l1Dentro2, ifs);
-    var d2TextW2 = hasD2L2 ? estW(order.l2Dentro2, ifs) : 0;
+    var d2TextW1 = estW(order.l1Dentro2, ifs2);
+    var d2TextW2 = hasD2L2 ? estW(order.l2Dentro2, ifs2) : 0;
     var d2MaxTextW = Math.max(d2TextW1, d2TextW2);
     var totalD2W = sd2Width + symGap + d2MaxTextW;
     var d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
@@ -426,20 +447,20 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloDentro2, order.cor, sd2X, sd2Y, sd2Sz));
     var d2TextX = d2GroupStart + sd2Width + symGap + Math.round(d2MaxTextW / 2);
     p.push(
-      '  <text x="' + d2TextX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
+      '  <text x="' + d2TextX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
     );
     if (hasD2L2) {
       p.push(
-        '  <text x="' + d2TextX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+        '  <text x="' + d2TextX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
       );
     }
   } else {
     p.push(
-      '  <text x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
+      '  <text x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
     );
     if (hasD2L2) {
       p.push(
-        '  <text x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+        '  <text x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
       );
     }
   }
