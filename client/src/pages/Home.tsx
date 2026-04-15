@@ -61,6 +61,7 @@ export default function Home() {
   const [sheetUrlInput, setSheetUrlInput] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [importingMore, setImportingMore] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFetchSheet = () => {
@@ -69,6 +70,7 @@ export default function Home() {
       return;
     }
     fetchSheet(sheetUrlInput.trim());
+    setImportingMore(false);
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,6 +81,7 @@ export default function Home() {
       const text = ev.target?.result as string;
       loadFromCSVText(text);
       toast.success("CSV carregado com sucesso!");
+      setImportingMore(false);
     };
     reader.readAsText(file);
   };
@@ -88,6 +91,7 @@ export default function Home() {
     setOrders([...orders, newOrder]);
     setSelectedIndex(orders.length);
     setEditingIndex(orders.length);
+    setImportingMore(false);
     toast.success("Novo pedido adicionado");
   };
 
@@ -159,8 +163,8 @@ export default function Home() {
       </header>
 
       <main className="flex-1 container py-6">
-        {orders.length === 0 ? (
-          /* Empty state - Data import */
+        {orders.length === 0 || importingMore ? (
+          /* Empty state / Import more - Data import */
           <div className="max-w-3xl mx-auto space-y-8">
             {/* Hero section */}
             <div className="text-center space-y-3 pt-8">
@@ -243,12 +247,21 @@ export default function Home() {
                     <p className="text-sm mb-4">Crie pedidos manualmente, um por um.</p>
                     <Button onClick={handleAddOrder} className="bg-primary text-primary-foreground">
                       <Plus className="w-4 h-4 mr-1.5" />
-                      Criar Primeiro Pedido
+                      {orders.length === 0 ? "Criar Primeiro Pedido" : "Criar Novo Pedido"}
                     </Button>
                   </CardContent>
                 </Card>
               </TabsContent>
             </Tabs>
+
+            {importingMore && orders.length > 0 && (
+              <div className="text-center">
+                <Button variant="outline" onClick={() => setImportingMore(false)} className="gap-1.5">
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                  Voltar ao Arquivo ({orders.length} pedidos)
+                </Button>
+              </div>
+            )}
 
             {error && (
               <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 text-sm text-destructive">
@@ -353,9 +366,13 @@ export default function Home() {
 
               {/* Quick actions */}
               <div className="pt-2 border-t border-border space-y-2">
-                <Button variant="outline" size="sm" className="w-full gap-1.5" onClick={() => { setOrders([]); setSelectedIndex(0); setEditingIndex(null); }}>
+                <Button variant="outline" size="sm" className="w-full gap-1.5" onClick={() => { setSelectedIndex(orders.length); setEditingIndex(null); setImportingMore(true); }}>
                   <FileSpreadsheet className="w-3.5 h-3.5" />
-                  Importar Nova Planilha
+                  Importar Mais Pedidos
+                </Button>
+                <Button variant="ghost" size="sm" className="w-full gap-1.5 text-destructive hover:text-destructive" onClick={() => { if (window.confirm("Tem certeza que deseja limpar todo o arquivo? Esta ação não pode ser desfeita.")) { setOrders([]); setSelectedIndex(0); setEditingIndex(null); } }}>
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Limpar Arquivo
                 </Button>
               </div>
             </div>

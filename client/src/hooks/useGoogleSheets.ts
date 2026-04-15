@@ -1,6 +1,29 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import type { BraceletOrder } from "@/lib/constants";
 import { BRACELET_COLORS, BRACELET_SIZES, SHEETS_URL_PATTERN } from "@/lib/constants";
+
+const STORAGE_KEY = "pulseira-maker-orders";
+
+function loadOrdersFromStorage(): BraceletOrder[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {
+    // ignore corrupted data
+  }
+  return [];
+}
+
+function saveOrdersToStorage(orders: BraceletOrder[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  } catch {
+    // ignore quota errors
+  }
+}
 
 function parseCSV(text: string): string[][] {
   const rows: string[][] = [];
@@ -76,10 +99,15 @@ function findSize(name: string): { tamanho: string; tamanhoLabel: string; tamanh
 }
 
 export function useGoogleSheets() {
-  const [orders, setOrders] = useState<BraceletOrder[]>([]);
+  const [orders, setOrders] = useState<BraceletOrder[]>(() => loadOrdersFromStorage());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sheetUrl, setSheetUrl] = useState("");
+
+  // Sincronizar orders com localStorage sempre que mudar
+  useEffect(() => {
+    saveOrdersToStorage(orders);
+  }, [orders]);
 
   const fetchSheet = useCallback(async (url: string) => {
     setLoading(true);
@@ -148,11 +176,10 @@ export function useGoogleSheets() {
         };
       });
 
-      setOrders(parsed);
+      setOrders((prev) => [...prev, ...parsed]);
       setSheetUrl(url);
     } catch (err: any) {
       setError(err.message || "Erro ao processar a planilha.");
-      setOrders([]);
     } finally {
       setLoading(false);
     }
@@ -209,10 +236,9 @@ export function useGoogleSheets() {
         };
       });
 
-      setOrders(parsed);
+      setOrders((prev) => [...prev, ...parsed]);
     } catch (err: any) {
       setError(err.message || "Erro ao processar o CSV.");
-      setOrders([]);
     } finally {
       setLoading(false);
     }
