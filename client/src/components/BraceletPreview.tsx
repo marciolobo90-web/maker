@@ -506,7 +506,10 @@ export default function BraceletPreview({
           const sd1X = d1GroupStart;
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
-          const d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
+          // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+          const d1TextAreaStart = d1GroupStart + sd1Width + dentroSymGap;
+          const d1TextAreaEnd = frenteX + rectW;
+          const d1TextX = Math.round((d1TextAreaStart + d1TextAreaEnd) / 2);
           return (
             <>
               <SymbolGroup
@@ -590,7 +593,10 @@ export default function BraceletPreview({
           const sd2X = d2GroupStart;
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
-          const d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
+          // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+          const d2TextAreaStart = d2GroupStart + sd2Width + dentroSymGap;
+          const d2TextAreaEnd = versoX + rectW;
+          const d2TextX = Math.round((d2TextAreaStart + d2TextAreaEnd) / 2);
           return (
             <>
               <SymbolGroup

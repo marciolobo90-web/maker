@@ -415,7 +415,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
     var sd1Y = dentroY + Math.round((rH - sd1TargetH) / 2);
     p.push(getSymbolPaths(order.simboloDentro1, order.cor, sd1X, sd1Y, sd1Sz));
-    var d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
+    // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+    var d1TextAreaStart = d1GroupStart + sd1Width + dentroSymGap;
+    var d1TextAreaEnd = fX + rW;
+    var d1TextX = Math.round((d1TextAreaStart + d1TextAreaEnd) / 2);
     p.push(
       '  <text x="' + d1TextX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
     );
@@ -452,7 +455,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");
     var sd2Y = dentroY + Math.round((rH - sd2TargetH) / 2);
     p.push(getSymbolPaths(order.simboloDentro2, order.cor, sd2X, sd2Y, sd2Sz));
-    var d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
+    // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+    var d2TextAreaStart = d2GroupStart + sd2Width + dentroSymGap;
+    var d2TextAreaEnd = vX + rW;
+    var d2TextX = Math.round((d2TextAreaStart + d2TextAreaEnd) / 2);
     p.push(
       '  <text x="' + d2TextX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
     );
