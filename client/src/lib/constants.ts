@@ -304,25 +304,25 @@ export function canAddCharToVerso(
 }
 
 // ========================================
-// Área máxima de personalização do DENTRO (+5cm em relação à frente)
+// Área máxima de personalização do DENTRO (mesmos valores da frente)
 // ========================================
 export const DENTRO_MAX_AREA_CM: Record<string, number> = {
-  "Bebê": 10.0,
-  "PP infantil": 10.5,
-  "P infantil": 11.0,
-  "M infantil": 11.5,
-  "G infantil": 12.0,
-  "PP adulto": 12.5,
-  "P adulto": 13.0,
-  "M adulto": 13.5,
-  "G adulto": 14.0,
-  "GG adulto": 14.5,
+  "Bebê": 5.0,
+  "PP infantil": 5.5,
+  "P infantil": 6.0,
+  "M infantil": 6.5,
+  "G infantil": 7.0,
+  "PP adulto": 7.5,
+  "P adulto": 8.0,
+  "M adulto": 8.5,
+  "G adulto": 9.0,
+  "GG adulto": 9.5,
 };
 
 export function getDentroMaxWidthSvg(sizeName: string): number {
   const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
   const name = size ? size.name : "M adulto";
-  const cm = DENTRO_MAX_AREA_CM[name] || 10.0;
+  const cm = DENTRO_MAX_AREA_CM[name] || 8.5;
   return Math.round(cm * 1000);
 }
 
