@@ -376,26 +376,23 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
-              {(() => {
-                const whats = BRACELET_SYMBOLS.find((s) => s.id === "whatsapp");
-                return whats ? (
-                  <SelectItem value={whats.id}>
-                    <div className="flex items-center gap-2">
-                      <svg width="16" height="16" viewBox={whats.viewBox} className="shrink-0">
-                        {whats.paths.map((p, i) => (
-                          <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
-                        ))}
-                      </svg>
-                      {whats.name}
-                    </div>
-                  </SelectItem>
-                ) : null;
-              })()}
+              {BRACELET_SYMBOLS.filter((s) => ["whatsapp", "gota", "alerta", "brasil"].includes(s.id)).map((sym) => (
+                <SelectItem key={sym.id} value={sym.id}>
+                  <div className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox={sym.viewBox} className="shrink-0">
+                      {sym.paths.map((p, i) => (
+                        <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+                      ))}
+                    </svg>
+                    {sym.name}
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* Símbolo Dentro 2 (WhatsApp) */}
+        {/* Símbolo Dentro 2 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Dentro (dir)</Label>
           <Select value={form.simboloDentro2 || "none"} onValueChange={(v) => update("simboloDentro2", v === "none" ? undefined : v)}>
@@ -404,21 +401,18 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
-              {(() => {
-                const whats = BRACELET_SYMBOLS.find((s) => s.id === "whatsapp");
-                return whats ? (
-                  <SelectItem value={whats.id}>
-                    <div className="flex items-center gap-2">
-                      <svg width="16" height="16" viewBox={whats.viewBox} className="shrink-0">
-                        {whats.paths.map((p, i) => (
-                          <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
-                        ))}
-                      </svg>
-                      {whats.name}
-                    </div>
-                  </SelectItem>
-                ) : null;
-              })()}
+              {BRACELET_SYMBOLS.filter((s) => ["whatsapp", "gota", "alerta", "brasil"].includes(s.id)).map((sym) => (
+                <SelectItem key={sym.id} value={sym.id}>
+                  <div className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox={sym.viewBox} className="shrink-0">
+                      {sym.paths.map((p, i) => (
+                        <path key={i} d={p.d} fill={p.fill} fillRule="evenodd" clipRule="evenodd" />
+                      ))}
+                    </svg>
+                    {sym.name}
+                  </div>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

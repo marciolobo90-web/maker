@@ -1,0 +1,14 @@
+Aparecida:
+- viewBox: "0 0 21000 29700" (full page, need to calculate bounding box)
+- Path starts around x=10200, y=14500 to x=10700, y=15900
+- Approximate viewBox: "10200 14500 550 1400"
+
+Clave:
+- viewBox: "0 0 21000 29700"  
+- Path around x=10350, y=14500 to x=10650, y=15250
+- Approximate viewBox: "10350 14500 300 750"
+
+Eletromusical:
+- viewBox: "0 0 21000 29700"
+- Path around x=9500, y=14600 to x=11600, y=15300
+- Approximate viewBox: "9500 14600 2100 700"
