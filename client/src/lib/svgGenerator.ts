@@ -171,6 +171,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     order.simboloDentro2
   );
   var symGap = 100;
+  var dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
 
   // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)
   var padding = 750;
@@ -404,14 +405,14 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var d1TextW1 = estW(order.l1Dentro1, ifs1);
     var d1TextW2 = hasD1L2 ? estW(order.l2Dentro1, ifs1) : 0;
     var d1MaxTextW = Math.max(d1TextW1, d1TextW2);
-    var totalD1W = sd1Width + symGap + d1MaxTextW;
+    var totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
     var d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
     var sd1X = d1GroupStart;
     var sd1Sz = sd1Width;
     var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
     var sd1Y = dentroY + Math.round((rH - sd1TargetH) / 2);
     p.push(getSymbolPaths(order.simboloDentro1, order.cor, sd1X, sd1Y, sd1Sz));
-    var d1TextX = d1GroupStart + sd1Width + symGap + Math.round(d1MaxTextW / 2);
+    var d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
     p.push(
       '  <text x="' + d1TextX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
     );
@@ -438,14 +439,14 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var d2TextW1 = estW(order.l1Dentro2, ifs2);
     var d2TextW2 = hasD2L2 ? estW(order.l2Dentro2, ifs2) : 0;
     var d2MaxTextW = Math.max(d2TextW1, d2TextW2);
-    var totalD2W = sd2Width + symGap + d2MaxTextW;
+    var totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
     var d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
     var sd2X = d2GroupStart;
     var sd2Sz = sd2Width;
     var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");
     var sd2Y = dentroY + Math.round((rH - sd2TargetH) / 2);
     p.push(getSymbolPaths(order.simboloDentro2, order.cor, sd2X, sd2Y, sd2Sz));
-    var d2TextX = d2GroupStart + sd2Width + symGap + Math.round(d2MaxTextW / 2);
+    var d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
     p.push(
       '  <text x="' + d2TextX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
     );

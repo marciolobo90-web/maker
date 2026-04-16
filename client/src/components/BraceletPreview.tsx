@@ -180,6 +180,7 @@ export default function BraceletPreview({
     order.simboloDentro2
   );
   const symGap = 100;
+  const dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
   const hasSym1 = !!order.simboloFrente;
@@ -497,12 +498,12 @@ export default function BraceletPreview({
           const d1TextW1 = estimateTextWidth(order.l1Dentro1, inside1FontSize);
           const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
           const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
-          const totalD1W = sd1Width + symGap + d1MaxTextW;
+          const totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
           const d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
           const sd1X = d1GroupStart;
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
-          const d1TextX = d1GroupStart + sd1Width + symGap + Math.round(d1MaxTextW / 2);
+          const d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
           return (
             <>
               <SymbolGroup
@@ -578,12 +579,12 @@ export default function BraceletPreview({
           const d2TextW1 = estimateTextWidth(order.l1Dentro2, inside2FontSize);
           const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
           const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
-          const totalD2W = sd2Width + symGap + d2MaxTextW;
+          const totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
           const d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
           const sd2X = d2GroupStart;
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
-          const d2TextX = d2GroupStart + sd2Width + symGap + Math.round(d2MaxTextW / 2);
+          const d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
           return (
             <>
               <SymbolGroup
