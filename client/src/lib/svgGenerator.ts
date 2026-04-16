@@ -407,6 +407,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var d1MaxTextW = Math.max(d1TextW1, d1TextW2);
     var totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
     var d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
+    // Clamp: símbolo não pode sair do retângulo (mínimo = fX + margem 1cm)
+    var d1MinX = fX + 1000;
+    if (d1GroupStart < d1MinX) d1GroupStart = d1MinX;
     var sd1X = d1GroupStart;
     var sd1Sz = sd1Width;
     var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
@@ -441,6 +444,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     var d2MaxTextW = Math.max(d2TextW1, d2TextW2);
     var totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
     var d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
+    // Clamp: símbolo não pode sair do retângulo (mínimo = vX + margem 1cm)
+    var d2MinX = vX + 1000;
+    if (d2GroupStart < d2MinX) d2GroupStart = d2MinX;
     var sd2X = d2GroupStart;
     var sd2Sz = sd2Width;
     var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");

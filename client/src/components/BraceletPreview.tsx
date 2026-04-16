@@ -499,7 +499,10 @@ export default function BraceletPreview({
           const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
           const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
           const totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
-          const d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
+          let d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
+          // Clamp: símbolo não pode sair do retângulo (mínimo = frenteX + margem 1cm)
+          const d1MinX = frenteX + 1000;
+          if (d1GroupStart < d1MinX) d1GroupStart = d1MinX;
           const sd1X = d1GroupStart;
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
@@ -580,7 +583,10 @@ export default function BraceletPreview({
           const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
           const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
           const totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
-          const d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
+          let d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
+          // Clamp: símbolo não pode sair do retângulo (mínimo = versoX + margem 1cm)
+          const d2MinX = versoX + 1000;
+          if (d2GroupStart < d2MinX) d2GroupStart = d2MinX;
           const sd2X = d2GroupStart;
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
