@@ -399,6 +399,12 @@ export interface BraceletOrder {
   simboloVerso?: string;
   simboloDentro1?: string;  // símbolo WhatsApp antes do texto no dentro1
   simboloDentro2?: string;  // símbolo WhatsApp antes do texto no dentro2
+  // Offsets horizontais dos símbolos (em mm, positivo = direita, negativo = esquerda)
+  offsetSimboloFrente?: number;
+  offsetSimboloFrente2?: number;
+  offsetSimboloVerso?: number;
+  offsetSimboloDentro1?: number;
+  offsetSimboloDentro2?: number;
   quantidade?: number;
 }
 

@@ -192,13 +192,16 @@ export default function BraceletPreview({
   if (hasSym1) totalFrenteW += sym1Width + symGap;
   if (hasSym2) totalFrenteW += symGap + sym2Width;
   const frenteGroupStart = frenteCX - Math.round(totalFrenteW / 2);
-  const sym1X = frenteGroupStart;
+  // Offsets horizontais dos símbolos (mm → SVG units)
+  const offsetSym1 = Math.round((order.offsetSimboloFrente || 0) * 100);
+  const offsetSym2 = Math.round((order.offsetSimboloFrente2 || 0) * 100);
+  const sym1X = frenteGroupStart + offsetSym1;
   const textFrenteX =
     frenteGroupStart +
     (hasSym1 ? sym1Width + symGap : 0) +
     Math.round(frenteTextW / 2);
   const sym2X =
-    textFrenteX + Math.round(frenteTextW / 2) + symGap;
+    textFrenteX + Math.round(frenteTextW / 2) + symGap + offsetSym2;
 
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   const textYOffset = 70;
@@ -217,7 +220,8 @@ export default function BraceletPreview({
   let totalVersoW = versoTextW;
   if (hasSV) totalVersoW += svSymWidth + symGap;
   const versoGroupStart = versoCX - Math.round(totalVersoW / 2);
-  const symVX = versoGroupStart;
+  const offsetSymVerso = Math.round((order.offsetSimboloVerso || 0) * 100);
+  const symVX = versoGroupStart + offsetSymVerso;
   const textVersoX =
     versoGroupStart +
     (hasSV ? svSymWidth + symGap : 0) +
@@ -503,7 +507,8 @@ export default function BraceletPreview({
           // Clamp: símbolo não pode sair do retângulo (mínimo = frenteX + margem 1cm)
           const d1MinX = frenteX + 1000;
           if (d1GroupStart < d1MinX) d1GroupStart = d1MinX;
-          const sd1X = d1GroupStart;
+          const offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
+          const sd1X = d1GroupStart + offsetD1;
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
           // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
@@ -590,7 +595,8 @@ export default function BraceletPreview({
           // Clamp: símbolo não pode sair do retângulo (mínimo = versoX + margem 1cm)
           const d2MinX = versoX + 1000;
           if (d2GroupStart < d2MinX) d2GroupStart = d2MinX;
-          const sd2X = d2GroupStart;
+          const offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
+          const sd2X = d2GroupStart + offsetD2;
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
           // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo

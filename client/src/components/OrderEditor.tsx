@@ -295,7 +295,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
         {/* Símbolo Frente (antes do texto) */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Frente (antes)</Label>
-          <Select value={form.simboloFrente || "none"} onValueChange={(v) => update("simboloFrente", v === "none" ? undefined : v)}>
+          <Select value={form.simboloFrente || "none"} onValueChange={(v) => { update("simboloFrente", v === "none" ? undefined : v); if (v === "none") update("offsetSimboloFrente", 0); }}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -315,12 +315,22 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               ))}
             </SelectContent>
           </Select>
+          {form.simboloFrente && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Posição horizontal</span>
+                <span className="text-xs text-muted-foreground font-mono">{(form.offsetSimboloFrente || 0) > 0 ? "+" : ""}{form.offsetSimboloFrente || 0}mm</span>
+              </div>
+              <input type="range" min={-15} max={15} step={0.5} value={form.offsetSimboloFrente || 0} onChange={(e) => update("offsetSimboloFrente", parseFloat(e.target.value))} className="w-full h-2 mt-1 accent-primary cursor-pointer" />
+              <div className="flex justify-between text-[10px] text-muted-foreground opacity-50"><span>← esq</span><span>centro</span><span>dir →</span></div>
+            </div>
+          )}
         </div>
 
         {/* Símbolo Frente 2 (depois do texto) */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Frente (depois)</Label>
-          <Select value={form.simboloFrente2 || "none"} onValueChange={(v) => update("simboloFrente2", v === "none" ? undefined : v)}>
+          <Select value={form.simboloFrente2 || "none"} onValueChange={(v) => { update("simboloFrente2", v === "none" ? undefined : v); if (v === "none") update("offsetSimboloFrente2", 0); }}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -340,12 +350,22 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               ))}
             </SelectContent>
           </Select>
+          {form.simboloFrente2 && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Posição horizontal</span>
+                <span className="text-xs text-muted-foreground font-mono">{(form.offsetSimboloFrente2 || 0) > 0 ? "+" : ""}{form.offsetSimboloFrente2 || 0}mm</span>
+              </div>
+              <input type="range" min={-15} max={15} step={0.5} value={form.offsetSimboloFrente2 || 0} onChange={(e) => update("offsetSimboloFrente2", parseFloat(e.target.value))} className="w-full h-2 mt-1 accent-primary cursor-pointer" />
+              <div className="flex justify-between text-[10px] text-muted-foreground opacity-50"><span>← esq</span><span>centro</span><span>dir →</span></div>
+            </div>
+          )}
         </div>
 
         {/* Símbolo Verso */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Verso</Label>
-          <Select value={form.simboloVerso || "none"} onValueChange={(v) => update("simboloVerso", v === "none" ? undefined : v)}>
+          <Select value={form.simboloVerso || "none"} onValueChange={(v) => { update("simboloVerso", v === "none" ? undefined : v); if (v === "none") update("offsetSimboloVerso", 0); }}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -365,12 +385,22 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               ))}
             </SelectContent>
           </Select>
+          {form.simboloVerso && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Posição horizontal</span>
+                <span className="text-xs text-muted-foreground font-mono">{(form.offsetSimboloVerso || 0) > 0 ? "+" : ""}{form.offsetSimboloVerso || 0}mm</span>
+              </div>
+              <input type="range" min={-15} max={15} step={0.5} value={form.offsetSimboloVerso || 0} onChange={(e) => update("offsetSimboloVerso", parseFloat(e.target.value))} className="w-full h-2 mt-1 accent-primary cursor-pointer" />
+              <div className="flex justify-between text-[10px] text-muted-foreground opacity-50"><span>← esq</span><span>centro</span><span>dir →</span></div>
+            </div>
+          )}
         </div>
 
-        {/* Símbolo Dentro 1 (WhatsApp) */}
+        {/* Símbolo Dentro 1 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Dentro (esq)</Label>
-          <Select value={form.simboloDentro1 || "none"} onValueChange={(v) => update("simboloDentro1", v === "none" ? undefined : v)}>
+          <Select value={form.simboloDentro1 || "none"} onValueChange={(v) => { update("simboloDentro1", v === "none" ? undefined : v); if (v === "none") update("offsetSimboloDentro1", 0); }}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -390,12 +420,22 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               ))}
             </SelectContent>
           </Select>
+          {form.simboloDentro1 && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Posição horizontal</span>
+                <span className="text-xs text-muted-foreground font-mono">{(form.offsetSimboloDentro1 || 0) > 0 ? "+" : ""}{form.offsetSimboloDentro1 || 0}mm</span>
+              </div>
+              <input type="range" min={-15} max={15} step={0.5} value={form.offsetSimboloDentro1 || 0} onChange={(e) => update("offsetSimboloDentro1", parseFloat(e.target.value))} className="w-full h-2 mt-1 accent-primary cursor-pointer" />
+              <div className="flex justify-between text-[10px] text-muted-foreground opacity-50"><span>← esq</span><span>centro</span><span>dir →</span></div>
+            </div>
+          )}
         </div>
 
         {/* Símbolo Dentro 2 */}
         <div>
           <Label className="text-muted-foreground text-xs uppercase tracking-wider">Símbolo Dentro (dir)</Label>
-          <Select value={form.simboloDentro2 || "none"} onValueChange={(v) => update("simboloDentro2", v === "none" ? undefined : v)}>
+          <Select value={form.simboloDentro2 || "none"} onValueChange={(v) => { update("simboloDentro2", v === "none" ? undefined : v); if (v === "none") update("offsetSimboloDentro2", 0); }}>
             <SelectTrigger className="mt-1 bg-secondary border-border">
               <SelectValue />
             </SelectTrigger>
@@ -415,6 +455,16 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               ))}
             </SelectContent>
           </Select>
+          {form.simboloDentro2 && (
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Posição horizontal</span>
+                <span className="text-xs text-muted-foreground font-mono">{(form.offsetSimboloDentro2 || 0) > 0 ? "+" : ""}{form.offsetSimboloDentro2 || 0}mm</span>
+              </div>
+              <input type="range" min={-15} max={15} step={0.5} value={form.offsetSimboloDentro2 || 0} onChange={(e) => update("offsetSimboloDentro2", parseFloat(e.target.value))} className="w-full h-2 mt-1 accent-primary cursor-pointer" />
+              <div className="flex justify-between text-[10px] text-muted-foreground opacity-50"><span>← esq</span><span>centro</span><span>dir →</span></div>
+            </div>
+          )}
         </div>
 
         {/* Quantidade */}

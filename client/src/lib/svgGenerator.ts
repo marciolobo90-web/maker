@@ -186,9 +186,12 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   if (hasSym1) totalFrenteW += sym1Width + symGap;
   if (hasSym2) totalFrenteW += symGap + sym2Width;
   var frenteGroupStart = fCx - Math.round(totalFrenteW / 2);
-  var sym1X = frenteGroupStart;
+  // Offsets horizontais dos símbolos (mm → SVG units)
+  var offsetSym1 = Math.round((order.offsetSimboloFrente || 0) * 100);
+  var offsetSym2 = Math.round((order.offsetSimboloFrente2 || 0) * 100);
+  var sym1X = frenteGroupStart + offsetSym1;
   var textFrenteX = frenteGroupStart + (hasSym1 ? sym1Width + symGap : 0) + Math.round(frenteTextW / 2);
-  var sym2X = textFrenteX + Math.round(frenteTextW / 2) + symGap;
+  var sym2X = textFrenteX + Math.round(frenteTextW / 2) + symGap + offsetSym2;
 
   // Calcular posições VERSO (agora com 2 linhas possíveis)
   var versoL1 = order.textoVerso || "";
@@ -200,7 +203,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var totalVersoW = versoTextW;
   if (hasSV) totalVersoW += svWidth + symGap;
   var versoGroupStart = vCx - Math.round(totalVersoW / 2);
-  var symVX = versoGroupStart;
+  var offsetSymVerso = Math.round((order.offsetSimboloVerso || 0) * 100);
+  var symVX = versoGroupStart + offsetSymVerso;
   var textVersoX = versoGroupStart + (hasSV ? svWidth + symGap : 0) + Math.round(versoTextW / 2);
 
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
@@ -410,7 +414,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     // Clamp: símbolo não pode sair do retângulo (mínimo = fX + margem 1cm)
     var d1MinX = fX + 1000;
     if (d1GroupStart < d1MinX) d1GroupStart = d1MinX;
-    var sd1X = d1GroupStart;
+    var offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
+    var sd1X = d1GroupStart + offsetD1;
     var sd1Sz = sd1Width;
     var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
     var sd1Y = dentroY + Math.round((rH - sd1TargetH) / 2);
@@ -450,7 +455,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     // Clamp: símbolo não pode sair do retângulo (mínimo = vX + margem 1cm)
     var d2MinX = vX + 1000;
     if (d2GroupStart < d2MinX) d2GroupStart = d2MinX;
-    var sd2X = d2GroupStart;
+    var offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
+    var sd2X = d2GroupStart + offsetD2;
     var sd2Sz = sd2Width;
     var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");
     var sd2Y = dentroY + Math.round((rH - sd2TargetH) / 2);
