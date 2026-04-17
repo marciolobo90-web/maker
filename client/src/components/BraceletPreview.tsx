@@ -415,6 +415,8 @@ export default function BraceletPreview({
         fontFamily={fontFrente}
         fontWeight={boldFrente ? "bold" : "normal"}
         fontSize={fontSize}
+        xmlSpace="preserve"
+        style={{ whiteSpace: "pre" }}
       >
         {order.textoFrente}
       </text>
@@ -446,6 +448,8 @@ export default function BraceletPreview({
         fontFamily={fontVerso}
         fontWeight={boldVerso ? "bold" : "normal"}
         fontSize={versoFontSize}
+        xmlSpace="preserve"
+        style={{ whiteSpace: "pre" }}
       >
         {versoL1}
       </text>
@@ -458,6 +462,8 @@ export default function BraceletPreview({
           fontFamily={fontVerso}
           fontWeight={boldVerso ? "bold" : "normal"}
           fontSize={versoFontSize}
+          xmlSpace="preserve"
+          style={{ whiteSpace: "pre" }}
         >
           {versoL2}
         </text>
@@ -532,6 +538,8 @@ export default function BraceletPreview({
                 fontFamily={insideFont}
                 fontWeight="bold"
                 fontSize={inside1FontSize}
+                xmlSpace="preserve"
+                style={{ whiteSpace: "pre" }}
               >
                 {order.l1Dentro1}
               </text>
@@ -544,6 +552,8 @@ export default function BraceletPreview({
                   fontFamily={insideFont}
                   fontWeight="bold"
                   fontSize={inside1FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro1}
                 </text>
@@ -561,6 +571,8 @@ export default function BraceletPreview({
                 fontFamily={insideFont}
                 fontWeight="bold"
                 fontSize={inside1FontSize}
+                xmlSpace="preserve"
+                style={{ whiteSpace: "pre" }}
               >
                 {order.l1Dentro1}
               </text>
@@ -573,6 +585,8 @@ export default function BraceletPreview({
                   fontFamily={insideFont}
                   fontWeight="bold"
                   fontSize={inside1FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro1}
                 </text>
@@ -620,6 +634,8 @@ export default function BraceletPreview({
                 fontFamily={insideFont}
                 fontWeight="bold"
                 fontSize={inside2FontSize}
+                xmlSpace="preserve"
+                style={{ whiteSpace: "pre" }}
               >
                 {order.l1Dentro2}
               </text>
@@ -632,6 +648,8 @@ export default function BraceletPreview({
                   fontFamily={insideFont}
                   fontWeight="bold"
                   fontSize={inside2FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro2}
                 </text>
@@ -649,6 +667,8 @@ export default function BraceletPreview({
                 fontFamily={insideFont}
                 fontWeight="bold"
                 fontSize={inside2FontSize}
+                xmlSpace="preserve"
+                style={{ whiteSpace: "pre" }}
               >
                 {order.l1Dentro2}
               </text>
@@ -661,6 +681,8 @@ export default function BraceletPreview({
                   fontFamily={insideFont}
                   fontWeight="bold"
                   fontSize={inside2FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro2}
                 </text>
