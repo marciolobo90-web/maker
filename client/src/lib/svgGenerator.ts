@@ -156,19 +156,21 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     sName,
     order.simboloVerso
   );
-  // Tamanho de fonte do dentro1: auto-ajuste baseado na área máxima
+  // Tamanho de fonte do dentro1: auto-ajuste baseado na área máxima (suporta 3 linhas)
   var ifs1 = calcDentroFontSize(
     order.l1Dentro1 || "",
     order.l2Dentro1 || "",
     sName,
-    order.simboloDentro1
+    order.simboloDentro1,
+    order.l3Dentro1 || ""
   );
-  // Tamanho de fonte do dentro2: auto-ajuste baseado na área máxima
+  // Tamanho de fonte do dentro2: auto-ajuste baseado na área máxima (suporta 3 linhas)
   var ifs2 = calcDentroFontSize(
     order.l1Dentro2 || "",
     order.l2Dentro2 || "",
     sName,
-    order.simboloDentro2
+    order.simboloDentro2,
+    order.l3Dentro2 || ""
   );
   var symGap = 100;
   var dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
@@ -221,36 +223,54 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     versoTextY2 = 0;
   }
 
-  // Frente text Y (sempre centralizado) + offset extra por fonte
-  var frenteTextY = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset + 60;
+  // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
+  var frenteTextY = frenteY + Math.round(rH / 2) + textYOffset + fontInfo.fontYOffset;
 
   // Calcular posições DENTRO com centralização vertical
   var dentro1CX = Math.round(fX + rW / 2);
   var dentro2CX = Math.round(vX + rW / 2);
 
   var hasD1L2 = (order.l2Dentro1 || "").length > 0;
+  var hasD1L3 = (order.l3Dentro1 || "").length > 0;
   var hasD2L2 = (order.l2Dentro2 || "").length > 0;
+  var hasD2L3 = (order.l3Dentro2 || "").length > 0;
 
-  // Y positions para dentro1 (1 ou 2 linhas)
+  // Y positions para dentro1 (1, 2 ou 3 linhas)
+  var d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
   var d1Y1: number;
   var d1Y2: number;
-  if (hasD1L2) {
+  var d1Y3: number;
+  if (d1Lines === 3) {
+    d1Y1 = dentroY + Math.round(rH * 0.25) + textYOffset;
+    d1Y2 = dentroY + Math.round(rH * 0.50) + textYOffset;
+    d1Y3 = dentroY + Math.round(rH * 0.75) + textYOffset;
+  } else if (d1Lines === 2) {
     d1Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
     d1Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
+    d1Y3 = 0;
   } else {
     d1Y1 = dentroY + Math.round(rH * 0.58) + textYOffset;
     d1Y2 = 0;
+    d1Y3 = 0;
   }
 
-  // Y positions para dentro2 (1 ou 2 linhas)
+  // Y positions para dentro2 (1, 2 ou 3 linhas)
+  var d2Lines = hasD2L3 ? 3 : hasD2L2 ? 2 : 1;
   var d2Y1: number;
   var d2Y2: number;
-  if (hasD2L2) {
+  var d2Y3: number;
+  if (d2Lines === 3) {
+    d2Y1 = dentroY + Math.round(rH * 0.25) + textYOffset;
+    d2Y2 = dentroY + Math.round(rH * 0.50) + textYOffset;
+    d2Y3 = dentroY + Math.round(rH * 0.75) + textYOffset;
+  } else if (d2Lines === 2) {
     d2Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
     d2Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
+    d2Y3 = 0;
   } else {
     d2Y1 = dentroY + Math.round(rH * 0.58) + textYOffset;
     d2Y2 = 0;
+    d2Y3 = 0;
   }
 
   var p: string[] = [];
@@ -379,7 +399,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, s1Y, s1Sz));
   }
   p.push(
-    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
+    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
   );
   if (hasSym2) {
     var s2Sz = getSymbolSize(order.simboloFrente2 || "");
@@ -432,6 +452,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
         '  <text xml:space="preserve" x="' + d1TextX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
       );
     }
+    if (hasD1L3) {
+      p.push(
+        '  <text xml:space="preserve" x="' + d1TextX + '" y="' + d1Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l3Dentro1 || "") + "</text>"
+      );
+    }
   } else {
     p.push(
       '  <text xml:space="preserve" x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
@@ -439,6 +464,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     if (hasD1L2) {
       p.push(
         '  <text xml:space="preserve" x="' + dentro1CX + '" y="' + d1Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l2Dentro1) + "</text>"
+      );
+    }
+    if (hasD1L3) {
+      p.push(
+        '  <text xml:space="preserve" x="' + dentro1CX + '" y="' + d1Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l3Dentro1 || "") + "</text>"
       );
     }
   }
@@ -473,6 +503,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
         '  <text xml:space="preserve" x="' + d2TextX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
       );
     }
+    if (hasD2L3) {
+      p.push(
+        '  <text xml:space="preserve" x="' + d2TextX + '" y="' + d2Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l3Dentro2 || "") + "</text>"
+      );
+    }
   } else {
     p.push(
       '  <text xml:space="preserve" x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"
@@ -480,6 +515,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     if (hasD2L2) {
       p.push(
         '  <text xml:space="preserve" x="' + dentro2CX + '" y="' + d2Y2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l2Dentro2) + "</text>"
+      );
+    }
+    if (hasD2L3) {
+      p.push(
+        '  <text xml:space="preserve" x="' + dentro2CX + '" y="' + d2Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l3Dentro2 || "") + "</text>"
       );
     }
   }

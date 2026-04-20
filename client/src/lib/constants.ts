@@ -170,6 +170,8 @@ export function getFrontMaxWidthSvg(sizeName: string): number {
 
 // Fonte mínima: 12pt = 423 SVG units
 export const MIN_FONT_SIZE_12PT = 423;
+// Fonte mínima para dentro: 11.5pt = 406 SVG units
+export const MIN_FONT_SIZE_11_5PT = 406;
 // Alias para compatibilidade
 export const FRONT_MIN_FONT_SIZE = MIN_FONT_SIZE_12PT;
 
@@ -304,19 +306,19 @@ export function canAddCharToVerso(
 }
 
 // ========================================
-// Área máxima de personalização do DENTRO (+1,5cm em relação à frente)
+// Área máxima de personalização do DENTRO (+2,5cm em relação à frente)
 // ========================================
 export const DENTRO_MAX_AREA_CM: Record<string, number> = {
-  "Bebê": 6.5,
-  "PP infantil": 7.0,
-  "P infantil": 7.5,
-  "M infantil": 8.0,
-  "G infantil": 8.5,
-  "PP adulto": 9.0,
-  "P adulto": 9.5,
-  "M adulto": 10.0,
-  "G adulto": 10.5,
-  "GG adulto": 11.0,
+  "Bebê": 7.5,
+  "PP infantil": 8.0,
+  "P infantil": 8.5,
+  "M infantil": 9.0,
+  "G infantil": 9.5,
+  "PP adulto": 10.0,
+  "P adulto": 10.5,
+  "M adulto": 11.0,
+  "G adulto": 11.5,
+  "GG adulto": 12.0,
 };
 
 export function getDentroMaxWidthSvg(sizeName: string): number {
@@ -329,13 +331,15 @@ export function getDentroMaxWidthSvg(sizeName: string): number {
 // ========================================
 // Auto-ajuste de fonte para DENTRO (1 e 2)
 // Dentro usa Calibri Negrito base 12pt (423 SVG units)
-// Área máxima = frente + 1,5cm
+// Área máxima = frente + 2,5cm
+// Suporta até 3 linhas, com fonte mínima de 11.5pt
 // ========================================
 export function calcDentroFontSize(
   l1Dentro: string,
   l2Dentro: string,
   sizeName: string,
-  simboloDentro?: string
+  simboloDentro?: string,
+  l3Dentro?: string
 ): number {
   const maxWidth = getDentroMaxWidthSvg(sizeName);
   const baseFontSize = 423; // Calibri Negrito 12pt
@@ -347,23 +351,25 @@ export function calcDentroFontSize(
   }
 
   const availableWidth = maxWidth - symbolsWidth;
-  if (availableWidth <= 0) return MIN_FONT_SIZE_12PT;
+  if (availableWidth <= 0) return MIN_FONT_SIZE_11_5PT;
 
   const textW1 = estimateTextWidthShared(l1Dentro, baseFontSize);
   const textW2 = l2Dentro ? estimateTextWidthShared(l2Dentro, baseFontSize) : 0;
-  const maxTextW = Math.max(textW1, textW2);
+  const textW3 = l3Dentro ? estimateTextWidthShared(l3Dentro, baseFontSize) : 0;
+  const maxTextW = Math.max(textW1, textW2, textW3);
   if (maxTextW <= availableWidth) return baseFontSize;
 
   const ratio = availableWidth / maxTextW;
   const newFontSize = Math.round(baseFontSize * ratio);
-  return Math.max(newFontSize, MIN_FONT_SIZE_12PT);
+  return Math.max(newFontSize, MIN_FONT_SIZE_11_5PT);
 }
 
 export function canAddCharToDentro(
   currentText: string,
   otherLine: string,
   sizeName: string,
-  simboloDentro?: string
+  simboloDentro?: string,
+  thirdLine?: string
 ): boolean {
   const testText = currentText + "W";
   const maxWidth = getDentroMaxWidthSvg(sizeName);
@@ -371,9 +377,10 @@ export function canAddCharToDentro(
   let symbolsWidth = 0;
   if (simboloDentro) symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
   const availableWidth = maxWidth - symbolsWidth;
-  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_12PT);
-  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_12PT);
-  return Math.max(testW, otherW) <= availableWidth;
+  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_11_5PT);
+  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_11_5PT);
+  const thirdW = thirdLine ? estimateTextWidthShared(thirdLine, MIN_FONT_SIZE_11_5PT) : 0;
+  return Math.max(testW, otherW, thirdW) <= availableWidth;
 }
 
 export interface BraceletOrder {
@@ -387,6 +394,8 @@ export interface BraceletOrder {
   l2Dentro1: string;
   l1Dentro2: string;
   l2Dentro2: string;
+  l3Dentro1?: string;  // linha 3 do dentro1 (opcional)
+  l3Dentro2?: string;  // linha 3 do dentro2 (opcional)
   cor: string;
   corTexto: string;
   fonteFrente: string;
@@ -514,4 +523,6 @@ export const EXPECTED_COLUMNS = [
   "SIMBOLO_DENTRO1",
   "SIMBOLO_DENTRO2",
   "QUANTIDADE",
+  "L3_DENTRO1",
+  "L3_DENTRO2",
 ];

@@ -165,19 +165,21 @@ export default function BraceletPreview({
     sizeName,
     order.simboloVerso
   );
-  // Tamanho de fonte do dentro1: auto-ajuste
+  // Tamanho de fonte do dentro1: auto-ajuste (suporta 3 linhas)
   const inside1FontSize = calcDentroFontSize(
     order.l1Dentro1 || "",
     order.l2Dentro1 || "",
     sizeName,
-    order.simboloDentro1
+    order.simboloDentro1,
+    order.l3Dentro1 || ""
   );
-  // Tamanho de fonte do dentro2: auto-ajuste
+  // Tamanho de fonte do dentro2: auto-ajuste (suporta 3 linhas)
   const inside2FontSize = calcDentroFontSize(
     order.l1Dentro2 || "",
     order.l2Dentro2 || "",
     sizeName,
-    order.simboloDentro2
+    order.simboloDentro2,
+    order.l3Dentro2 || ""
   );
   const symGap = 100;
   const dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
@@ -206,9 +208,9 @@ export default function BraceletPreview({
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   const textYOffset = 70;
 
-  // Frente text Y (sempre centralizado) + offset extra por fonte
+  // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
   const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
-  const frenteTextY = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset + 60;
+  const frenteTextY = frenteY + Math.round(rectH / 2) + textYOffset + fontExtraOffset;
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   const versoL1 = order.textoVerso || "";
@@ -242,24 +244,40 @@ export default function BraceletPreview({
   const dentro2CX = Math.round(versoX + rectW / 2);
 
   const hasD1L2 = (order.l2Dentro1 || "").length > 0;
+  const hasD1L3 = (order.l3Dentro1 || "").length > 0;
   const hasD2L2 = (order.l2Dentro2 || "").length > 0;
+  const hasD2L3 = (order.l3Dentro2 || "").length > 0;
 
-  let d1Y1: number, d1Y2: number;
-  if (hasD1L2) {
+  const d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
+  let d1Y1: number, d1Y2: number, d1Y3: number;
+  if (d1Lines === 3) {
+    d1Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset;
+    d1Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset;
+    d1Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset;
+  } else if (d1Lines === 2) {
     d1Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
     d1Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
+    d1Y3 = 0;
   } else {
     d1Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
     d1Y2 = 0;
+    d1Y3 = 0;
   }
 
-  let d2Y1: number, d2Y2: number;
-  if (hasD2L2) {
+  const d2Lines = hasD2L3 ? 3 : hasD2L2 ? 2 : 1;
+  let d2Y1: number, d2Y2: number, d2Y3: number;
+  if (d2Lines === 3) {
+    d2Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset;
+    d2Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset;
+    d2Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset;
+  } else if (d2Lines === 2) {
     d2Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
     d2Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
+    d2Y3 = 0;
   } else {
     d2Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
     d2Y2 = 0;
+    d2Y3 = 0;
   }
 
   return (
@@ -411,6 +429,7 @@ export default function BraceletPreview({
         x={textFrenteX}
         y={frenteTextY}
         textAnchor="middle"
+        dominantBaseline="central"
         fill={textColor}
         fontFamily={fontFrente}
         fontWeight={boldFrente ? "bold" : "normal"}
@@ -558,6 +577,21 @@ export default function BraceletPreview({
                   {order.l2Dentro1}
                 </text>
               )}
+              {hasD1L3 && (
+                <text
+                  x={d1TextX}
+                  y={d1Y3}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={inside1FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
+                >
+                  {order.l3Dentro1}
+                </text>
+              )}
             </>
           );
         } else {
@@ -589,6 +623,21 @@ export default function BraceletPreview({
                   style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro1}
+                </text>
+              )}
+              {hasD1L3 && (
+                <text
+                  x={dentro1CX}
+                  y={d1Y3}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={inside1FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
+                >
+                  {order.l3Dentro1}
                 </text>
               )}
             </>
@@ -654,6 +703,21 @@ export default function BraceletPreview({
                   {order.l2Dentro2}
                 </text>
               )}
+              {hasD2L3 && (
+                <text
+                  x={d2TextX}
+                  y={d2Y3}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={inside2FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
+                >
+                  {order.l3Dentro2}
+                </text>
+              )}
             </>
           );
         } else {
@@ -685,6 +749,21 @@ export default function BraceletPreview({
                   style={{ whiteSpace: "pre" }}
                 >
                   {order.l2Dentro2}
+                </text>
+              )}
+              {hasD2L3 && (
+                <text
+                  x={dentro2CX}
+                  y={d2Y3}
+                  textAnchor="middle"
+                  fill={textColor}
+                  fontFamily={insideFont}
+                  fontWeight="bold"
+                  fontSize={inside2FontSize}
+                  xmlSpace="preserve"
+                  style={{ whiteSpace: "pre" }}
+                >
+                  {order.l3Dentro2}
                 </text>
               )}
             </>

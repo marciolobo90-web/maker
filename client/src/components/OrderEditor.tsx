@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { BraceletOrder } from "@/lib/constants";
-import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS, canAddCharToFront, calcFrontFontSize, FRONT_MIN_FONT_SIZE, MIN_FONT_SIZE_12PT, calcVersoFontSize, canAddCharToVerso, calcDentroFontSize, canAddCharToDentro } from "@/lib/constants";
+import { BRACELET_COLORS, FRONT_FONTS, VERSO_FONT, BRACELET_SIZES, BRACELET_SYMBOLS, canAddCharToFront, calcFrontFontSize, FRONT_MIN_FONT_SIZE, MIN_FONT_SIZE_12PT, MIN_FONT_SIZE_11_5PT, calcVersoFontSize, canAddCharToVerso, calcDentroFontSize, canAddCharToDentro } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -146,7 +146,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= form.l1Dentro1.length) { update("l1Dentro1", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1)) {
+              if (canAddCharToDentro(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1, form.l3Dentro1)) {
                 update("l1Dentro1", newValue);
               }
             }}
@@ -161,20 +161,36 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= form.l2Dentro1.length) { update("l2Dentro1", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l2Dentro1, form.l1Dentro1, sizeName, form.simboloDentro1)) {
+              if (canAddCharToDentro(form.l2Dentro1, form.l1Dentro1, sizeName, form.simboloDentro1, form.l3Dentro1)) {
                 update("l2Dentro1", newValue);
               }
             }}
             className="mt-1 bg-secondary border-border"
             placeholder="Opcional"
           />
+        </div>
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">L3 Dentro (esq)</Label>
+          <Input
+            value={form.l3Dentro1 || ""}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= (form.l3Dentro1 || "").length) { update("l3Dentro1", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l3Dentro1 || "", Math.max(form.l1Dentro1.length, form.l2Dentro1.length) > 0 ? (form.l1Dentro1.length >= form.l2Dentro1.length ? form.l1Dentro1 : form.l2Dentro1) : "", sizeName, form.simboloDentro1, newValue)) {
+                update("l3Dentro1", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional (3ª linha)"
+          />
           {(() => {
             const sizeName = form.tamanhoLabel || form.tamanho;
-            const currentFs = calcDentroFontSize(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1);
+            const currentFs = calcDentroFontSize(form.l1Dentro1, form.l2Dentro1, sizeName, form.simboloDentro1, form.l3Dentro1);
             const isReduced = currentFs < 423;
-            const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
+            const isAtLimit = currentFs <= MIN_FONT_SIZE_11_5PT;
             const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
-            if (isAtLimit && (form.l1Dentro1.length > 0 || form.l2Dentro1.length > 0)) {
+            if (isAtLimit && (form.l1Dentro1.length > 0 || form.l2Dentro1.length > 0 || (form.l3Dentro1 || "").length > 0)) {
               return <p className="text-xs text-destructive mt-1">Dentro (esq): limite atingido ({ptSize}pt mínimo).</p>;
             }
             if (isReduced) {
@@ -191,7 +207,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= form.l1Dentro2.length) { update("l1Dentro2", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2)) {
+              if (canAddCharToDentro(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2, form.l3Dentro2)) {
                 update("l1Dentro2", newValue);
               }
             }}
@@ -206,20 +222,36 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= form.l2Dentro2.length) { update("l2Dentro2", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l2Dentro2, form.l1Dentro2, sizeName, form.simboloDentro2)) {
+              if (canAddCharToDentro(form.l2Dentro2, form.l1Dentro2, sizeName, form.simboloDentro2, form.l3Dentro2)) {
                 update("l2Dentro2", newValue);
               }
             }}
             className="mt-1 bg-secondary border-border"
             placeholder="Opcional"
           />
+        </div>
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">L3 Dentro (dir)</Label>
+          <Input
+            value={form.l3Dentro2 || ""}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= (form.l3Dentro2 || "").length) { update("l3Dentro2", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToDentro(form.l3Dentro2 || "", Math.max(form.l1Dentro2.length, form.l2Dentro2.length) > 0 ? (form.l1Dentro2.length >= form.l2Dentro2.length ? form.l1Dentro2 : form.l2Dentro2) : "", sizeName, form.simboloDentro2, newValue)) {
+                update("l3Dentro2", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional (3ª linha)"
+          />
           {(() => {
             const sizeName = form.tamanhoLabel || form.tamanho;
-            const currentFs = calcDentroFontSize(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2);
+            const currentFs = calcDentroFontSize(form.l1Dentro2, form.l2Dentro2, sizeName, form.simboloDentro2, form.l3Dentro2);
             const isReduced = currentFs < 423;
-            const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
+            const isAtLimit = currentFs <= MIN_FONT_SIZE_11_5PT;
             const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
-            if (isAtLimit && (form.l1Dentro2.length > 0 || form.l2Dentro2.length > 0)) {
+            if (isAtLimit && (form.l1Dentro2.length > 0 || form.l2Dentro2.length > 0 || (form.l3Dentro2 || "").length > 0)) {
               return <p className="text-xs text-destructive mt-1">Dentro (dir): limite atingido ({ptSize}pt mínimo).</p>;
             }
             if (isReduced) {
