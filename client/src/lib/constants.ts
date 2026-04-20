@@ -168,6 +168,29 @@ export function getFrontMaxWidthSvg(sizeName: string): number {
   return Math.round(cm * 1000);
 }
 
+// ========================================
+// Área máxima de personalização do VERSO (+1cm em relação à frente)
+// ========================================
+export const VERSO_MAX_AREA_CM: Record<string, number> = {
+  "Bebê": 6.0,
+  "PP infantil": 6.5,
+  "P infantil": 7.0,
+  "M infantil": 7.5,
+  "G infantil": 8.0,
+  "PP adulto": 8.5,
+  "P adulto": 9.0,
+  "M adulto": 9.5,
+  "G adulto": 10.0,
+  "GG adulto": 10.5,
+};
+
+export function getVersoMaxWidthSvg(sizeName: string): number {
+  const size = BRACELET_SIZES.find((s) => s.name === sizeName || s.label === sizeName);
+  const name = size ? size.name : "M adulto";
+  const cm = VERSO_MAX_AREA_CM[name] || 9.5;
+  return Math.round(cm * 1000);
+}
+
 // Fonte mínima: 12pt = 423 SVG units
 export const MIN_FONT_SIZE_12PT = 423;
 // Fonte mínima para dentro: 11.5pt = 406 SVG units
@@ -269,7 +292,7 @@ export function calcVersoFontSize(
   sizeName: string,
   simboloVerso?: string
 ): number {
-  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const maxWidth = getVersoMaxWidthSvg(sizeName);
   const baseFontSize = 423; // Calibri Negrito 12pt
   const symGap = 100;
 
@@ -300,7 +323,7 @@ export function canAddCharToVerso(
 ): boolean {
   const testText = currentText + "W";
   // Testar com a linha mais larga
-  const maxWidth = getFrontMaxWidthSvg(sizeName);
+  const maxWidth = getVersoMaxWidthSvg(sizeName);
   const symGap = 100;
   let symbolsWidth = 0;
   if (simboloVerso) symbolsWidth += getSymbolWidthForCalc(simboloVerso) + symGap;
