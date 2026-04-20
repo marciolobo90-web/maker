@@ -229,14 +229,14 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     versoTextY2 = 0;
   }
 
-  // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
+  // Frente text Y: mesmo padrão do verso (sem dominant-baseline)
   var frenteTextY1: number;
   var frenteTextY2: number;
   if (hasFrenteL2) {
     frenteTextY1 = frenteY + Math.round(rH * 0.38) + textYOffset + fontInfo.fontYOffset;
     frenteTextY2 = frenteY + Math.round(rH * 0.72) + textYOffset + fontInfo.fontYOffset;
   } else {
-    frenteTextY1 = frenteY + Math.round(rH / 2) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY1 = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset;
     frenteTextY2 = 0;
   }
 
@@ -414,11 +414,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, s1Y, s1Sz));
   }
   p.push(
-    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY1 + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
+    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
   );
   if (hasFrenteL2) {
     p.push(
-      '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY2 + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(frenteL2) + "</text>"
+      '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(frenteL2) + "</text>"
     );
   }
   if (hasSym2) {

@@ -214,7 +214,7 @@ export default function BraceletPreview({
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   const textYOffset = 70;
 
-  // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
+  // Frente text Y: mesmo padrão do verso (sem dominant-baseline)
   const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
   let frenteTextY1: number;
   let frenteTextY2: number;
@@ -222,7 +222,7 @@ export default function BraceletPreview({
     frenteTextY1 = frenteY + Math.round(rectH * 0.38) + textYOffset + fontExtraOffset;
     frenteTextY2 = frenteY + Math.round(rectH * 0.72) + textYOffset + fontExtraOffset;
   } else {
-    frenteTextY1 = frenteY + Math.round(rectH / 2) + textYOffset + fontExtraOffset;
+    frenteTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset;
     frenteTextY2 = 0;
   }
 
@@ -445,7 +445,6 @@ export default function BraceletPreview({
         x={textFrenteX}
         y={frenteTextY1}
         textAnchor="middle"
-        dominantBaseline="central"
         fill={textColor}
         fontFamily={fontFrente}
         fontWeight={boldFrente ? "bold" : "normal"}
@@ -460,7 +459,6 @@ export default function BraceletPreview({
           x={textFrenteX}
           y={frenteTextY2}
           textAnchor="middle"
-          dominantBaseline="central"
           fill={textColor}
           fontFamily={fontFrente}
           fontWeight={boldFrente ? "bold" : "normal"}
