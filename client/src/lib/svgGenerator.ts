@@ -142,12 +142,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var symFrenteY = frenteY + Math.round((rH - symSz) / 2);
   var symDentroY = dentroY + Math.round((rH - symSz) / 2);
   // Tamanho de fonte da frente: auto-ajuste baseado na área máxima de personalização
+  var frenteL2 = order.l2Frente || "";
+  var hasFrenteL2 = frenteL2.length > 0;
   var fs = calcFrontFontSize(
     order.textoFrente,
     order.fonteFrente || "Segoe Print Negrito",
     sName,
     order.simboloFrente,
-    order.simboloFrente2
+    order.simboloFrente2,
+    frenteL2
   );
   // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
   var vfs = calcVersoFontSize(
@@ -179,7 +182,10 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var padding = 750;
 
   // Calcular posições FRENTE com 2 símbolos possíveis
-  var frenteTextW = estW(order.textoFrente, fs);
+  // Para 2 linhas na frente, usar a linha mais larga para centralização horizontal
+  var frenteTextW1 = estW(order.textoFrente, fs);
+  var frenteTextW2 = hasFrenteL2 ? estW(frenteL2, fs) : 0;
+  var frenteTextW = Math.max(frenteTextW1, frenteTextW2);
   var hasSym1 = !!order.simboloFrente;
   var hasSym2 = !!order.simboloFrente2;
   var sym1Width = hasSym1 ? getSymbolSize(order.simboloFrente || "") : 0;
@@ -224,7 +230,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   }
 
   // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
-  var frenteTextY = frenteY + Math.round(rH / 2) + textYOffset + fontInfo.fontYOffset;
+  var frenteTextY1: number;
+  var frenteTextY2: number;
+  if (hasFrenteL2) {
+    frenteTextY1 = frenteY + Math.round(rH * 0.38) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY2 = frenteY + Math.round(rH * 0.72) + textYOffset + fontInfo.fontYOffset;
+  } else {
+    frenteTextY1 = frenteY + Math.round(rH / 2) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY2 = 0;
+  }
 
   // Calcular posições DENTRO com centralização vertical
   var dentro1CX = Math.round(fX + rW / 2);
@@ -400,8 +414,13 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloFrente, order.cor, sym1X, s1Y, s1Sz));
   }
   p.push(
-    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
+    '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY1 + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(order.textoFrente) + "</text>"
   );
+  if (hasFrenteL2) {
+    p.push(
+      '  <text xml:space="preserve" x="' + textFrenteX + '" y="' + frenteTextY2 + '" text-anchor="middle" dominant-baseline="central" fill="' + tCol + '" font-weight="' + (fBold ? "bold" : "normal") + '" font-size="' + fs + '" font-family="' + esc(fFam) + '">' + esc(frenteL2) + "</text>"
+    );
+  }
   if (hasSym2) {
     var s2Sz = getSymbolSize(order.simboloFrente2 || "");
     var s2Y = frenteY + Math.round((rH - s2Sz) / 2);

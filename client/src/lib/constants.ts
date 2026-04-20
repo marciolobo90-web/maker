@@ -187,7 +187,8 @@ export function calcFrontFontSize(
   fonteName: string,
   sizeName: string,
   simboloFrente?: string,
-  simboloFrente2?: string
+  simboloFrente2?: string,
+  l2Frente?: string
 ): number {
   const maxWidth = getFrontMaxWidthSvg(sizeName);
   const fontInfo = FRONT_FONTS.find((f) => f.name === fonteName);
@@ -206,12 +207,14 @@ export function calcFrontFontSize(
   const availableWidth = maxWidth - symbolsWidth;
   if (availableWidth <= 0) return FRONT_MIN_FONT_SIZE;
 
-  // Se o texto cabe com o tamanho base, retorna o tamanho base
-  const textWidth = estimateTextWidthShared(textoFrente, baseFontSize);
-  if (textWidth <= availableWidth) return baseFontSize;
+  // Verificar a linha mais larga (L1 ou L2)
+  const textW1 = estimateTextWidthShared(textoFrente, baseFontSize);
+  const textW2 = l2Frente ? estimateTextWidthShared(l2Frente, baseFontSize) : 0;
+  const maxTextW = Math.max(textW1, textW2);
+  if (maxTextW <= availableWidth) return baseFontSize;
 
   // Reduzir proporcionalmente
-  const ratio = availableWidth / textWidth;
+  const ratio = availableWidth / maxTextW;
   const newFontSize = Math.round(baseFontSize * ratio);
 
   // Não pode ser menor que 12pt
@@ -225,10 +228,11 @@ export function canAddCharToFront(
   fonteName: string,
   sizeName: string,
   simboloFrente?: string,
-  simboloFrente2?: string
+  simboloFrente2?: string,
+  otherLine?: string
 ): boolean {
   const testText = currentText + "W"; // W é um dos caracteres mais largos
-  const fontSize = calcFrontFontSize(testText, fonteName, sizeName, simboloFrente, simboloFrente2);
+  const fontSize = calcFrontFontSize(testText, fonteName, sizeName, simboloFrente, simboloFrente2, otherLine);
   if (fontSize <= FRONT_MIN_FONT_SIZE) {
     // Verificar se mesmo com 12pt o texto cabe
     const maxWidth = getFrontMaxWidthSvg(sizeName);
@@ -237,8 +241,9 @@ export function canAddCharToFront(
     if (simboloFrente) symbolsWidth += getSymbolWidthForCalc(simboloFrente) + symGap;
     if (simboloFrente2) symbolsWidth += getSymbolWidthForCalc(simboloFrente2) + symGap;
     const availableWidth = maxWidth - symbolsWidth;
-    const testWidth = estimateTextWidthShared(testText, FRONT_MIN_FONT_SIZE);
-    return testWidth <= availableWidth;
+    const testW = estimateTextWidthShared(testText, FRONT_MIN_FONT_SIZE);
+    const otherW = otherLine ? estimateTextWidthShared(otherLine, FRONT_MIN_FONT_SIZE) : 0;
+    return Math.max(testW, otherW) <= availableWidth;
   }
   return true;
 }
@@ -387,6 +392,7 @@ export interface BraceletOrder {
   id: string;
   nomeCliente: string;
   textoFrente: string;
+  l2Frente?: string;        // linha 2 da frente (opcional)
   textoVerso: string;       // agora pode ser linha 1 do verso
   l1Verso?: string;         // alias para textoVerso (linha 1)
   l2Verso?: string;         // linha 2 do verso (novo)
@@ -506,6 +512,7 @@ export const SHEETS_PUBLIC_CSV = (sheetId: string) =>
 export const EXPECTED_COLUMNS = [
   "NOME_CLIENTE",
   "TEXTO_FRENTE",
+  "L2_FRENTE",
   "TEXTO_VERSO",
   "L2_VERSO",
   "L1_DENTRO1",

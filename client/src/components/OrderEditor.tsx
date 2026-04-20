@@ -66,7 +66,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               }
               // Se está adicionando, verificar se cabe
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToFront(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2)) {
+              if (canAddCharToFront(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2, form.l2Frente || "")) {
                 update("textoFrente", newValue);
               }
             }}
@@ -74,7 +74,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
           />
           {(() => {
             const sizeName = form.tamanhoLabel || form.tamanho;
-            const currentFs = calcFrontFontSize(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2);
+            const currentFs = calcFrontFontSize(form.textoFrente, form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2, form.l2Frente || "");
             const isReduced = currentFs < (FRONT_FONTS.find(f => f.name === form.fonteFrente)?.svgFontSize || 635);
             const isAtLimit = currentFs <= FRONT_MIN_FONT_SIZE;
             const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
@@ -86,6 +86,24 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             }
             return null;
           })()}
+        </div>
+
+        {/* Texto Frente L2 */}
+        <div className="col-span-2">
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Frente (Linha 2)</Label>
+          <Input
+            value={form.l2Frente || ""}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= (form.l2Frente || "").length) { update("l2Frente", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToFront(form.l2Frente || "", form.fonteFrente, sizeName, form.simboloFrente, form.simboloFrente2, form.textoFrente)) {
+                update("l2Frente", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional"
+          />
         </div>
 
         {/* Texto Verso L1 */}

@@ -151,12 +151,15 @@ export default function BraceletPreview({
   const dentroY = 7606;
   const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
   // Tamanho de fonte da frente: auto-ajuste baseado na área máxima de personalização
+  const frenteL2 = order.l2Frente || "";
+  const hasFrenteL2 = frenteL2.length > 0;
   const fontSize = calcFrontFontSize(
     order.textoFrente,
     order.fonteFrente || "Segoe Print Negrito",
     sizeName,
     order.simboloFrente,
-    order.simboloFrente2
+    order.simboloFrente2,
+    frenteL2
   );
   // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
   const versoFontSize = calcVersoFontSize(
@@ -189,7 +192,10 @@ export default function BraceletPreview({
   const hasSym2 = !!order.simboloFrente2;
   const sym1Width = hasSym1 ? getSymbolSize(order.simboloFrente!) : 0;
   const sym2Width = hasSym2 ? getSymbolSize(order.simboloFrente2!) : 0;
-  const frenteTextW = estimateTextWidth(order.textoFrente, fontSize);
+  // Para 2 linhas na frente, usar a linha mais larga para centralização horizontal
+  const frenteTextW1 = estimateTextWidth(order.textoFrente, fontSize);
+  const frenteTextW2 = hasFrenteL2 ? estimateTextWidth(frenteL2, fontSize) : 0;
+  const frenteTextW = Math.max(frenteTextW1, frenteTextW2);
   let totalFrenteW = frenteTextW;
   if (hasSym1) totalFrenteW += sym1Width + symGap;
   if (hasSym2) totalFrenteW += symGap + sym2Width;
@@ -210,7 +216,15 @@ export default function BraceletPreview({
 
   // Frente text Y: centro real do retângulo + ajuste para dominant-baseline central
   const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
-  const frenteTextY = frenteY + Math.round(rectH / 2) + textYOffset + fontExtraOffset;
+  let frenteTextY1: number;
+  let frenteTextY2: number;
+  if (hasFrenteL2) {
+    frenteTextY1 = frenteY + Math.round(rectH * 0.38) + textYOffset + fontExtraOffset;
+    frenteTextY2 = frenteY + Math.round(rectH * 0.72) + textYOffset + fontExtraOffset;
+  } else {
+    frenteTextY1 = frenteY + Math.round(rectH / 2) + textYOffset + fontExtraOffset;
+    frenteTextY2 = 0;
+  }
 
   // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
   const versoL1 = order.textoVerso || "";
@@ -429,7 +443,7 @@ export default function BraceletPreview({
       )}
       <text
         x={textFrenteX}
-        y={frenteTextY}
+        y={frenteTextY1}
         textAnchor="middle"
         dominantBaseline="central"
         fill={textColor}
@@ -441,6 +455,22 @@ export default function BraceletPreview({
       >
         {order.textoFrente}
       </text>
+      {hasFrenteL2 && (
+        <text
+          x={textFrenteX}
+          y={frenteTextY2}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={textColor}
+          fontFamily={fontFrente}
+          fontWeight={boldFrente ? "bold" : "normal"}
+          fontSize={fontSize}
+          xmlSpace="preserve"
+          style={{ whiteSpace: "pre" }}
+        >
+          {frenteL2}
+        </text>
+      )}
       {hasSym2 && (
         <SymbolGroup
           symbolId={order.simboloFrente2!}

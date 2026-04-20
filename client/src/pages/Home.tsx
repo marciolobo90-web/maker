@@ -39,6 +39,7 @@ function createEmptyOrder(index: number): BraceletOrder {
     id: "manual_" + Date.now() + "_" + index,
     nomeCliente: "",
     textoFrente: "",
+    l2Frente: "",
     textoVerso: "",
     l2Verso: "",
     l1Dentro1: "",
