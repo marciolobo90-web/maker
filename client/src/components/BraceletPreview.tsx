@@ -250,10 +250,12 @@ export default function BraceletPreview({
 
   const d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
   let d1Y1: number, d1Y2: number, d1Y3: number;
+  // +50 SVG units (0.5mm) para baixo quando 3 linhas para centralizar na altura
+  const threeLineOffset = 50;
   if (d1Lines === 3) {
-    d1Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset;
-    d1Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset;
-    d1Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset;
+    d1Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset + threeLineOffset;
+    d1Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset + threeLineOffset;
+    d1Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset + threeLineOffset;
   } else if (d1Lines === 2) {
     d1Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
     d1Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
@@ -267,9 +269,9 @@ export default function BraceletPreview({
   const d2Lines = hasD2L3 ? 3 : hasD2L2 ? 2 : 1;
   let d2Y1: number, d2Y2: number, d2Y3: number;
   if (d2Lines === 3) {
-    d2Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset;
-    d2Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset;
-    d2Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset;
+    d2Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset + threeLineOffset;
+    d2Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset + threeLineOffset;
+    d2Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset + threeLineOffset;
   } else if (d2Lines === 2) {
     d2Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
     d2Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;

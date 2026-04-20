@@ -236,14 +236,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var hasD2L3 = (order.l3Dentro2 || "").length > 0;
 
   // Y positions para dentro1 (1, 2 ou 3 linhas)
+  var threeLineOffset = 50; // +0.5mm para baixo quando 3 linhas
   var d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
   var d1Y1: number;
   var d1Y2: number;
   var d1Y3: number;
   if (d1Lines === 3) {
-    d1Y1 = dentroY + Math.round(rH * 0.25) + textYOffset;
-    d1Y2 = dentroY + Math.round(rH * 0.50) + textYOffset;
-    d1Y3 = dentroY + Math.round(rH * 0.75) + textYOffset;
+    d1Y1 = dentroY + Math.round(rH * 0.25) + textYOffset + threeLineOffset;
+    d1Y2 = dentroY + Math.round(rH * 0.50) + textYOffset + threeLineOffset;
+    d1Y3 = dentroY + Math.round(rH * 0.75) + textYOffset + threeLineOffset;
   } else if (d1Lines === 2) {
     d1Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
     d1Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
@@ -260,9 +261,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var d2Y2: number;
   var d2Y3: number;
   if (d2Lines === 3) {
-    d2Y1 = dentroY + Math.round(rH * 0.25) + textYOffset;
-    d2Y2 = dentroY + Math.round(rH * 0.50) + textYOffset;
-    d2Y3 = dentroY + Math.round(rH * 0.75) + textYOffset;
+    d2Y1 = dentroY + Math.round(rH * 0.25) + textYOffset + threeLineOffset;
+    d2Y2 = dentroY + Math.round(rH * 0.50) + textYOffset + threeLineOffset;
+    d2Y3 = dentroY + Math.round(rH * 0.75) + textYOffset + threeLineOffset;
   } else if (d2Lines === 2) {
     d2Y1 = dentroY + Math.round(rH * 0.38) + textYOffset;
     d2Y2 = dentroY + Math.round(rH * 0.72) + textYOffset;
