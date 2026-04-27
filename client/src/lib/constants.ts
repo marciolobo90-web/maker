@@ -406,8 +406,9 @@ export function canAddCharToDentro(
   if (simboloDentro) symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
   const availableWidth = maxWidth - symbolsWidth;
   const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_11_5PT);
-  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_11_5PT);
+  const otherW = otherLine ? estimateTextWidthShared(otherLine, MIN_FONT_SIZE_11_5PT) : 0;
   const thirdW = thirdLine ? estimateTextWidthShared(thirdLine, MIN_FONT_SIZE_11_5PT) : 0;
+  // A linha sendo editada (currentText+M) deve caber junto com as outras linhas existentes
   return Math.max(testW, otherW, thirdW) <= availableWidth;
 }
 

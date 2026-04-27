@@ -195,7 +195,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= (form.l3Dentro1 || "").length) { update("l3Dentro1", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l3Dentro1 || "", Math.max(form.l1Dentro1.length, form.l2Dentro1.length) > 0 ? (form.l1Dentro1.length >= form.l2Dentro1.length ? form.l1Dentro1 : form.l2Dentro1) : "", sizeName, form.simboloDentro1, newValue)) {
+              if (canAddCharToDentro(form.l3Dentro1 || "", form.l1Dentro1, sizeName, form.simboloDentro1, form.l2Dentro1)) {
                 update("l3Dentro1", newValue);
               }
             }}
@@ -256,7 +256,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= (form.l3Dentro2 || "").length) { update("l3Dentro2", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToDentro(form.l3Dentro2 || "", Math.max(form.l1Dentro2.length, form.l2Dentro2.length) > 0 ? (form.l1Dentro2.length >= form.l2Dentro2.length ? form.l1Dentro2 : form.l2Dentro2) : "", sizeName, form.simboloDentro2, newValue)) {
+              if (canAddCharToDentro(form.l3Dentro2 || "", form.l1Dentro2, sizeName, form.simboloDentro2, form.l2Dentro2)) {
                 update("l3Dentro2", newValue);
               }
             }}
