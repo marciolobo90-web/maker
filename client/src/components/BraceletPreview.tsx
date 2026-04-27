@@ -107,7 +107,7 @@ function SymbolGroup({
 }
 
 function estimateTextWidth(text: string, fontSize: number): number {
-  return Math.round(text.length * fontSize * 0.50);
+  return Math.round(text.length * fontSize * 0.45);
 }
 
 export default function BraceletPreview({

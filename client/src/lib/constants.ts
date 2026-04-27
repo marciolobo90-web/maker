@@ -193,14 +193,16 @@ export function getVersoMaxWidthSvg(sizeName: string): number {
 
 // Fonte mínima: 12pt = 423 SVG units
 export const MIN_FONT_SIZE_12PT = 423;
-// Fonte mínima para dentro: 11.5pt = 406 SVG units
-export const MIN_FONT_SIZE_11_5PT = 406;
+// Fonte mínima para dentro: 10pt = 353 SVG units (permite 3 linhas com textos longos)
+export const MIN_FONT_SIZE_10PT = 353;
+// Alias mantido para compatibilidade
+export const MIN_FONT_SIZE_11_5PT = MIN_FONT_SIZE_10PT;
 // Alias para compatibilidade
 export const FRONT_MIN_FONT_SIZE = MIN_FONT_SIZE_12PT;
 
 // Estima largura de texto em SVG units (mesma fórmula usada em estW/estimateTextWidth)
 function estimateTextWidthShared(text: string, fontSize: number): number {
-  return Math.round(text.length * fontSize * 0.50);
+  return Math.round(text.length * fontSize * 0.45);
 }
 
 // Calcula o tamanho de fonte ideal para a frente, reduzindo se necessário
