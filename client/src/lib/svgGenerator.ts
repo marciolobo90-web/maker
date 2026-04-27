@@ -108,7 +108,7 @@ function esc(str: string): string {
 }
 
 function estW(text: string, fontSize: number): number {
-  return Math.round(text.length * fontSize * 0.55);
+  return Math.round(text.length * fontSize * 0.50);
 }
 
 export function generateBraceletSVG(order: BraceletOrder): string {

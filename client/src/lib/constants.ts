@@ -172,16 +172,16 @@ export function getFrontMaxWidthSvg(sizeName: string): number {
 // Área máxima de personalização do VERSO (+1cm em relação à frente)
 // ========================================
 export const VERSO_MAX_AREA_CM: Record<string, number> = {
-  "Bebê": 6.0,
-  "PP infantil": 6.5,
-  "P infantil": 7.0,
-  "M infantil": 7.5,
-  "G infantil": 8.0,
-  "PP adulto": 8.5,
-  "P adulto": 9.0,
-  "M adulto": 9.5,
-  "G adulto": 10.0,
-  "GG adulto": 10.5,
+  "Bebê": 6.5,
+  "PP infantil": 7.0,
+  "P infantil": 7.5,
+  "M infantil": 8.0,
+  "G infantil": 8.5,
+  "PP adulto": 9.0,
+  "P adulto": 9.5,
+  "M adulto": 10.0,
+  "G adulto": 10.5,
+  "GG adulto": 11.0,
 };
 
 export function getVersoMaxWidthSvg(sizeName: string): number {
@@ -200,7 +200,7 @@ export const FRONT_MIN_FONT_SIZE = MIN_FONT_SIZE_12PT;
 
 // Estima largura de texto em SVG units (mesma fórmula usada em estW/estimateTextWidth)
 function estimateTextWidthShared(text: string, fontSize: number): number {
-  return Math.round(text.length * fontSize * 0.55);
+  return Math.round(text.length * fontSize * 0.50);
 }
 
 // Calcula o tamanho de fonte ideal para a frente, reduzindo se necessário
@@ -254,7 +254,7 @@ export function canAddCharToFront(
   simboloFrente2?: string,
   otherLine?: string
 ): boolean {
-  const testText = currentText + "W"; // W é um dos caracteres mais largos
+  const testText = currentText + "M"; // M é largo mas mais realista que W
   const fontSize = calcFrontFontSize(testText, fonteName, sizeName, simboloFrente, simboloFrente2, otherLine);
   if (fontSize <= FRONT_MIN_FONT_SIZE) {
     // Verificar se mesmo com 12pt o texto cabe
@@ -321,7 +321,7 @@ export function canAddCharToVerso(
   sizeName: string,
   simboloVerso?: string
 ): boolean {
-  const testText = currentText + "W";
+  const testText = currentText + "M";
   // Testar com a linha mais larga
   const maxWidth = getVersoMaxWidthSvg(sizeName);
   const symGap = 100;
@@ -399,7 +399,7 @@ export function canAddCharToDentro(
   simboloDentro?: string,
   thirdLine?: string
 ): boolean {
-  const testText = currentText + "W";
+  const testText = currentText + "M";
   const maxWidth = getDentroMaxWidthSvg(sizeName);
   const symGap = 100;
   let symbolsWidth = 0;
