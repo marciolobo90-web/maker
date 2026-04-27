@@ -193,7 +193,9 @@ export function getVersoMaxWidthSvg(sizeName: string): number {
 
 // Fonte mínima: 12pt = 423 SVG units
 export const MIN_FONT_SIZE_12PT = 423;
-// Fonte mínima para dentro: 10pt = 353 SVG units (permite 3 linhas com textos longos)
+// Fonte fixa para dentro com 3 linhas: 11.6pt = 409 SVG units
+export const FONT_SIZE_11_6PT = 409;
+// Fonte mínima para dentro: 10pt = 353 SVG units (permite textos muito longos)
 export const MIN_FONT_SIZE_10PT = 353;
 // Alias mantido para compatibilidade
 export const MIN_FONT_SIZE_11_5PT = MIN_FONT_SIZE_10PT;
@@ -371,6 +373,13 @@ export function calcDentroFontSize(
   simboloDentro?: string,
   l3Dentro?: string
 ): number {
+  const has3Lines = !!(l3Dentro && l3Dentro.length > 0);
+
+  // Se tem 3 linhas, forçar 11.6pt (409 SVG units)
+  if (has3Lines) {
+    return FONT_SIZE_11_6PT;
+  }
+
   const maxWidth = getDentroMaxWidthSvg(sizeName);
   const baseFontSize = 423; // Calibri Negrito 12pt
   const symGap = 100;
@@ -385,8 +394,7 @@ export function calcDentroFontSize(
 
   const textW1 = estimateTextWidthShared(l1Dentro, baseFontSize);
   const textW2 = l2Dentro ? estimateTextWidthShared(l2Dentro, baseFontSize) : 0;
-  const textW3 = l3Dentro ? estimateTextWidthShared(l3Dentro, baseFontSize) : 0;
-  const maxTextW = Math.max(textW1, textW2, textW3);
+  const maxTextW = Math.max(textW1, textW2);
   if (maxTextW <= availableWidth) return baseFontSize;
 
   const ratio = availableWidth / maxTextW;
@@ -407,10 +415,12 @@ export function canAddCharToDentro(
   let symbolsWidth = 0;
   if (simboloDentro) symbolsWidth += getSymbolWidthForCalc(simboloDentro) + symGap;
   const availableWidth = maxWidth - symbolsWidth;
-  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_11_5PT);
-  const otherW = otherLine ? estimateTextWidthShared(otherLine, MIN_FONT_SIZE_11_5PT) : 0;
-  const thirdW = thirdLine ? estimateTextWidthShared(thirdLine, MIN_FONT_SIZE_11_5PT) : 0;
-  // A linha sendo editada (currentText+M) deve caber junto com as outras linhas existentes
+  // Se há 3 linhas (thirdLine preenchida ou currentText é a 3a linha sendo editada),
+  // usar fonte fixa 11.6pt para validação
+  const fontSize = (thirdLine && thirdLine.length > 0) ? FONT_SIZE_11_6PT : MIN_FONT_SIZE_11_5PT;
+  const testW = estimateTextWidthShared(testText, fontSize);
+  const otherW = otherLine ? estimateTextWidthShared(otherLine, fontSize) : 0;
+  const thirdW = thirdLine ? estimateTextWidthShared(thirdLine, fontSize) : 0;
   return Math.max(testW, otherW, thirdW) <= availableWidth;
 }
 
