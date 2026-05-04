@@ -556,8 +556,7 @@ export default function BraceletPreview({
           const sd1Width = getSymbolSize(order.simboloDentro1!);
           const d1TextW1 = estimateTextWidth(order.l1Dentro1, inside1FontSize);
           const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
-          const d1TextW3 = hasD1L3 ? estimateTextWidth(order.l3Dentro1 || "", inside1FontSize) : 0;
-          const d1MaxTextW = Math.max(d1TextW1, d1TextW2, d1TextW3);
+          const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
           const totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
           let d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
           // Clamp: símbolo não pode sair do retângulo (mínimo = frenteX + margem 1cm)
@@ -567,8 +566,10 @@ export default function BraceletPreview({
           const sd1X = d1GroupStart + offsetD1;
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
-          // Texto centralizado no espaço do texto dentro do grupo (símbolo + gap + texto)
-          const d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
+          // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+          const d1TextAreaStart = d1GroupStart + sd1Width + dentroSymGap;
+          const d1TextAreaEnd = frenteX + rectW;
+          const d1TextX = Math.round((d1TextAreaStart + d1TextAreaEnd) / 2);
           return (
             <>
               <SymbolGroup
@@ -681,8 +682,7 @@ export default function BraceletPreview({
           const sd2Width = getSymbolSize(order.simboloDentro2!);
           const d2TextW1 = estimateTextWidth(order.l1Dentro2, inside2FontSize);
           const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
-          const d2TextW3 = hasD2L3 ? estimateTextWidth(order.l3Dentro2 || "", inside2FontSize) : 0;
-          const d2MaxTextW = Math.max(d2TextW1, d2TextW2, d2TextW3);
+          const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
           const totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
           let d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
           // Clamp: símbolo não pode sair do retângulo (mínimo = versoX + margem 1cm)
@@ -692,8 +692,10 @@ export default function BraceletPreview({
           const sd2X = d2GroupStart + offsetD2;
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
-          // Texto centralizado no espaço do texto dentro do grupo (símbolo + gap + texto)
-          const d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
+          // Texto centralizado no espaço restante entre símbolo e borda direita do retângulo
+          const d2TextAreaStart = d2GroupStart + sd2Width + dentroSymGap;
+          const d2TextAreaEnd = versoX + rectW;
+          const d2TextX = Math.round((d2TextAreaStart + d2TextAreaEnd) / 2);
           return (
             <>
               <SymbolGroup
