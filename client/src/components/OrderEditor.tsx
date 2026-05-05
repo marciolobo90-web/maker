@@ -456,7 +456,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
-              {BRACELET_SYMBOLS.filter((s) => ["whatsapp", "gota", "alerta", "brasil", "brazil"].includes(s.id)).map((sym) => (
+              {BRACELET_SYMBOLS.map((sym) => (
                 <SelectItem key={sym.id} value={sym.id}>
                   <div className="flex items-center gap-2">
                     <svg width="16" height="16" viewBox={sym.viewBox} className="shrink-0">
@@ -491,7 +491,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
-              {BRACELET_SYMBOLS.filter((s) => ["whatsapp", "gota", "alerta", "brasil", "brazil"].includes(s.id)).map((sym) => (
+              {BRACELET_SYMBOLS.map((sym) => (
                 <SelectItem key={sym.id} value={sym.id}>
                   <div className="flex items-center gap-2">
                     <svg width="16" height="16" viewBox={sym.viewBox} className="shrink-0">
