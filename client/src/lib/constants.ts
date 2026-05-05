@@ -47,8 +47,8 @@ export function getSymbolColor(symbolId: string, braceletColorName: string): str
   if (symbolId === "104") return null; // Autismo - sempre cores originais
   const color = BRACELET_COLORS.find((c) => c.name === braceletColorName);
   if (!color) return "#FFFFFF";
-  // Alerta médico (118) e Gota (81): sempre vermelho, exceto em certas cores onde fica branco
-  if (symbolId === "118" || symbolId === "81") {
+  // Alerta médico (108) e Gota (109): sempre vermelho, exceto em certas cores onde fica branco
+  if (symbolId === "108" || symbolId === "109") {
     if (braceletColorName === "Vermelho" || braceletColorName === "Pink" || braceletColorName === "Rosa Médio" || braceletColorName === "Laranja") return "#FFFFFF";
     return "#ED3237"; // vermelho em todas as outras cores
   }
@@ -133,11 +133,11 @@ export function getSizePrefixFromSize(sizeName: string): string {
 export const SYMBOL_MAX_SIZE = 750;
 // Tamanhos individuais de altura para símbolos específicos (em SVG units = mm * 100)
 export const SYMBOL_CUSTOM_HEIGHT: Record<string, number> = {
-  "123": 400,   // 4mm - Brasil (antigo "brasil")
-  "81": 600,    // 6mm - Gota (antigo "gota")
-  "118": 600,   // 6mm - Alerta Médico (antigo "alerta")
-  "104": 700,   // 7mm - Autismo (antigo "autismo")
-  "124": 600,   // 6mm - WhatsApp (antigo "whatsapp")
+  "123": 400,   // 4mm - Brasil
+  "109": 600,   // 6mm - Gota
+  "108": 600,   // 6mm - Alerta Médico
+  "104": 700,   // 7mm - Autismo
+  "124": 600,   // 6mm - WhatsApp
 };
 
 // Mantido para compatibilidade
