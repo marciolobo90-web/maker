@@ -161,12 +161,13 @@ export default function BraceletPreview({
     order.simboloFrente2,
     frenteL2
   );
-  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
+  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima (suporta 3 linhas)
   const versoFontSize = calcVersoFontSize(
     order.textoVerso || "",
     order.l2Verso || "",
     sizeName,
-    order.simboloVerso
+    order.simboloVerso,
+    order.l3Verso || ""
   );
   // Tamanho de fonte do dentro1: auto-ajuste (suporta 3 linhas)
   const inside1FontSize = calcDentroFontSize(
@@ -226,10 +227,12 @@ export default function BraceletPreview({
     frenteTextY2 = 0;
   }
 
-  // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
+  // ---- VERSO: símbolo + texto (1, 2 ou 3 linhas) ----
   const versoL1 = order.textoVerso || "";
   const versoL2 = order.l2Verso || "";
+  const versoL3 = order.l3Verso || "";
   const hasVersoL2 = versoL2.length > 0;
+  const hasVersoL3 = versoL3.length > 0;
   const hasSV = !!order.simboloVerso;
   const svSymWidth = hasSV ? getSymbolSize(order.simboloVerso!) : 0;
   const versoTextW = estimateTextWidth(versoL1, versoFontSize);
@@ -243,14 +246,24 @@ export default function BraceletPreview({
     (hasSV ? svSymWidth + symGap : 0) +
     Math.round(versoTextW / 2);
 
+  const versoLines = hasVersoL3 ? 3 : hasVersoL2 ? 2 : 1;
   let versoTextY1: number;
   let versoTextY2: number;
-  if (hasVersoL2) {
+  let versoTextY3: number;
+  // threeLineOffset será definido abaixo, mas precisamos do valor aqui também
+  const versoThreeLineOffset = 50;
+  if (versoLines === 3) {
+    versoTextY1 = frenteY + Math.round(rectH * 0.25) + textYOffset + versoThreeLineOffset;
+    versoTextY2 = frenteY + Math.round(rectH * 0.50) + textYOffset + versoThreeLineOffset;
+    versoTextY3 = frenteY + Math.round(rectH * 0.75) + textYOffset + versoThreeLineOffset;
+  } else if (versoLines === 2) {
     versoTextY1 = frenteY + Math.round(rectH * 0.38) + textYOffset;
     versoTextY2 = frenteY + Math.round(rectH * 0.72) + textYOffset;
+    versoTextY3 = 0;
   } else {
     versoTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset;
     versoTextY2 = 0;
+    versoTextY3 = 0;
   }
 
   // ---- DENTRO: centralizado se 1 linha ----
@@ -515,6 +528,21 @@ export default function BraceletPreview({
           style={{ whiteSpace: "pre" }}
         >
           {versoL2}
+        </text>
+      )}
+      {hasVersoL3 && (
+        <text
+          x={textVersoX}
+          y={versoTextY3}
+          textAnchor="middle"
+          fill={textColor}
+          fontFamily={fontVerso}
+          fontWeight={boldVerso ? "bold" : "normal"}
+          fontSize={versoFontSize}
+          xmlSpace="preserve"
+          style={{ whiteSpace: "pre" }}
+        >
+          {versoL3}
         </text>
       )}
 

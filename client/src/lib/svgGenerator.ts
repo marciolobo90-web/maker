@@ -152,12 +152,13 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     order.simboloFrente2,
     frenteL2
   );
-  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima
+  // Tamanho de fonte do verso: auto-ajuste baseado na área máxima (suporta 3 linhas)
   var vfs = calcVersoFontSize(
     order.textoVerso || "",
     order.l2Verso || "",
     sName,
-    order.simboloVerso
+    order.simboloVerso,
+    order.l3Verso || ""
   );
   // Tamanho de fonte do dentro1: auto-ajuste baseado na área máxima (suporta 3 linhas)
   var ifs1 = calcDentroFontSize(
@@ -201,10 +202,12 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var textFrenteX = frenteGroupStart + (hasSym1 ? sym1Width + symGap : 0) + Math.round(frenteTextW / 2);
   var sym2X = textFrenteX + Math.round(frenteTextW / 2) + symGap + offsetSym2;
 
-  // Calcular posições VERSO (agora com 2 linhas possíveis)
+  // Calcular posições VERSO (agora com 3 linhas possíveis)
   var versoL1 = order.textoVerso || "";
   var versoL2 = order.l2Verso || "";
+  var versoL3 = order.l3Verso || "";
   var hasVersoL2 = versoL2.length > 0;
+  var hasVersoL3 = versoL3.length > 0;
   var versoTextW = estW(versoL1, vfs);
   var hasSV = !!order.simboloVerso;
   var svWidth = hasSV ? getSymbolSize(order.simboloVerso || "") : 0;
@@ -217,16 +220,25 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
   var textYOffset = 70;
+  var threeLineOffset = 50; // +0.5mm para baixo quando 3 linhas
 
-  // Y positions para verso (1 ou 2 linhas)
+  // Y positions para verso (1, 2 ou 3 linhas)
+  var versoLines = hasVersoL3 ? 3 : hasVersoL2 ? 2 : 1;
   var versoTextY1: number;
   var versoTextY2: number;
-  if (hasVersoL2) {
+  var versoTextY3: number;
+  if (versoLines === 3) {
+    versoTextY1 = frenteY + Math.round(rH * 0.25) + textYOffset + threeLineOffset;
+    versoTextY2 = frenteY + Math.round(rH * 0.50) + textYOffset + threeLineOffset;
+    versoTextY3 = frenteY + Math.round(rH * 0.75) + textYOffset + threeLineOffset;
+  } else if (versoLines === 2) {
     versoTextY1 = frenteY + Math.round(rH * 0.38) + textYOffset;
     versoTextY2 = frenteY + Math.round(rH * 0.72) + textYOffset;
+    versoTextY3 = 0;
   } else {
     versoTextY1 = frenteY + Math.round(rH * 0.58) + textYOffset;
     versoTextY2 = 0;
+    versoTextY3 = 0;
   }
 
   // Frente text Y: mesmo padrão do verso (sem dominant-baseline)
@@ -250,7 +262,6 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var hasD2L3 = (order.l3Dentro2 || "").length > 0;
 
   // Y positions para dentro1 (1, 2 ou 3 linhas)
-  var threeLineOffset = 50; // +0.5mm para baixo quando 3 linhas
   var d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
   var d1Y1: number;
   var d1Y2: number;
@@ -427,7 +438,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     p.push(getSymbolPaths(order.simboloFrente2, order.cor, sym2X, s2Y, s2Sz));
   }
 
-  // ---- VERSO: símbolo + texto (1 ou 2 linhas) ----
+  // ---- VERSO: símbolo + texto (1, 2 ou 3 linhas) ----
   if (hasSV) {
     var svSz = getSymbolSize(order.simboloVerso || "");
     var svY = frenteY + Math.round((rH - svSz) / 2);
@@ -439,6 +450,11 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   if (hasVersoL2) {
     p.push(
       '  <text xml:space="preserve" x="' + textVersoX + '" y="' + versoTextY2 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + vfs + '" font-family="' + esc(vFam) + '">' + esc(versoL2) + "</text>"
+    );
+  }
+  if (hasVersoL3) {
+    p.push(
+      '  <text xml:space="preserve" x="' + textVersoX + '" y="' + versoTextY3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="' + (vBold ? "bold" : "normal") + '" font-size="' + vfs + '" font-family="' + esc(vFam) + '">' + esc(versoL3) + "</text>"
     );
   }
 

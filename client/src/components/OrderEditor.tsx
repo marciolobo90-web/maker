@@ -115,7 +115,7 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= form.textoVerso.length) { update("textoVerso", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToVerso(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso)) {
+              if (canAddCharToVerso(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso, form.l3Verso)) {
                 update("textoVerso", newValue);
               }
             }}
@@ -132,20 +132,38 @@ export default function OrderEditor({ order, onSave, onClose }: OrderEditorProps
               const newValue = e.target.value;
               if (newValue.length <= (form.l2Verso || "").length) { update("l2Verso", newValue); return; }
               const sizeName = form.tamanhoLabel || form.tamanho;
-              if (canAddCharToVerso(form.l2Verso || "", form.textoVerso, sizeName, form.simboloVerso)) {
+              if (canAddCharToVerso(form.l2Verso || "", form.textoVerso, sizeName, form.simboloVerso, form.l3Verso)) {
                 update("l2Verso", newValue);
               }
             }}
             className="mt-1 bg-secondary border-border"
             placeholder="Opcional"
           />
+        </div>
+
+        {/* Texto Verso L3 */}
+        <div>
+          <Label className="text-muted-foreground text-xs uppercase tracking-wider">Texto Verso (Linha 3)</Label>
+          <Input
+            value={form.l3Verso || ""}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= (form.l3Verso || "").length) { update("l3Verso", newValue); return; }
+              const sizeName = form.tamanhoLabel || form.tamanho;
+              if (canAddCharToVerso(form.l3Verso || "", form.textoVerso, sizeName, form.simboloVerso, form.l2Verso)) {
+                update("l3Verso", newValue);
+              }
+            }}
+            className="mt-1 bg-secondary border-border"
+            placeholder="Opcional (3ª linha)"
+          />
           {(() => {
             const sizeName = form.tamanhoLabel || form.tamanho;
-            const currentFs = calcVersoFontSize(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso);
+            const currentFs = calcVersoFontSize(form.textoVerso, form.l2Verso || "", sizeName, form.simboloVerso, form.l3Verso);
             const isReduced = currentFs < 423;
             const isAtLimit = currentFs <= MIN_FONT_SIZE_12PT;
             const ptSize = Math.round(currentFs / 35.28 * 10) / 10;
-            if (isAtLimit && (form.textoVerso.length > 0 || (form.l2Verso || "").length > 0)) {
+            if (isAtLimit && (form.textoVerso.length > 0 || (form.l2Verso || "").length > 0 || (form.l3Verso || "").length > 0)) {
               return <p className="text-xs text-destructive mt-1">Verso: limite atingido ({ptSize}pt mínimo).</p>;
             }
             if (isReduced) {

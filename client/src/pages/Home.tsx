@@ -42,6 +42,7 @@ function createEmptyOrder(index: number): BraceletOrder {
     l2Frente: "",
     textoVerso: "",
     l2Verso: "",
+    l3Verso: "",
     l1Dentro1: "",
     l2Dentro1: "",
     l3Dentro1: "",

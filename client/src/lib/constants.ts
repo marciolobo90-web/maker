@@ -294,8 +294,16 @@ export function calcVersoFontSize(
   textoVerso: string,
   l2Verso: string,
   sizeName: string,
-  simboloVerso?: string
+  simboloVerso?: string,
+  l3Verso?: string
 ): number {
+  const has3Lines = !!(l3Verso && l3Verso.length > 0);
+
+  // Se tem 3 linhas, forçar 11.6pt (409 SVG units)
+  if (has3Lines) {
+    return FONT_SIZE_11_6PT;
+  }
+
   const maxWidth = getVersoMaxWidthSvg(sizeName);
   const baseFontSize = 423; // Calibri Negrito 12pt
   const symGap = 100;
@@ -308,7 +316,7 @@ export function calcVersoFontSize(
   const availableWidth = maxWidth - symbolsWidth;
   if (availableWidth <= 0) return MIN_FONT_SIZE_12PT;
 
-  // Verificar a linha mais larga (L1 ou L2)
+  // Verificar a linha mais larga (L1, L2 ou L3)
   const textW1 = estimateTextWidthShared(textoVerso, baseFontSize);
   const textW2 = l2Verso ? estimateTextWidthShared(l2Verso, baseFontSize) : 0;
   const maxTextW = Math.max(textW1, textW2);
@@ -323,7 +331,8 @@ export function canAddCharToVerso(
   currentText: string,
   otherLine: string,
   sizeName: string,
-  simboloVerso?: string
+  simboloVerso?: string,
+  thirdLine?: string
 ): boolean {
   const testText = currentText + "M";
   // Testar com a linha mais larga
@@ -332,9 +341,12 @@ export function canAddCharToVerso(
   let symbolsWidth = 0;
   if (simboloVerso) symbolsWidth += getSymbolWidthForCalc(simboloVerso) + symGap;
   const availableWidth = maxWidth - symbolsWidth;
-  const testW = estimateTextWidthShared(testText, MIN_FONT_SIZE_12PT);
-  const otherW = estimateTextWidthShared(otherLine, MIN_FONT_SIZE_12PT);
-  return Math.max(testW, otherW) <= availableWidth;
+  // Se há 3 linhas, usar fonte fixa 11.6pt para validação
+  const fontSize = (thirdLine && thirdLine.length > 0) ? FONT_SIZE_11_6PT : MIN_FONT_SIZE_12PT;
+  const testW = estimateTextWidthShared(testText, fontSize);
+  const otherW = otherLine ? estimateTextWidthShared(otherLine, fontSize) : 0;
+  const thirdW = thirdLine ? estimateTextWidthShared(thirdLine, fontSize) : 0;
+  return Math.max(testW, otherW, thirdW) <= availableWidth;
 }
 
 // ========================================
@@ -431,7 +443,8 @@ export interface BraceletOrder {
   l2Frente?: string;        // linha 2 da frente (opcional)
   textoVerso: string;       // agora pode ser linha 1 do verso
   l1Verso?: string;         // alias para textoVerso (linha 1)
-  l2Verso?: string;         // linha 2 do verso (novo)
+  l2Verso?: string;         // linha 2 do verso
+  l3Verso?: string;         // linha 3 do verso (opcional)
   l1Dentro1: string;
   l2Dentro1: string;
   l1Dentro2: string;
@@ -510,4 +523,5 @@ export const EXPECTED_COLUMNS = [
   "QUANTIDADE",
   "L3_DENTRO1",
   "L3_DENTRO2",
+  "L3_VERSO",
 ];
