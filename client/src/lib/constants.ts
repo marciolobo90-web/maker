@@ -484,6 +484,7 @@ export interface BraceletSymbol {
   viewBox: string;
   paths: SymbolPath[];
   keepOriginalColors?: boolean; // se true, nunca muda as cores (ex: autismo)
+  fillRule?: "nonzero" | "evenodd"; // fill-rule do SVG (default: evenodd)
 }
 
 // Todos os símbolos vêm do EXTRA_SYMBOLS (symbolsData.ts) - ordenados numericamente

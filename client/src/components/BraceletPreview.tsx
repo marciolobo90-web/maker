@@ -98,8 +98,8 @@ function SymbolGroup({
           key={i}
           d={p.d}
           fill={overrideColor !== null ? overrideColor : p.fill}
-          fillRule="evenodd"
-          clipRule="evenodd"
+          fillRule={symbol.fillRule || "evenodd"}
+          clipRule={symbol.fillRule || "evenodd"}
         />
       ))}
     </g>

@@ -55,6 +55,7 @@ function getSymbolPaths(
 
   // Determinar a cor do símbolo baseado na cor da pulseira
   var overrideColor = getSymbolColor(symbolId, braceletColor);
+  var fillRuleAttr = symbol.fillRule ? ' fill-rule="' + symbol.fillRule + '"' : '';
 
   var paths = symbol.paths
     .map(function (pp) {
@@ -70,7 +71,9 @@ function getSymbolPaths(
         pp.d +
         '" fill="' +
         fillColor +
-        '"/>'
+        '"' +
+        fillRuleAttr +
+        '/>'
       );
     })
     .join("\n");
