@@ -135,7 +135,7 @@ export const SYMBOL_MAX_SIZE = 750;
 export const SYMBOL_CUSTOM_HEIGHT: Record<string, number> = {
   "123": 600,   // 6mm - Brasil
   "109": 600,   // 6mm - Gota
-  "108": 600,   // 6mm - Alerta Médico
+  "108": 800,   // 8mm - Alerta Médico
   "104": 700,   // 7mm - Autismo
   "124": 600,   // 6mm - WhatsApp
 };
