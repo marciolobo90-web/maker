@@ -248,8 +248,8 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var frenteTextY1: number;
   var frenteTextY2: number;
   if (hasFrenteL2) {
-    frenteTextY1 = frenteY + Math.round(rH * 0.35) + textYOffset + fontInfo.fontYOffset;
-    frenteTextY2 = frenteY + Math.round(rH * 0.68) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY1 = frenteY + Math.round(rH * 0.30) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY2 = frenteY + Math.round(rH * 0.63) + textYOffset + fontInfo.fontYOffset;
   } else {
     frenteTextY1 = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset;
     frenteTextY2 = 0;

@@ -220,8 +220,8 @@ export default function BraceletPreview({
   let frenteTextY1: number;
   let frenteTextY2: number;
   if (hasFrenteL2) {
-    frenteTextY1 = frenteY + Math.round(rectH * 0.35) + textYOffset + fontExtraOffset;
-    frenteTextY2 = frenteY + Math.round(rectH * 0.68) + textYOffset + fontExtraOffset;
+    frenteTextY1 = frenteY + Math.round(rectH * 0.30) + textYOffset + fontExtraOffset;
+    frenteTextY2 = frenteY + Math.round(rectH * 0.63) + textYOffset + fontExtraOffset;
   } else {
     frenteTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset;
     frenteTextY2 = 0;
