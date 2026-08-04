@@ -133,11 +133,12 @@ export function getSizePrefixFromSize(sizeName: string): string {
 export const SYMBOL_MAX_SIZE = 750;
 // Tamanhos individuais de altura para símbolos específicos (em SVG units = mm * 100)
 export const SYMBOL_CUSTOM_HEIGHT: Record<string, number> = {
-  "123": 600,   // 6mm - Brasil
+  "123": 750,   // 7.5mm - Brasil
   "109": 600,   // 6mm - Gota
   "108": 800,   // 8mm - Alerta Médico
   "104": 700,   // 7mm - Autismo
   "124": 600,   // 6mm - WhatsApp
+  "88": 650,    // 6.5mm - São Paulo FC
 };
 
 // Mantido para compatibilidade
