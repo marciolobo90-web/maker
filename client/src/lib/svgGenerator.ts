@@ -463,7 +463,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // ---- DENTRO1: símbolo WhatsApp (opcional) + 1 ou 2 linhas ----
   var hasSD1 = !!order.simboloDentro1;
-  if (hasSD1) {
+  var hasD1Text = (order.l1Dentro1 || "").length > 0;
+  if (hasSD1 && hasD1Text) {
+    // Símbolo + texto: colados sem gap
     var sd1Width = getSymbolSize(order.simboloDentro1 || "");
     var d1TextW1 = estW(order.l1Dentro1, ifs1);
     var d1TextW2 = hasD1L2 ? estW(order.l2Dentro1, ifs1) : 0;
@@ -496,6 +498,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
         '  <text xml:space="preserve" x="' + d1TextX + '" y="' + d1Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l3Dentro1 || "") + "</text>"
       );
     }
+  } else if (hasSD1 && !hasD1Text) {
+    // Só símbolo sem texto: centralizar o símbolo no retângulo
+    var sd1Width = getSymbolSize(order.simboloDentro1 || "");
+    var offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
+    var sd1X = dentro1CX - Math.round(sd1Width / 2) + offsetD1;
+    var sd1Sz = sd1Width;
+    var sd1TargetH = getTargetHeight(order.simboloDentro1 || "");
+    var sd1Y = dentroY + Math.round((rH - sd1TargetH) / 2);
+    p.push(getSymbolPaths(order.simboloDentro1, order.cor, sd1X, sd1Y, sd1Sz));
   } else {
     p.push(
       '  <text xml:space="preserve" x="' + dentro1CX + '" y="' + d1Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs1 + '" font-family="Calibri">' + esc(order.l1Dentro1) + "</text>"
@@ -514,7 +525,9 @@ export function generateBraceletSVG(order: BraceletOrder): string {
 
   // ---- DENTRO2: símbolo WhatsApp (opcional) + 1 ou 2 linhas ----
   var hasSD2 = !!order.simboloDentro2;
-  if (hasSD2) {
+  var hasD2Text = (order.l1Dentro2 || "").length > 0;
+  if (hasSD2 && hasD2Text) {
+    // Símbolo + texto: colados sem gap
     var sd2Width = getSymbolSize(order.simboloDentro2 || "");
     var d2TextW1 = estW(order.l1Dentro2, ifs2);
     var d2TextW2 = hasD2L2 ? estW(order.l2Dentro2, ifs2) : 0;
@@ -547,6 +560,15 @@ export function generateBraceletSVG(order: BraceletOrder): string {
         '  <text xml:space="preserve" x="' + d2TextX + '" y="' + d2Y3 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l3Dentro2 || "") + "</text>"
       );
     }
+  } else if (hasSD2 && !hasD2Text) {
+    // Só símbolo sem texto: centralizar o símbolo no retângulo
+    var sd2Width = getSymbolSize(order.simboloDentro2 || "");
+    var offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
+    var sd2X = dentro2CX - Math.round(sd2Width / 2) + offsetD2;
+    var sd2Sz = sd2Width;
+    var sd2TargetH = getTargetHeight(order.simboloDentro2 || "");
+    var sd2Y = dentroY + Math.round((rH - sd2TargetH) / 2);
+    p.push(getSymbolPaths(order.simboloDentro2, order.cor, sd2X, sd2Y, sd2Sz));
   } else {
     p.push(
       '  <text xml:space="preserve" x="' + dentro2CX + '" y="' + d2Y1 + '" text-anchor="middle" fill="' + tCol + '" font-weight="bold" font-size="' + ifs2 + '" font-family="Calibri">' + esc(order.l1Dentro2) + "</text>"

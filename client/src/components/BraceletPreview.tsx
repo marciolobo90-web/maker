@@ -580,7 +580,8 @@ export default function BraceletPreview({
       {/* DENTRO1: símbolo WhatsApp (opcional) + 1 ou 2 linhas */}
       {(() => {
         const hasSD1 = !!order.simboloDentro1;
-        if (hasSD1) {
+        const hasD1Text = (order.l1Dentro1 || "").length > 0;
+        if (hasSD1 && hasD1Text) {
           const sd1Width = getSymbolSize(order.simboloDentro1!);
           const d1TextW1 = estimateTextWidth(order.l1Dentro1, inside1FontSize);
           const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
@@ -647,10 +648,25 @@ export default function BraceletPreview({
                   xmlSpace="preserve"
                   style={{ whiteSpace: "pre" }}
                 >
-                  {order.l3Dentro1}
-                </text>
-              )}
-            </>
+                 {order.l3Dentro1}
+               </text>
+             )}
+           </>
+         );
+        } else if (hasSD1 && !hasD1Text) {
+          const sd1Width = getSymbolSize(order.simboloDentro1!);
+          const offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
+          const sd1X = dentro1CX - Math.round(sd1Width / 2) + offsetD1;
+          const sd1TargetH = getTargetHeight(order.simboloDentro1!);
+          const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
+          return (
+            <SymbolGroup
+              symbolId={order.simboloDentro1!}
+              braceletColor={order.cor}
+              x={sd1X}
+              y={sd1Y}
+              size={sd1Width}
+            />
           );
         } else {
           return (
@@ -706,7 +722,8 @@ export default function BraceletPreview({
       {/* DENTRO2: símbolo WhatsApp (opcional) + 1 ou 2 linhas */}
       {(() => {
         const hasSD2 = !!order.simboloDentro2;
-        if (hasSD2) {
+        const hasD2Text = (order.l1Dentro2 || "").length > 0;
+        if (hasSD2 && hasD2Text) {
           const sd2Width = getSymbolSize(order.simboloDentro2!);
           const d2TextW1 = estimateTextWidth(order.l1Dentro2, inside2FontSize);
           const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
@@ -773,10 +790,25 @@ export default function BraceletPreview({
                   xmlSpace="preserve"
                   style={{ whiteSpace: "pre" }}
                 >
-                  {order.l3Dentro2}
-                </text>
-              )}
-            </>
+                 {order.l3Dentro2}
+               </text>
+             )}
+           </>
+         );
+        } else if (hasSD2 && !hasD2Text) {
+          const sd2Width = getSymbolSize(order.simboloDentro2!);
+          const offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
+          const sd2X = dentro2CX - Math.round(sd2Width / 2) + offsetD2;
+          const sd2TargetH = getTargetHeight(order.simboloDentro2!);
+          const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
+          return (
+            <SymbolGroup
+              symbolId={order.simboloDentro2!}
+              braceletColor={order.cor}
+              x={sd2X}
+              y={sd2Y}
+              size={sd2Width}
+            />
           );
         } else {
           return (
