@@ -180,7 +180,7 @@ export function generateBraceletSVG(order: BraceletOrder): string {
     order.l3Dentro2 || ""
   );
   var symGap = 100;
-  var dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
+  var dentroSymGap = 0; // sem gap entre símbolo e texto no dentro (colados)
 
   // Padding da área útil: 15mm = 1500 SVG units (750 de cada lado)
   var padding = 750;

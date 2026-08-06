@@ -186,7 +186,7 @@ export default function BraceletPreview({
     order.l3Dentro2 || ""
   );
   const symGap = 100;
-  const dentroSymGap = 50; // gap menor no dentro para manter dentro da área de gravação
+  const dentroSymGap = 0; // sem gap entre símbolo e texto no dentro (colados)
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
   const hasSym1 = !!order.simboloFrente;
