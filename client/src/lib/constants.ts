@@ -2,7 +2,7 @@
 // Pulseira Maker - Constantes do Sistema
 // Design: Industrial Workshop
 // ========================================
-import { EXTRA_SYMBOLS } from "./symbolsData";
+import { EXTRA_SYMBOLS } from "./symbolsData.ts";
 
 export interface BraceletColor {
   name: string;
@@ -498,8 +498,8 @@ export const BRACELET_SYMBOLS: BraceletSymbol[] = [...BRACKET_SYMBOLS_BASE, ...E
 export const SHEETS_URL_PATTERN = /\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/;
 export const SHEETS_CSV_URL = (sheetId: string, gid: string = "0") =>
   "https://docs.google.com/spreadsheets/d/" + sheetId + "/export?format=csv&gid=" + gid;
-export const SHEETS_PUBLIC_CSV = (sheetId: string) =>
-  "https://docs.google.com/spreadsheets/d/" + sheetId + "/gviz/tq?tqx=out:csv";
+export const SHEETS_PUBLIC_CSV = (sheetId: string, gid: string = "0") =>
+  "https://docs.google.com/spreadsheets/d/" + sheetId + "/gviz/tq?tqx=out:csv&gid=" + gid;
 
 // Expected column headers in the Google Sheet
 export const EXPECTED_COLUMNS = [

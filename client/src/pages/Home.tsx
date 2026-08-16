@@ -35,8 +35,11 @@ import {
 } from "@/lib/constants";
 
 function createEmptyOrder(index: number): BraceletOrder {
+  const uniqueId =
+    globalThis.crypto?.randomUUID?.() ||
+    `${Date.now()}_${index}_${Math.random().toString(36).slice(2, 10)}`;
   return {
-    id: "manual_" + Date.now() + "_" + index,
+    id: `manual_${uniqueId}`,
     nomeCliente: "",
     textoFrente: "",
     l2Frente: "",
@@ -60,6 +63,11 @@ function createEmptyOrder(index: number): BraceletOrder {
   };
 }
 
+function getImportSuccessMessage(count: number): string {
+  const suffix = count === 1 ? "" : "s";
+  return `${count} pedido${suffix} importado${suffix}`;
+}
+
 export default function Home() {
   const { orders, setOrders, loading, error, fetchSheet, loadFromCSVText } = useGoogleSheets();
   const [sheetUrlInput, setSheetUrlInput] = useState("");
@@ -68,24 +76,37 @@ export default function Home() {
   const [importingMore, setImportingMore] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFetchSheet = () => {
+  const handleFetchSheet = async () => {
     if (!sheetUrlInput.trim()) {
       toast.error("Cole a URL da planilha Google Sheets");
       return;
     }
-    fetchSheet(sheetUrlInput.trim());
-    setImportingMore(false);
+    const result = await fetchSheet(sheetUrlInput.trim());
+    if (result.ok) {
+      toast.success(getImportSuccessMessage(result.count));
+      setImportingMore(false);
+    }
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const input = e.currentTarget;
+    const file = input.files?.[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const text = ev.target?.result as string;
-      loadFromCSVText(text);
-      toast.success("CSV carregado com sucesso!");
-      setImportingMore(false);
+      const text = typeof ev.target?.result === "string" ? ev.target.result : "";
+      const result = loadFromCSVText(text);
+      if (result.ok) {
+        toast.success(getImportSuccessMessage(result.count));
+        setImportingMore(false);
+      } else {
+        toast.error(result.error);
+      }
+      input.value = "";
+    };
+    reader.onerror = () => {
+      toast.error("Não foi possível ler o arquivo CSV.");
+      input.value = "";
     };
     reader.readAsText(file);
   };
