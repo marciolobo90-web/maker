@@ -46,5 +46,14 @@ describe("generateBraceletSVG", () => {
 
     expect(svg).toContain('y="5797"');
     expect(svg).toContain('y="6193"');
+    expect(svg).toContain('font-size="546" font-family="Segoe Print"');
+  });
+
+  it("mantém o tamanho original da Segoe Print quando há uma linha", () => {
+    const svg = generateBraceletSVG(
+      createOrder({ fonteFrente: "Segoe Print Negrito", l2Frente: "" })
+    );
+
+    expect(svg).toContain('font-size="635" font-family="Segoe Print"');
   });
 });
