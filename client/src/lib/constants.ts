@@ -62,6 +62,7 @@ export interface FontOption {
   svgFontSize?: number; // tamanho em SVG units para a frente (calculado de pt)
   fontYOffset?: number; // offset vertical extra em SVG units (1mm = 100 units)
   fontTwoLineYOffset?: number; // compensação adicional quando a frente usa duas linhas
+  twoLineFontScale?: number; // redução de tamanho quando a frente usa duas linhas
 }
 
 // Fontes disponíveis para a FRENTE da pulseira
@@ -87,6 +88,7 @@ export const FRONT_FONTS: FontOption[] = [
     svgFontSize: 635,
     fontYOffset: 50,
     fontTwoLineYOffset: 50,
+    twoLineFontScale: 0.86,
   },
 ];
 
@@ -235,7 +237,11 @@ export function calcFrontFontSize(
 ): number {
   const maxWidth = getFrontMaxWidthSvg(sizeName);
   const fontInfo = FRONT_FONTS.find((f) => f.name === fonteName);
-  const baseFontSize = fontInfo?.svgFontSize || 635;
+  const originalFontSize = fontInfo?.svgFontSize || 635;
+  const hasSecondLine = !!l2Frente;
+  const baseFontSize = hasSecondLine
+    ? Math.round(originalFontSize * (fontInfo?.twoLineFontScale || 1))
+    : originalFontSize;
   const symGap = 100;
 
   // Calcular largura dos símbolos
