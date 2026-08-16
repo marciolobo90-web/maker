@@ -49,9 +49,10 @@ function getSymbolPaths(
   var targetH = getTargetHeight(symbolId);
   var sc = targetH / vb[3];
   var renderedW = vb[2] * sc;
-  var renderedH = vb[3] * sc;
   var tx = x + (size - renderedW) / 2 - vb[0] * sc;
-  var ty = y + (size - renderedH) / 2 - vb[1] * sc;
+  // O chamador já centraliza `y` usando a altura renderizada. `size` contém
+  // a largura, portanto não pode participar do cálculo vertical.
+  var ty = y - vb[1] * sc;
 
   // Determinar a cor do símbolo baseado na cor da pulseira
   var overrideColor = getSymbolColor(symbolId, braceletColor);
@@ -80,7 +81,13 @@ function getSymbolPaths(
   return paths;
 }
 
-function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontSize: number; fontYOffset: number } {
+function getFontInfo(fontName: string): {
+  clean: string;
+  bold: boolean;
+  svgFontSize: number;
+  fontYOffset: number;
+  fontTwoLineYOffset: number;
+} {
   var f = FRONT_FONTS.find(function (x) {
     return x.name === fontName;
   });
@@ -90,7 +97,14 @@ function getFontInfo(fontName: string): { clean: string; bold: boolean; svgFontS
   var bold = fontName !== "Kids Station" && fontName !== "Milky Matcha";
   var svgFontSize = f && f.svgFontSize ? f.svgFontSize : 635;
   var fontYOffset = f && f.fontYOffset ? f.fontYOffset : 0;
-  return { clean: clean, bold: bold, svgFontSize: svgFontSize, fontYOffset: fontYOffset };
+  var fontTwoLineYOffset = f && f.fontTwoLineYOffset ? f.fontTwoLineYOffset : 0;
+  return {
+    clean: clean,
+    bold: bold,
+    svgFontSize: svgFontSize,
+    fontYOffset: fontYOffset,
+    fontTwoLineYOffset: fontTwoLineYOffset,
+  };
 }
 
 function getCol(colorName: string): { hex: string; text: string } {
@@ -248,8 +262,18 @@ export function generateBraceletSVG(order: BraceletOrder): string {
   var frenteTextY1: number;
   var frenteTextY2: number;
   if (hasFrenteL2) {
-    frenteTextY1 = frenteY + Math.round(rH * 0.30) + textYOffset + fontInfo.fontYOffset;
-    frenteTextY2 = frenteY + Math.round(rH * 0.63) + textYOffset + fontInfo.fontYOffset;
+    frenteTextY1 =
+      frenteY +
+      Math.round(rH * 0.30) +
+      textYOffset +
+      fontInfo.fontYOffset +
+      fontInfo.fontTwoLineYOffset;
+    frenteTextY2 =
+      frenteY +
+      Math.round(rH * 0.63) +
+      textYOffset +
+      fontInfo.fontYOffset +
+      fontInfo.fontTwoLineYOffset;
   } else {
     frenteTextY1 = frenteY + Math.round(rH * 0.58) + textYOffset + fontInfo.fontYOffset;
     frenteTextY2 = 0;
