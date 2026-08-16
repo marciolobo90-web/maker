@@ -61,6 +61,7 @@ export interface FontOption {
   label: string;
   svgFontSize?: number; // tamanho em SVG units para a frente (calculado de pt)
   fontYOffset?: number; // offset vertical extra em SVG units (1mm = 100 units)
+  fontTwoLineYOffset?: number; // compensação adicional quando a frente usa duas linhas
 }
 
 // Fontes disponíveis para a FRENTE da pulseira
@@ -71,8 +72,22 @@ export const FRONT_FONTS: FontOption[] = [
   { name: "Kids Station", family: "'Kids Station', 'Comic Sans MS', cursive", label: "Kids Station", svgFontSize: 847, fontYOffset: 70 },
   { name: "Comic Sans MS Negrito", family: "'Comic Sans MS', 'Comic Sans', cursive", label: "Comic Sans MS Negrito", svgFontSize: 635 },
   { name: "Calibri Negrito", family: "Calibri, 'Segoe UI', sans-serif", label: "Calibri Negrito", svgFontSize: 706, fontYOffset: 100 },
-  { name: "Milky Matcha", family: "'Milky Matcha', 'Comic Sans MS', cursive", label: "Milky Matcha", svgFontSize: 494, fontYOffset: 20 },
-  { name: "Segoe Print Negrito", family: "'Segoe Print', 'Bradley Hand', cursive", label: "Segoe Print Negrito", svgFontSize: 635 },
+  {
+    name: "Milky Matcha",
+    family: "'Milky Matcha', 'Comic Sans MS', cursive",
+    label: "Milky Matcha",
+    svgFontSize: 494,
+    fontYOffset: 90,
+    fontTwoLineYOffset: 140,
+  },
+  {
+    name: "Segoe Print Negrito",
+    family: "'Segoe Print', 'Bradley Hand', cursive",
+    label: "Segoe Print Negrito",
+    svgFontSize: 635,
+    fontYOffset: 50,
+    fontTwoLineYOffset: 50,
+  },
 ];
 
 // Alias para compatibilidade (usado em imports existentes)

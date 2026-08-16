@@ -52,9 +52,12 @@ function getFontSvgSize(fontName: string): number {
   return font?.svgFontSize || 635;
 }
 
-function getFontYOffset(fontName: string): number {
+function getFontYOffset(fontName: string, hasSecondLine: boolean): number {
   const font = FRONT_FONTS.find((f) => f.name === fontName);
-  return font?.fontYOffset || 0;
+  return (
+    (font?.fontYOffset || 0) +
+    (hasSecondLine ? font?.fontTwoLineYOffset || 0 : 0)
+  );
 }
 
 function isBoldFont(fontName: string): boolean {
@@ -83,9 +86,11 @@ function SymbolGroup({
   const targetH = getTargetHeight(symbolId);
   const scale = targetH / vb[3];
   const scaledW = vb[2] * scale;
-  const scaledH = vb[3] * scale;
   const tx = x + (size - scaledW) / 2 - vb[0] * scale;
-  const ty = y + (size - scaledH) / 2 - vb[1] * scale;
+  // O chamador já centraliza `y` usando a altura renderizada. Usar `size`
+  // aqui deslocava símbolos largos (como o tubarão) para baixo, pois `size`
+  // representa a largura do símbolo.
+  const ty = y - vb[1] * scale;
 
   const overrideColor = getSymbolColor(symbolId, braceletColor);
 
@@ -216,7 +221,10 @@ export default function BraceletPreview({
   const textYOffset = 70;
 
   // Frente text Y: mesmo padrão do verso (sem dominant-baseline)
-  const fontExtraOffset = getFontYOffset(order.fonteFrente || "Segoe Print Negrito");
+  const fontExtraOffset = getFontYOffset(
+    order.fonteFrente || "Segoe Print Negrito",
+    hasFrenteL2
+  );
   let frenteTextY1: number;
   let frenteTextY2: number;
   if (hasFrenteL2) {
