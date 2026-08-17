@@ -1,4 +1,4 @@
-import type { BraceletOrder, BraceletSymbol } from "@/lib/constants";
+import type { BraceletOrder } from "@/lib/constants";
 import {
   BRACELET_COLORS,
   BRACELET_SYMBOLS,
@@ -8,8 +8,15 @@ import {
   getHalfWidthSvg,
   getSizePrefixFromSize,
   getSymbolColor,
+  getFrontMaxWidthSvg,
+  getVersoMaxWidthSvg,
+  getDentroMaxWidthSvg,
+  estimateFrontTextWidth,
+  estimateStandardTextWidth,
+  getFrontTextBaselines,
+  getStandardTextBaselines,
+  SYMBOL_TEXT_GAP,
   SYMBOL_MAX_SIZE,
-  AUTISMO_SYMBOL_SIZE,
   SYMBOL_CUSTOM_HEIGHT,
   calcFrontFontSize,
   calcVersoFontSize,
@@ -17,12 +24,13 @@ import {
 } from "@/lib/constants";
 
 function getTargetHeight(symbolId: string): number {
-  if (SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined) return SYMBOL_CUSTOM_HEIGHT[symbolId];
+  if (SYMBOL_CUSTOM_HEIGHT[symbolId] !== undefined)
+    return SYMBOL_CUSTOM_HEIGHT[symbolId];
   return SYMBOL_MAX_SIZE;
 }
 
 function getSymbolSize(symbolId: string): number {
-  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
+  const symbol = BRACELET_SYMBOLS.find(s => s.id === symbolId);
   if (!symbol) return SYMBOL_MAX_SIZE;
   const vb = symbol.viewBox.split(" ").map(Number);
   const targetH = getTargetHeight(symbolId);
@@ -36,28 +44,15 @@ interface BraceletPreviewProps {
 }
 
 function getBraceletColor(colorName: string) {
-  const color = BRACELET_COLORS.find((c) => c.name === colorName);
+  const color = BRACELET_COLORS.find(c => c.name === colorName);
   return color
     ? { hex: color.hex, textColor: color.textColor }
     : { hex: "#000000", textColor: "#FFFFFF" };
 }
 
 function getFontFamily(fontName: string): string {
-  const font = FRONT_FONTS.find((f) => f.name === fontName);
+  const font = FRONT_FONTS.find(f => f.name === fontName);
   return font ? font.family : "Calibri, 'Segoe UI', sans-serif";
-}
-
-function getFontSvgSize(fontName: string): number {
-  const font = FRONT_FONTS.find((f) => f.name === fontName);
-  return font?.svgFontSize || 635;
-}
-
-function getFontYOffset(fontName: string, hasSecondLine: boolean): number {
-  const font = FRONT_FONTS.find((f) => f.name === fontName);
-  return (
-    (font?.fontYOffset || 0) +
-    (hasSecondLine ? font?.fontTwoLineYOffset || 0 : 0)
-  );
 }
 
 function isBoldFont(fontName: string): boolean {
@@ -77,7 +72,7 @@ function SymbolGroup({
   y: number;
   size: number;
 }) {
-  const symbol = BRACELET_SYMBOLS.find((s) => s.id === symbolId);
+  const symbol = BRACELET_SYMBOLS.find(s => s.id === symbolId);
   if (!symbol) return null;
 
   const vb = symbol.viewBox.split(" ").map(Number);
@@ -111,8 +106,9 @@ function SymbolGroup({
   );
 }
 
-function estimateTextWidth(text: string, fontSize: number): number {
-  return Math.round(text.length * fontSize * 0.45);
+function clamp(value: number, minimum: number, maximum: number): number {
+  if (maximum < minimum) return minimum;
+  return Math.min(Math.max(value, minimum), maximum);
 }
 
 export default function BraceletPreview({
@@ -121,8 +117,18 @@ export default function BraceletPreview({
 }: BraceletPreviewProps) {
   const colorInfo = getBraceletColor(order.cor);
   const braceletHex = colorInfo.hex;
-  const isGradient = order.cor === "Colorido" || order.cor === "Mesclado Rosa" || order.cor === "Mesclado Azul";
-  const gradientId = order.cor === "Colorido" ? "coloridoGrad" : order.cor === "Mesclado Rosa" ? "rosaGrad" : order.cor === "Mesclado Azul" ? "azulGrad" : "";
+  const isGradient =
+    order.cor === "Colorido" ||
+    order.cor === "Mesclado Rosa" ||
+    order.cor === "Mesclado Azul";
+  const gradientId =
+    order.cor === "Colorido"
+      ? "coloridoGrad"
+      : order.cor === "Mesclado Rosa"
+        ? "rosaGrad"
+        : order.cor === "Mesclado Azul"
+          ? "azulGrad"
+          : "";
   const gradientFill = isGradient ? `url(#${gradientId})` : braceletHex;
   const textColor = order.corTexto || colorInfo.textColor;
   const fontFrente = getFontFamily(order.fonteFrente || "Segoe Print Negrito");
@@ -150,11 +156,8 @@ export default function BraceletPreview({
   const frenteCX = Math.round(frenteX + rectW / 2);
   const versoCX = Math.round(versoX + rectW / 2);
 
-  // Tamanho máximo do símbolo: 7.5mm = 750 SVG units
-  const symSz = SYMBOL_MAX_SIZE;
   const frenteY = 5267;
   const dentroY = 7606;
-  const symFrenteY = frenteY + Math.round((rectH - symSz) / 2);
   // Tamanho de fonte da frente: auto-ajuste baseado na área máxima de personalização
   const frenteL2 = order.l2Frente || "";
   const hasFrenteL2 = frenteL2.length > 0;
@@ -190,50 +193,62 @@ export default function BraceletPreview({
     order.simboloDentro2,
     order.l3Dentro2 || ""
   );
-  const symGap = 100;
-  const dentroSymGap = 0; // sem gap entre símbolo e texto no dentro (colados)
+  const symGap = SYMBOL_TEXT_GAP;
+  const dentroSymGap = SYMBOL_TEXT_GAP;
 
   // ---- FRENTE: símbolo1 + texto + símbolo2 ----
   const hasSym1 = !!order.simboloFrente;
   const hasSym2 = !!order.simboloFrente2;
   const sym1Width = hasSym1 ? getSymbolSize(order.simboloFrente!) : 0;
   const sym2Width = hasSym2 ? getSymbolSize(order.simboloFrente2!) : 0;
-  // Para 2 linhas na frente, usar a linha mais larga para centralização horizontal
-  const frenteTextW1 = estimateTextWidth(order.textoFrente, fontSize);
-  const frenteTextW2 = hasFrenteL2 ? estimateTextWidth(frenteL2, fontSize) : 0;
+  const frontFontName = order.fonteFrente || "Segoe Print Negrito";
+  // A linha mais larga define o espaço reservado para o bloco de texto.
+  const frenteTextW1 = estimateFrontTextWidth(
+    order.textoFrente,
+    fontSize,
+    frontFontName
+  );
+  const frenteTextW2 = hasFrenteL2
+    ? estimateFrontTextWidth(frenteL2, fontSize, frontFontName)
+    : 0;
   const frenteTextW = Math.max(frenteTextW1, frenteTextW2);
   let totalFrenteW = frenteTextW;
   if (hasSym1) totalFrenteW += sym1Width + symGap;
   if (hasSym2) totalFrenteW += symGap + sym2Width;
+  const frontAreaWidth = getFrontMaxWidthSvg(sizeName);
+  const frontAreaLeft = frenteCX - Math.round(frontAreaWidth / 2);
+  const frontAreaRight = frenteCX + Math.round(frontAreaWidth / 2);
   const frenteGroupStart = frenteCX - Math.round(totalFrenteW / 2);
   // Offsets horizontais dos símbolos (mm → SVG units)
   const offsetSym1 = Math.round((order.offsetSimboloFrente || 0) * 100);
   const offsetSym2 = Math.round((order.offsetSimboloFrente2 || 0) * 100);
-  const sym1X = frenteGroupStart + offsetSym1;
   const textFrenteX =
     frenteGroupStart +
     (hasSym1 ? sym1Width + symGap : 0) +
     Math.round(frenteTextW / 2);
-  const sym2X =
-    textFrenteX + Math.round(frenteTextW / 2) + symGap + offsetSym2;
+  const frontTextLeft = textFrenteX - Math.round(frenteTextW / 2);
+  const frontTextRight = textFrenteX + Math.round(frenteTextW / 2);
+  const sym1X = hasSym1
+    ? clamp(
+        frenteGroupStart + offsetSym1,
+        frontAreaLeft,
+        frontTextLeft - symGap - sym1Width
+      )
+    : 0;
+  const sym2BaseX = frontTextRight + symGap;
+  const sym2X = hasSym2
+    ? clamp(sym2BaseX + offsetSym2, sym2BaseX, frontAreaRight - sym2Width)
+    : 0;
 
-  // Offset vertical de 0,7mm = 70 SVG units para centralizar textos corretamente
-  const textYOffset = 70;
-
-  // Frente text Y: mesmo padrão do verso (sem dominant-baseline)
-  const fontExtraOffset = getFontYOffset(
-    order.fonteFrente || "Segoe Print Negrito",
-    hasFrenteL2
+  const frontBaselines = getFrontTextBaselines(
+    frontFontName,
+    fontSize,
+    hasFrenteL2 ? 2 : 1,
+    frenteY,
+    rectH
   );
-  let frenteTextY1: number;
-  let frenteTextY2: number;
-  if (hasFrenteL2) {
-    frenteTextY1 = frenteY + Math.round(rectH * 0.30) + textYOffset + fontExtraOffset;
-    frenteTextY2 = frenteY + Math.round(rectH * 0.63) + textYOffset + fontExtraOffset;
-  } else {
-    frenteTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset + fontExtraOffset;
-    frenteTextY2 = 0;
-  }
+  const frenteTextY1 = frontBaselines[0];
+  const frenteTextY2 = frontBaselines[1] || 0;
 
   // ---- VERSO: símbolo + texto (1, 2 ou 3 linhas) ----
   const versoL1 = order.textoVerso || "";
@@ -243,36 +258,40 @@ export default function BraceletPreview({
   const hasVersoL3 = versoL3.length > 0;
   const hasSV = !!order.simboloVerso;
   const svSymWidth = hasSV ? getSymbolSize(order.simboloVerso!) : 0;
-  const versoTextW = estimateTextWidth(versoL1, versoFontSize);
+  const versoTextW = Math.max(
+    estimateStandardTextWidth(versoL1, versoFontSize),
+    estimateStandardTextWidth(versoL2, versoFontSize),
+    estimateStandardTextWidth(versoL3, versoFontSize)
+  );
   let totalVersoW = versoTextW;
   if (hasSV) totalVersoW += svSymWidth + symGap;
+  const versoAreaWidth = getVersoMaxWidthSvg(sizeName);
+  const versoAreaLeft = versoCX - Math.round(versoAreaWidth / 2);
   const versoGroupStart = versoCX - Math.round(totalVersoW / 2);
   const offsetSymVerso = Math.round((order.offsetSimboloVerso || 0) * 100);
-  const symVX = versoGroupStart + offsetSymVerso;
   const textVersoX =
     versoGroupStart +
     (hasSV ? svSymWidth + symGap : 0) +
     Math.round(versoTextW / 2);
+  const versoTextLeft = textVersoX - Math.round(versoTextW / 2);
+  const symVX = hasSV
+    ? clamp(
+        versoGroupStart + offsetSymVerso,
+        versoAreaLeft,
+        versoTextLeft - symGap - svSymWidth
+      )
+    : 0;
 
   const versoLines = hasVersoL3 ? 3 : hasVersoL2 ? 2 : 1;
-  let versoTextY1: number;
-  let versoTextY2: number;
-  let versoTextY3: number;
-  // threeLineOffset será definido abaixo, mas precisamos do valor aqui também
-  const versoThreeLineOffset = 50;
-  if (versoLines === 3) {
-    versoTextY1 = frenteY + Math.round(rectH * 0.25) + textYOffset + versoThreeLineOffset;
-    versoTextY2 = frenteY + Math.round(rectH * 0.50) + textYOffset + versoThreeLineOffset;
-    versoTextY3 = frenteY + Math.round(rectH * 0.75) + textYOffset + versoThreeLineOffset;
-  } else if (versoLines === 2) {
-    versoTextY1 = frenteY + Math.round(rectH * 0.38) + textYOffset;
-    versoTextY2 = frenteY + Math.round(rectH * 0.72) + textYOffset;
-    versoTextY3 = 0;
-  } else {
-    versoTextY1 = frenteY + Math.round(rectH * 0.58) + textYOffset;
-    versoTextY2 = 0;
-    versoTextY3 = 0;
-  }
+  const versoBaselines = getStandardTextBaselines(
+    versoFontSize,
+    versoLines,
+    frenteY,
+    rectH
+  );
+  const versoTextY1 = versoBaselines[0];
+  const versoTextY2 = versoBaselines[1] || 0;
+  const versoTextY3 = versoBaselines[2] || 0;
 
   // ---- DENTRO: centralizado se 1 linha ----
   const dentro1CX = Math.round(frenteX + rectW / 2);
@@ -283,39 +302,31 @@ export default function BraceletPreview({
   const hasD2L2 = (order.l2Dentro2 || "").length > 0;
   const hasD2L3 = (order.l3Dentro2 || "").length > 0;
 
+  const insideAreaWidth = getDentroMaxWidthSvg(sizeName);
+  const inside1AreaLeft = dentro1CX - Math.round(insideAreaWidth / 2);
+  const inside2AreaLeft = dentro2CX - Math.round(insideAreaWidth / 2);
+
   const d1Lines = hasD1L3 ? 3 : hasD1L2 ? 2 : 1;
-  let d1Y1: number, d1Y2: number, d1Y3: number;
-  // +50 SVG units (0.5mm) para baixo quando 3 linhas para centralizar na altura
-  const threeLineOffset = 50;
-  if (d1Lines === 3) {
-    d1Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset + threeLineOffset;
-    d1Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset + threeLineOffset;
-    d1Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset + threeLineOffset;
-  } else if (d1Lines === 2) {
-    d1Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
-    d1Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
-    d1Y3 = 0;
-  } else {
-    d1Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
-    d1Y2 = 0;
-    d1Y3 = 0;
-  }
+  const d1Baselines = getStandardTextBaselines(
+    inside1FontSize,
+    d1Lines,
+    dentroY,
+    rectH
+  );
+  const d1Y1 = d1Baselines[0];
+  const d1Y2 = d1Baselines[1] || 0;
+  const d1Y3 = d1Baselines[2] || 0;
 
   const d2Lines = hasD2L3 ? 3 : hasD2L2 ? 2 : 1;
-  let d2Y1: number, d2Y2: number, d2Y3: number;
-  if (d2Lines === 3) {
-    d2Y1 = dentroY + Math.round(rectH * 0.25) + textYOffset + threeLineOffset;
-    d2Y2 = dentroY + Math.round(rectH * 0.50) + textYOffset + threeLineOffset;
-    d2Y3 = dentroY + Math.round(rectH * 0.75) + textYOffset + threeLineOffset;
-  } else if (d2Lines === 2) {
-    d2Y1 = dentroY + Math.round(rectH * 0.38) + textYOffset;
-    d2Y2 = dentroY + Math.round(rectH * 0.72) + textYOffset;
-    d2Y3 = 0;
-  } else {
-    d2Y1 = dentroY + Math.round(rectH * 0.58) + textYOffset;
-    d2Y2 = 0;
-    d2Y3 = 0;
-  }
+  const d2Baselines = getStandardTextBaselines(
+    inside2FontSize,
+    d2Lines,
+    dentroY,
+    rectH
+  );
+  const d2Y1 = d2Baselines[0];
+  const d2Y2 = d2Baselines[1] || 0;
+  const d2Y3 = d2Baselines[2] || 0;
 
   return (
     <svg
@@ -402,7 +413,13 @@ export default function BraceletPreview({
       {isGradient && (
         <defs>
           {order.cor === "Colorido" && (
-            <linearGradient id="coloridoGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+            <linearGradient
+              id="coloridoGrad"
+              x1="0%"
+              y1="50%"
+              x2="100%"
+              y2="50%"
+            >
               <stop offset="0" stopColor="#FCDA11" />
               <stop offset="0.2" stopColor="#00A6D6" />
               <stop offset="0.729" stopColor="#FF0099" />
@@ -440,7 +457,9 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={gradientFill}
-        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
+        {...(order.cor === "Branco"
+          ? { stroke: "#CCCCCC", strokeWidth: 20 }
+          : {})}
       />
       <rect
         id={`${prefix}verso`}
@@ -449,7 +468,9 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={gradientFill}
-        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
+        {...(order.cor === "Branco"
+          ? { stroke: "#CCCCCC", strokeWidth: 20 }
+          : {})}
       />
 
       {/* FRENTE: símbolo1 + texto + símbolo2 */}
@@ -458,7 +479,10 @@ export default function BraceletPreview({
           symbolId={order.simboloFrente!}
           braceletColor={order.cor}
           x={sym1X}
-          y={frenteY + Math.round((rectH - sym1Width) / 2)}
+          y={
+            frenteY +
+            Math.round((rectH - getTargetHeight(order.simboloFrente!)) / 2)
+          }
           size={sym1Width}
         />
       )}
@@ -495,7 +519,10 @@ export default function BraceletPreview({
           symbolId={order.simboloFrente2!}
           braceletColor={order.cor}
           x={sym2X}
-          y={frenteY + Math.round((rectH - sym2Width) / 2)}
+          y={
+            frenteY +
+            Math.round((rectH - getTargetHeight(order.simboloFrente2!)) / 2)
+          }
           size={sym2Width}
         />
       )}
@@ -506,7 +533,10 @@ export default function BraceletPreview({
           symbolId={order.simboloVerso!}
           braceletColor={order.cor}
           x={symVX}
-          y={frenteY + Math.round((rectH - svSymWidth) / 2)}
+          y={
+            frenteY +
+            Math.round((rectH - getTargetHeight(order.simboloVerso!)) / 2)
+          }
           size={svSymWidth}
         />
       )}
@@ -573,7 +603,9 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={gradientFill}
-        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
+        {...(order.cor === "Branco"
+          ? { stroke: "#CCCCCC", strokeWidth: 20 }
+          : {})}
       />
       <rect
         id={`${prefix}dentro2`}
@@ -582,7 +614,9 @@ export default function BraceletPreview({
         width={rectW}
         height={rectH}
         fill={gradientFill}
-        {...(order.cor === "Branco" ? { stroke: "#CCCCCC", strokeWidth: 20 } : {})}
+        {...(order.cor === "Branco"
+          ? { stroke: "#CCCCCC", strokeWidth: 20 }
+          : {})}
       />
 
       {/* DENTRO1: símbolo WhatsApp (opcional) + 1 ou 2 linhas */}
@@ -591,20 +625,32 @@ export default function BraceletPreview({
         const hasD1Text = (order.l1Dentro1 || "").length > 0;
         if (hasSD1 && hasD1Text) {
           const sd1Width = getSymbolSize(order.simboloDentro1!);
-          const d1TextW1 = estimateTextWidth(order.l1Dentro1, inside1FontSize);
-          const d1TextW2 = hasD1L2 ? estimateTextWidth(order.l2Dentro1, inside1FontSize) : 0;
-          const d1MaxTextW = Math.max(d1TextW1, d1TextW2);
+          const d1TextW1 = estimateStandardTextWidth(
+            order.l1Dentro1,
+            inside1FontSize
+          );
+          const d1TextW2 = estimateStandardTextWidth(
+            order.l2Dentro1,
+            inside1FontSize
+          );
+          const d1TextW3 = estimateStandardTextWidth(
+            order.l3Dentro1 || "",
+            inside1FontSize
+          );
+          const d1MaxTextW = Math.max(d1TextW1, d1TextW2, d1TextW3);
           const totalD1W = sd1Width + dentroSymGap + d1MaxTextW;
-          let d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
-          // Clamp: símbolo não pode sair do retângulo (mínimo = frenteX + margem 1cm)
-          const d1MinX = frenteX + 1000;
-          if (d1GroupStart < d1MinX) d1GroupStart = d1MinX;
+          const d1GroupStart = dentro1CX - Math.round(totalD1W / 2);
           const offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
-          const sd1X = d1GroupStart + offsetD1;
+          const d1TextX =
+            d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
+          const d1TextLeft = d1TextX - Math.round(d1MaxTextW / 2);
+          const sd1X = clamp(
+            d1GroupStart + offsetD1,
+            inside1AreaLeft,
+            d1TextLeft - dentroSymGap - sd1Width
+          );
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
-          // Texto centralizado no espaço do texto (logo após o símbolo, dentro do grupo)
-          const d1TextX = d1GroupStart + sd1Width + dentroSymGap + Math.round(d1MaxTextW / 2);
           return (
             <>
               <SymbolGroup
@@ -654,15 +700,19 @@ export default function BraceletPreview({
                   xmlSpace="preserve"
                   style={{ whiteSpace: "pre" }}
                 >
-                 {order.l3Dentro1}
-               </text>
-             )}
-           </>
-         );
+                  {order.l3Dentro1}
+                </text>
+              )}
+            </>
+          );
         } else if (hasSD1 && !hasD1Text) {
           const sd1Width = getSymbolSize(order.simboloDentro1!);
           const offsetD1 = Math.round((order.offsetSimboloDentro1 || 0) * 100);
-          const sd1X = dentro1CX - Math.round(sd1Width / 2) + offsetD1;
+          const sd1X = clamp(
+            dentro1CX - Math.round(sd1Width / 2) + offsetD1,
+            inside1AreaLeft,
+            inside1AreaLeft + insideAreaWidth - sd1Width
+          );
           const sd1TargetH = getTargetHeight(order.simboloDentro1!);
           const sd1Y = dentroY + Math.round((rectH - sd1TargetH) / 2);
           return (
@@ -731,20 +781,32 @@ export default function BraceletPreview({
         const hasD2Text = (order.l1Dentro2 || "").length > 0;
         if (hasSD2 && hasD2Text) {
           const sd2Width = getSymbolSize(order.simboloDentro2!);
-          const d2TextW1 = estimateTextWidth(order.l1Dentro2, inside2FontSize);
-          const d2TextW2 = hasD2L2 ? estimateTextWidth(order.l2Dentro2, inside2FontSize) : 0;
-          const d2MaxTextW = Math.max(d2TextW1, d2TextW2);
+          const d2TextW1 = estimateStandardTextWidth(
+            order.l1Dentro2,
+            inside2FontSize
+          );
+          const d2TextW2 = estimateStandardTextWidth(
+            order.l2Dentro2,
+            inside2FontSize
+          );
+          const d2TextW3 = estimateStandardTextWidth(
+            order.l3Dentro2 || "",
+            inside2FontSize
+          );
+          const d2MaxTextW = Math.max(d2TextW1, d2TextW2, d2TextW3);
           const totalD2W = sd2Width + dentroSymGap + d2MaxTextW;
-          let d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
-          // Clamp: símbolo não pode sair do retângulo (mínimo = versoX + margem 1cm)
-          const d2MinX = versoX + 1000;
-          if (d2GroupStart < d2MinX) d2GroupStart = d2MinX;
+          const d2GroupStart = dentro2CX - Math.round(totalD2W / 2);
           const offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
-          const sd2X = d2GroupStart + offsetD2;
+          const d2TextX =
+            d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
+          const d2TextLeft = d2TextX - Math.round(d2MaxTextW / 2);
+          const sd2X = clamp(
+            d2GroupStart + offsetD2,
+            inside2AreaLeft,
+            d2TextLeft - dentroSymGap - sd2Width
+          );
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
-          // Texto centralizado no espaço do texto (logo após o símbolo, dentro do grupo)
-          const d2TextX = d2GroupStart + sd2Width + dentroSymGap + Math.round(d2MaxTextW / 2);
           return (
             <>
               <SymbolGroup
@@ -794,15 +856,19 @@ export default function BraceletPreview({
                   xmlSpace="preserve"
                   style={{ whiteSpace: "pre" }}
                 >
-                 {order.l3Dentro2}
-               </text>
-             )}
-           </>
-         );
+                  {order.l3Dentro2}
+                </text>
+              )}
+            </>
+          );
         } else if (hasSD2 && !hasD2Text) {
           const sd2Width = getSymbolSize(order.simboloDentro2!);
           const offsetD2 = Math.round((order.offsetSimboloDentro2 || 0) * 100);
-          const sd2X = dentro2CX - Math.round(sd2Width / 2) + offsetD2;
+          const sd2X = clamp(
+            dentro2CX - Math.round(sd2Width / 2) + offsetD2,
+            inside2AreaLeft,
+            inside2AreaLeft + insideAreaWidth - sd2Width
+          );
           const sd2TargetH = getTargetHeight(order.simboloDentro2!);
           const sd2Y = dentroY + Math.round((rectH - sd2TargetH) / 2);
           return (

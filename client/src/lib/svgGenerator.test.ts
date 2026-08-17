@@ -29,14 +29,15 @@ describe("generateBraceletSVG", () => {
     const svg = generateBraceletSVG(createOrder({ simboloDentro1: "68" }));
 
     expect(svg).toContain('transform="translate(');
-    expect(svg).toContain(',7831.00) scale(1.000000)');
+    expect(svg).toContain(",7831.00) scale(1.000000)");
   });
 
   it("compensa a métrica vertical da Milky Matcha em duas linhas", () => {
     const svg = generateBraceletSVG(createOrder());
 
-    expect(svg).toContain('y="5927"');
-    expect(svg).toContain('y="6323"');
+    expect(svg).toContain('y="5825"');
+    expect(svg).toContain('y="6342"');
+    expect(svg).toContain('font-size="420" font-family="Milky Matcha"');
   });
 
   it("compensa a métrica vertical da Segoe Print em duas linhas", () => {
@@ -44,9 +45,19 @@ describe("generateBraceletSVG", () => {
       createOrder({ fonteFrente: "Segoe Print Negrito" })
     );
 
-    expect(svg).toContain('y="5797"');
-    expect(svg).toContain('y="6193"');
-    expect(svg).toContain('font-size="546" font-family="Segoe Print"');
+    expect(svg).toContain('y="5747"');
+    expect(svg).toContain('y="6322"');
+    expect(svg).toContain('font-size="500" font-family="Segoe Print"');
+  });
+
+  it("centraliza a Kids Station e mantém espaço entre duas linhas", () => {
+    const svg = generateBraceletSVG(
+      createOrder({ fonteFrente: "Kids Station" })
+    );
+
+    expect(svg).toContain('y="5805"');
+    expect(svg).toContain('y="6309"');
+    expect(svg).toContain('font-size="560" font-family="Kids Station"');
   });
 
   it("mantém o tamanho original da Segoe Print quando há uma linha", () => {
@@ -55,5 +66,13 @@ describe("generateBraceletSVG", () => {
     );
 
     expect(svg).toContain('font-size="635" font-family="Segoe Print"');
+  });
+
+  it("centraliza um símbolo largo na frente pela altura renderizada", () => {
+    const svg = generateBraceletSVG(
+      createOrder({ simboloFrente: "68", l2Frente: "" })
+    );
+
+    expect(svg).toContain(",5492.00) scale(1.000000)");
   });
 });
