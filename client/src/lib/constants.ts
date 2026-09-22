@@ -2,7 +2,9 @@
 // Pulseira Maker - Constantes do Sistema
 // Design: Industrial Workshop
 // ========================================
-import { EXTRA_SYMBOLS } from "./symbolsData.ts";
+import { EXTRA_SYMBOLS as EXISTING_SYMBOLS } from "./symbolsData.ts";
+import { USA_SYMBOL } from "./usaSymbol";
+const EXTRA_SYMBOLS = [...EXISTING_SYMBOLS, USA_SYMBOL];
 
 export interface BraceletColor {
   name: string;
